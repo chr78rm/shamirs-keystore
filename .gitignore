@@ -1,0 +1,7 @@
+*.log
+target
+.idea/
+shamirs-keystore/json/**/*.json
+shamirs-secret-sharing/json/**/*.json
+!shamirs-secret-sharing/json/jws/secret-share.json
+shamirs-secret-sharing/json/jws/encoded-secret-share.txt

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<TraceConfig xmlns="http://www.christofreichardt.de/java/tracer">
+	<Pool>
+		<TraceLogger name="MySuitesTracer"
+			class="de.christofreichardt.diagnosis.file.FileTracer">
+			<LogDir>./log/</LogDir>
+			<AutoFlush>true</AutoFlush>
+			<BufSize>1024</BufSize>
+			<Limit>1048576</Limit>
+		</TraceLogger>
+		<TraceLogger name="TestTracer"
+			class="de.christofreichardt.diagnosis.file.FileTracer">
+			<LogDir>./log/</LogDir>
+			<AutoFlush>true</AutoFlush>
+			<BufSize>1024</BufSize>
+			<Limit>1048576</Limit>
+			<Context>
+				<Thread name="main">
+					<Online>true</Online>
+					<DebugLevel>10</DebugLevel>
+				</Thread>
+			</Context>
+		</TraceLogger>
+	</Pool>
+	<DefaultTracer class="de.christofreichardt.diagnosis.JDKLoggingRouter" />
+	<Map>
+		<Threads>
+			<Thread name="main">
+				<TraceLogger ref="TestTracer" />
+			</Thread>
+		</Threads>
+	</Map>
+</TraceConfig>
