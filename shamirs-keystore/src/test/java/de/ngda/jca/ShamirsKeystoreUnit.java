@@ -1,32 +1,31 @@
 package de.ngda.jca;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
-import scala.Predef;
-import scala.collection.Iterable;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import scala.collection.JavaConverters;
-import scala.collection.immutable.IndexedSeq;
-import scala.collection.mutable.Buffer;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShamirsKeystoreUnit implements Traceable {
@@ -59,7 +58,7 @@ public class ShamirsKeystoreUnit implements Traceable {
 			tracer.wayout();
 		}
 	}
-	
+
 	@Test
 	@DisplayName("SecretMerging-1")
 	void secretMerging_1() {
@@ -70,8 +69,7 @@ public class ShamirsKeystoreUnit implements Traceable {
 			List<Path> paths = new ArrayList<>();
 			paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-1.json"));
 			paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-2.json"));
-			Iterable<Path> iterable = JavaConverters.collectionAsScalaIterable(paths);
-			SecretMerging secretMerging = SecretMerging.apply(iterable);
+			SecretMerging secretMerging = SecretMerging.apply(JavaConverters.collectionAsScalaIterable(paths));
 			
 			tracer.out().printfIndentln("secretMerging.secretBytes() = (%s)", secretMerging.secretBytes().mkString(","));
 		} finally {
@@ -117,6 +115,36 @@ public class ShamirsKeystoreUnit implements Traceable {
 			Path[] paths_3 = {Paths.get("json", "roundtrip-2", "partition-1.json")};
 			Throwable catched = catchThrowable(() -> SecretMerging.apply(paths_3).password());
 			assertThat(catched).isInstanceOf(IllegalArgumentException.class);
+		} finally {
+			tracer.wayout();
+		}
+	}
+
+	@Test
+	@DisplayName("KeyStore-1")
+	void keyStore_1() throws GeneralSecurityException, IOException {
+		AbstractTracer tracer = getCurrentTracer();
+		tracer.entry("void", this, "keyStore_1()");
+
+		try {
+			String myPassword = "Super-sicheres-Passwort";
+			final int SHARES = 8;
+			final int THRESHOLD = 4;
+			SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword.getBytes(StandardCharsets.UTF_8));
+			final int[] SIZES = {4,2,2};
+			secretSharing.savePartition(SIZES, Paths.get("json", "keystore-1", "partition"));
+			Path[] paths_1 = {Paths.get("json", "keystore-1", "partition-0.json")};
+			File keyStoreFile = Paths.get("pkcs12", "my-keystore-1.p12").toFile();
+			ShamirsProtection shamirsProtection = new ShamirsProtection(paths_1);
+			ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
+			KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(Provider.NAME));
+			keyStore.load(shamirsLoadParameter);
+			Enumeration<String> aliases = keyStore.aliases();
+			while (aliases.hasMoreElements()) {
+				String alias = aliases.nextElement();
+				KeyStore.Entry entry = keyStore.getEntry(alias, new KeyStore.PasswordProtection(shamirsProtection.getPassword()));
+				tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
+			}
 		} finally {
 			tracer.wayout();
 		}
