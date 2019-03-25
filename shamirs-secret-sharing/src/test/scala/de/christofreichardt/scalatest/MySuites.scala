@@ -2,16 +2,10 @@ package de.christofreichardt.scalatest
 
 import java.io.File
 
-import org.scalatest.Args
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.SequentialNestedSuiteExecution
-import org.scalatest.Status
-import org.scalatest.Suites
-
+import org.scalatest._
 import de.christofreichardt.diagnosis.AbstractTracer
 import de.christofreichardt.diagnosis.TracerFactory
 import de.christofreichardt.scala.diagnosis.Tracing
-import org.scalatest.Suite
 
 class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with BeforeAndAfterAll with SequentialNestedSuiteExecution {
 
@@ -23,9 +17,14 @@ class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with Befo
     tracer.initCurrentTracingContext(5, true)
     try {
       withTracer("Status", this, "run(testName: Option[String], args: Args)") {
+        val myReporter = new MyReporter(args.reporter)
+        val myArgs = new Args(myReporter, args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
+          args.distributedTestSorter, args.distributedSuiteSorter)
         tracer.out().printfIndentln("testName = %s", testName)
-        tracer.out().printfIndentln("args = %s", args)
-        super.run(testName, args)
+        tracer.out().printfIndentln("myArgs = %s", myArgs)
+        val status = super.run(testName, myArgs)
+        tracer.out().printfIndentln("myReporter.succeeded = %d", myReporter.succeeded: java.lang.Integer)
+        status
       }
     } finally {
       tracer.close()

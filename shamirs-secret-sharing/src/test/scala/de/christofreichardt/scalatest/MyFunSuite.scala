@@ -17,7 +17,7 @@ import org.scalatest.events.Event
 /**
  * @author Christof Reichardt
  */
-class MyFunSuite extends FunSuite with Tracing with BeforeAndAfterAll with BeforeAndAfter with Reporter {
+class MyFunSuite extends FunSuite with Tracing with BeforeAndAfterAll with BeforeAndAfter {
 
   override def run(testName: Option[String], args: Args): Status = {
     printf("%s.run%n", this.getClass().getSimpleName())
@@ -43,10 +43,10 @@ class MyFunSuite extends FunSuite with Tracing with BeforeAndAfterAll with Befor
     withTracer("Status", this, "runTest(testName: String, args: Args)") {
       tracer.logMessage(LogLevel.INFO, testName + " started ...", getClass(), "runTest(testName: String, args: Args)")
       tracer.out().printfIndentln("testName = %s", testName)
-      val myArgs = new Args(new MyReporter(args.reporter), args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
-          args.distributedTestSorter, args.distributedSuiteSorter)
-      tracer.out().printfIndentln("args = %s", myArgs)
-      super.runTest(testName, myArgs)
+//      val myArgs = new Args(new MyReporter(args.reporter), args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
+//          args.distributedTestSorter, args.distributedSuiteSorter)
+      tracer.out().printfIndentln("args = %s", args)
+      super.runTest(testName, args)
     }
   }
   
@@ -54,11 +54,6 @@ class MyFunSuite extends FunSuite with Tracing with BeforeAndAfterAll with Befor
     val tracer = getCurrentTracer
     withTracer("Unit", this, "afterAll()") {
     }
-  }
-  
-  override def apply(event: Event): Unit = {
-    val tracer = getCurrentTracer
-    tracer.out().printfIndentln("event = %s", event)
   }
   
   override def getCurrentTracer(): AbstractTracer = {
