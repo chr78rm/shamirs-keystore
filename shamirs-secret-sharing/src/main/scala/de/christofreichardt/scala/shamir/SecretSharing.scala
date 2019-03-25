@@ -4,19 +4,22 @@ import java.nio.file.Path
 import java.security.SecureRandom
 import java.util.UUID
 
+import de.christofreichardt.scala.algorithms.BinomialCombinator
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import javax.json.{Json, JsonObject}
 
 class SecretSharing(
-  val shares:      Int,
-  val threshold:   Int,
-  val secretBytes: IndexedSeq[Byte],
-  val random:      SecureRandom)
+                     val shares: Int,
+                     val threshold: Int,
+                     val secretBytes: IndexedSeq[Byte],
+                     val random: SecureRandom)
   extends Tracing {
 
   def this(secretBytes: IndexedSeq[Byte]) = this(6, 3, secretBytes, new SecureRandom)
+
   def this(shares: Int, threshold: Int, secretBytes: IndexedSeq[Byte]) = this(shares, threshold, secretBytes, new SecureRandom)
+
   def this(shares: Int, threshold: Int, secretBytes: Array[Byte]) = this(shares, threshold, secretBytes.toIndexedSeq, new SecureRandom)
 
   val n: Int = shares
@@ -28,6 +31,7 @@ class SecretSharing(
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
   val id: String = UUID.randomUUID().toString()
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
+  lazy val verified: Boolean = verifyAll
 
   require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
   require(k <= n, "The threshold must be less than or equal to the number of shares.")
@@ -52,6 +56,18 @@ class SecretSharing(
       .toIndexedSeq
   }
 
+  def verifyAll: Boolean = {
+    val binomialCombinator = new BinomialCombinator[Int](Range(0, n).toSet, k)
+    binomialCombinator.combinations
+      .map(combination => {
+        val indices = combination.toIndexedSeq
+        val selectedPoints = indices.map(index => sharePoints(index))
+        val merger = SecretMerging(selectedPoints, prime)
+        merger.secretBytes
+      })
+      .forall(bytes => bytes == secretBytes)
+  }
+
   def sharePointsAsJson(ps: IndexedSeq[(BigInt, BigInt)]): JsonObject = {
     val arrayBuilder = Json.createArrayBuilder()
     ps.foreach(ps => {
@@ -69,11 +85,11 @@ class SecretSharing(
   }
 
   /**
-   * Partitions the share points into disjunct sequences according to the given sizes.
-   *
-   * @param sizes denotes the sizes of the desired share point sequences
-   * @return a list of share point sequences
-   */
+    * Partitions the share points into disjunct sequences according to the given sizes.
+    *
+    * @param sizes denotes the sizes of the desired share point sequences
+    * @return a list of share point sequences
+    */
   def sharePointPartition(sizes: Iterable[Int]): List[IndexedSeq[(BigInt, BigInt)]] = {
     require(sizes.foldLeft(0)((s0, s1) => s0 + s1) == sharePoints.length, "Too few shares for given partition.")
     require(sizes.forall(s => s <= k), "A partition must not exceed the threshold.")
