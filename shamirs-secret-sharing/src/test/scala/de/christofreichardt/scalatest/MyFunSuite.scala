@@ -1,23 +1,15 @@
 package de.christofreichardt.scalatest
 
-import org.scalatest.Args
-import org.scalatest.BeforeAndAfter
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.Status
-
-import de.christofreichardt.diagnosis.AbstractTracer
-import de.christofreichardt.diagnosis.LogLevel
-import de.christofreichardt.diagnosis.TracerFactory
+import de.christofreichardt.diagnosis.{AbstractTracer, LogLevel, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
-import org.scalatest.Reporter
-import org.scalatest.events.Event
+import org.scalatest.{Args, BeforeAndAfter, BeforeAndAfterAll, Status}
+import org.scalatest.funsuite.AnyFunSuite
 
 
 /**
  * @author Christof Reichardt
  */
-class MyFunSuite extends FunSuite with Tracing with BeforeAndAfterAll with BeforeAndAfter {
+class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with BeforeAndAfter {
 
   override def run(testName: Option[String], args: Args): Status = {
     printf("%s.run%n", this.getClass().getSimpleName())

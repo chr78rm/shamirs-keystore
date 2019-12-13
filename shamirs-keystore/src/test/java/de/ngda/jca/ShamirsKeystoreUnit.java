@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import scala.collection.JavaConverters;
+import scala.jdk.CollectionConverters;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class ShamirsKeystoreUnit implements Traceable {
 			List<Path> paths = new ArrayList<>();
 			paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-1.json"));
 			paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-2.json"));
-			SecretMerging secretMerging = SecretMerging.apply(JavaConverters.collectionAsScalaIterable(paths));
+			SecretMerging secretMerging = SecretMerging.apply(CollectionConverters.ListHasAsScala(paths).asScala());
 			
 			tracer.out().printfIndentln("secretMerging.secretBytes() = (%s)", secretMerging.secretBytes().mkString(","));
 		} finally {
