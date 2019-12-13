@@ -43,6 +43,6 @@ package object shamir {
 
   def bigIntToBytes(s: BigInt): IndexedSeq[Byte] = {
     val paddedBytes = s.toByteArray
-    paddedBytes.tail
+    paddedBytes.tail.toIndexedSeq
   }
 }

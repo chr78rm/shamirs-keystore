@@ -4,9 +4,9 @@ import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
-import javax.json.Json
+import javax.json.{Json, JsonValue}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters
 
 class SecretMerging(
   val sharePoints: IndexedSeq[(BigInt, BigInt)],
@@ -32,7 +32,7 @@ object SecretMerging {
     val prime = jsonObject.getJsonNumber("Prime").bigIntegerValue()
     val threshold = jsonObject.getInt("Threshold")
     val sharePointsAsJson = jsonObject.getJsonArray("SharePoints")
-    val ps = sharePointsAsJson.iterator().asScala
+    val ps = CollectionConverters.IteratorHasAsScala(sharePointsAsJson.iterator()).asScala
       .map(sp => sp.asJsonObject().getJsonObject("SharePoint"))
       .map(sp => (BigInt(sp.getJsonNumber("x").bigIntegerValue()), BigInt(sp.getJsonNumber("y").bigIntegerValue())))
       .toIndexedSeq
@@ -47,7 +47,7 @@ object SecretMerging {
     val (prime, threshold) = jsonObjects.view.map(jsonObject => (BigInt(jsonObject.getJsonNumber("Prime").bigIntegerValue()), jsonObject.getInt("Threshold"))).head
     val ps = jsonObjects
       .map(jsonObject => jsonObject.getJsonArray("SharePoints"))
-      .flatMap(jsonArray => jsonArray.iterator().asScala)
+      .flatMap(jsonArray => CollectionConverters.IteratorHasAsScala(jsonArray.iterator()).asScala)
       .map(jsonValue => jsonValue.asJsonObject())
       .map(jsonObject => jsonObject.getJsonObject("SharePoint"))
       .map(sp => (BigInt(sp.getJsonNumber("x").bigIntegerValue()), BigInt(sp.getJsonNumber("y").bigIntegerValue())))

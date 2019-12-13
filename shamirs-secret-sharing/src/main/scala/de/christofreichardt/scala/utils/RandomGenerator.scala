@@ -1,9 +1,7 @@
 package de.christofreichardt.scala.utils
 
-import scala.BigInt
-import scala.Stream
-import scala.util.Random
 import scala.annotation.tailrec
+import scala.util.Random
 
 /**
  * @author Christof Reichardt
@@ -13,12 +11,12 @@ class RandomGenerator(secureRandom: java.security.SecureRandom) {
   
   def this() = this(new java.security.SecureRandom)
   
-  final def bigIntStream(numberOfBits: Int, p: BigInt): Stream[BigInt] = {
+  final def bigIntStream(numberOfBits: Int, p: BigInt): LazyList[BigInt] = {
     val next = BigInt(numberOfBits, random).mod(p)
-    Stream.cons(next, bigIntStream(numberOfBits, p))
+    LazyList.cons(next, bigIntStream(numberOfBits, p))
   }
   
-  final def distinctBigIntStream(numberOfBits: Int, p: BigInt, consumedSet: Set[BigInt]): Stream[BigInt] = {
+  final def distinctBigIntStream(numberOfBits: Int, p: BigInt, consumedSet: Set[BigInt]): LazyList[BigInt] = {
     val MAX_DEPTH = 100
     @tailrec
     def findNextBigInt(i: Int): BigInt = {
@@ -28,30 +26,30 @@ class RandomGenerator(secureRandom: java.security.SecureRandom) {
       else findNextBigInt(i + 1)
     }
     val next = findNextBigInt(0)
-    Stream.cons(next, distinctBigIntStream(numberOfBits, p, consumedSet + next))
+    LazyList.cons(next, distinctBigIntStream(numberOfBits, p, consumedSet + next))
   }
   
-  final def bigIntStream(numberOfBits: Int): Stream[BigInt] = {
+  final def bigIntStream(numberOfBits: Int): LazyList[BigInt] = {
     val next = BigInt(numberOfBits, random)
-    Stream.cons(next, bigIntStream(numberOfBits))
+    LazyList.cons(next, bigIntStream(numberOfBits))
   }
   
-  final def bigPrimeStream(numberOfBits: Int, certainty: Int): Stream[BigInt] = {
+  final def bigPrimeStream(numberOfBits: Int, certainty: Int): LazyList[BigInt] = {
     val next = BigInt(numberOfBits, certainty, random)
-    Stream.cons(next, bigPrimeStream(numberOfBits, certainty))
+    LazyList.cons(next, bigPrimeStream(numberOfBits, certainty))
   }
   
-  final def bitStream: Stream[Boolean] = {
+  final def bitStream: LazyList[Boolean] = {
     val next = this.random.nextBoolean()
-    Stream.cons(next, bitStream)
+    LazyList.cons(next, bitStream)
   }
   
-  final def intStream(upperLimit: Int): Stream[Int] = {
+  final def intStream(upperLimit: Int): LazyList[Int] = {
     val next = this.random.nextInt(upperLimit)
-    Stream.cons(next, intStream(upperLimit))
+    LazyList.cons(next, intStream(upperLimit))
   }
   
-  final def distinctIntStream(upperLimit: Int, consumedSet: Set[Int]): Stream[Int] = {
+  final def distinctIntStream(upperLimit: Int, consumedSet: Set[Int]): LazyList[Int] = {
     @tailrec
     def findNextInt: Int = {
       if (consumedSet.size == upperLimit) throw new NoSuchElementException
@@ -60,12 +58,12 @@ class RandomGenerator(secureRandom: java.security.SecureRandom) {
       else findNextInt
     }
     val next = findNextInt
-    Stream.cons(next, distinctIntStream(upperLimit, consumedSet + next))
+    LazyList.cons(next, distinctIntStream(upperLimit, consumedSet + next))
   }
   
-  final def byteStream: Stream[Byte] = {
+  final def byteStream: LazyList[Byte] = {
     val next = new Array[Byte](1)
     this.random.nextBytes(next)
-    Stream.cons(next(0), byteStream)
+    LazyList.cons(next(0), byteStream)
   }
 }

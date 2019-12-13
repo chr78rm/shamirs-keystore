@@ -27,9 +27,9 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
-		<scala.version>2.12.8</scala.version>
-		<scalatest.version>3.0.5</scalatest.version>
-		<scala-maven-plugin.version>3.3.2</scala-maven-plugin.version>
+		<scala.version>2.13.1</scala.version>
+		<scalatest.version>3.1.0</scalatest.version>
+		<scala-maven-plugin.version>4.3.0</scala-maven-plugin.version>
 		<maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.0.0</scalatest-maven-plugin.version>
 		<javax.json.version>1.1.4</javax.json.version>
@@ -48,7 +48,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.12</artifactId>
+			<artifactId>scalatest_2.13</artifactId>
 			<version>${scalatest.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -80,6 +80,10 @@
 							<goal>testCompile</goal>
 						</goals>
 						<configuration>
+							<scalaVersion>${scala.version}</scalaVersion>
+							<args>
+								<arg>-deprecation</arg>
+							</args>
 						</configuration>
 					</execution>
 				</executions>
