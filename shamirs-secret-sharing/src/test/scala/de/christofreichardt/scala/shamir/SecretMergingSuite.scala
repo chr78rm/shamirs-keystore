@@ -164,4 +164,33 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
     assert(secretSharing.verified)
   }
+
+  testWithTracing(this, "Exhaustive-Verification-2") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 6
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
+    assert(secretSharing.verified)
+  }
+
+//
+// Takes several minutes to complete.
+//
+//  testWithTracing(this, "Exhaustive-Verification-3") {
+//    val tracer = getCurrentTracer()
+//    val SECRET_SIZE = 16 // Bytes
+//    val SHARES = 16
+//    val THRESHOLD = 8
+//    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+//    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+//    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+//    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+//    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
+//    assert(secretSharing.verified)
+//  }
 }

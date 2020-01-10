@@ -4,7 +4,7 @@ import java.nio.file.Path
 import java.security.SecureRandom
 import java.util.UUID
 
-import de.christofreichardt.scala.algorithms.BinomialCombinator
+import de.christofreichardt.scala.combinations.BinomialCombinator
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import javax.json.{Json, JsonObject}
@@ -57,8 +57,8 @@ class SecretSharing(
   }
 
   def verifyAll: Boolean = {
-    val binomialCombinator = new BinomialCombinator[Int](Range(0, n).toSet, k)
-    binomialCombinator.combinations
+    val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, n), k)
+    combinator.solutions
       .map(combination => {
         val indices = combination.toIndexedSeq
         val selectedPoints = indices.map(index => sharePoints(index))

@@ -1,9 +1,8 @@
 package de.christofreichardt.scala.shamir
 
-import de.christofreichardt.scala.algorithms.BinomialCombinatorSuite
-import de.christofreichardt.scalatest.MySuites
-import de.christofreichardt.scalatest.MyDummySuite
+import de.christofreichardt.scala.combinations.BinomialCombinatorSuite
 import de.christofreichardt.scala.jws.JsonWebSignatureSuite
+import de.christofreichardt.scalatest.{MyDummySuite, MySuites}
 
 class ShamirSuites extends MySuites(
     new MyDummySuite(),
