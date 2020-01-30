@@ -6,7 +6,7 @@ import java.security.ProviderException;
 public final class Provider extends java.security.Provider {
 
 	private static final long serialVersionUID = 1L;
-	public static final String NAME = "NGDA Crypto Lib";
+	public static final String NAME = "Christofs Crypto Lib";
 
 	public Provider() {
 		super(NAME, "0.0.1", "A pkcs12 KeyStore implementation which supports shared passwords.");

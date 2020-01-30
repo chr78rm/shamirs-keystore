@@ -6,7 +6,7 @@
 
 	<parent>
 		<artifactId>crypto-lib</artifactId>
-		<groupId>de.ngda</groupId>
+		<groupId>de.christofreichardt</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 

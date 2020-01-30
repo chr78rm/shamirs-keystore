@@ -6,10 +6,11 @@
 
     <parent>
         <artifactId>crypto-lib</artifactId>
-        <groupId>de.ngda</groupId>
+        <groupId>de.christofreichardt</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <groupId>de.christofreichardt</groupId>
     <artifactId>shamirs-keystore</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
