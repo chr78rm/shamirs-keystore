@@ -1,4 +1,4 @@
-package de.ngda.jca;
+package de.christofreichardt.jca;
 
 import java.io.FileInputStream;
 import java.io.IOException;

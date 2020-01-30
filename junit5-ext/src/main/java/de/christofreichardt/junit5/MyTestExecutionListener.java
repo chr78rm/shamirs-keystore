@@ -28,7 +28,7 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 		try {
 			TracerFactory.getInstance().reset();
 			InputStream resourceAsStream = MyTestExecutionListener.class.getClassLoader()
-					.getResourceAsStream("de/ngda/jca/trace-config.xml");
+					.getResourceAsStream("de/christofreichardt/jca/trace-config.xml");
 			if (resourceAsStream != null) {
 				TracerFactory.getInstance().readConfiguration(resourceAsStream);
 			}

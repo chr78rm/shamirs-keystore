@@ -1,4 +1,4 @@
-package de.ngda.jca;
+package de.christofreichardt.jca;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.ProviderException;
@@ -10,7 +10,7 @@ public final class Provider extends java.security.Provider {
 
 	public Provider() {
 		super(NAME, "0.0.1", "A pkcs12 KeyStore implementation which supports shared passwords.");
-		put("KeyStore.ShamirsKeystore", "de.ngda.jca.ShamirsKeystore");
+		put("KeyStore.ShamirsKeystore", "de.christofreichardt.jca.ShamirsKeystore");
 	}
 
 	private static final class ProviderService extends Provider.Service {

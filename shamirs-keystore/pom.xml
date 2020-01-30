@@ -39,9 +39,9 @@
                 <version>3.0.0-M3</version>
                 <configuration>
                     <includes>
-                        <include>de/ngda/jca/ShamirsKeystoreUnit.java</include>
+                        <include>de/christofreichardt/jca/ShamirsKeystoreUnit.java</include>
                     </includes>
-                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.ngda.jca/de.ngda.jca=ALL-UNNAMED</argLine>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
         </plugins>

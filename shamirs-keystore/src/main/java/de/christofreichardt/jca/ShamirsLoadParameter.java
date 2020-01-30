@@ -1,7 +1,6 @@
-package de.ngda.jca;
+package de.christofreichardt.jca;
 
 import java.io.File;
-import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.ProtectionParameter;
 
