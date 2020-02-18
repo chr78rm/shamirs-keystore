@@ -9,14 +9,29 @@
         width: 80%; border-style: outset; border-width: 1px; border-radius: 3px; border-color: rgb(224,224,224); margin-left: auto; margin-right: auto;
         padding-left: 1em; padding-right: 1em; padding-top: 0.25em; padding-bottom: 0.25em; background-color: rgb(224,224,224)
       }
-      p.headline {
+      p.headline-0 {
         background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em
+      }
+      p.headline-1 {
+        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em
+      }
+      p.section {
+        color: rgb(26,26,26); font-family: 'Crimson Text', serif; text-align: justify
       }
     </style>
   </head>
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
-      <p class="headline">Shamir's Keystore</p>
+      <p class="headline-0">Shamir's Keystore</p>
+      <p class="headline-1">Abstract</p>
+      <p class="section">
+        This maven multi module project presently implements <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
+        Newton's Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
+        as defined by the <a href="https://docs.oracle.com/en/java/javase/11/security/howtoimplaprovider.html">Java Cryptographic Architecture</a> is provided. Such a keystore instance might 
+        be unlocked - apart from the master password - by a previously computed subset of secret shares. In order to be able to reconstruct the master password a certain number of secret shares 
+        above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
+        password with fewer shares as defined by the given threshold. In this way, it is possible to enforce the e.g. the four-eye-principle.
+      </p>
     </div>
   </body>
 </html>
