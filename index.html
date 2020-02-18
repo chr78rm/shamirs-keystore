@@ -18,6 +18,9 @@
       p.section {
         color: rgb(26,26,26); font-family: 'Crimson Text', serif; text-align: justify
       }
+      hr {
+        color: rgb()
+      }
     </style>
   </head>
   <body style="background-color: rgb(255,255,255)">
@@ -25,13 +28,17 @@
       <p class="headline-0">Shamir's Keystore</p>
       <p class="headline-1">Abstract</p>
       <p class="section">
-        This maven multi module project presently implements <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
+        This <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html">JCA provider</a> presently implements 
+        <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
         Newton's Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
         as defined by the <a href="https://docs.oracle.com/en/java/javase/11/security/howtoimplaprovider.html">Java Cryptographic Architecture</a> is provided. Such a keystore instance might 
         be unlocked - apart from the master password - by a previously computed subset of secret shares. In order to be able to reconstruct the master password a certain number of secret shares 
         above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
         password with fewer shares as defined by the given threshold. In this way, it is possible to enforce the e.g. the four-eye-principle.
       </p>
+      <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px">
+        <img style="" src="./impressum.png" alt="Impressum" />
+      </div>
     </div>
   </body>
 </html>
