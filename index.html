@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <title>Shamir's Keystore</title>
     <style>
-      @import url('https://fonts.googleapis.com/css?family=Crimson+Text|Fira+Mono|Montserrat&amp;display=swap');
+      @import url('https://fonts.googleapis.com/css?family=Crimson+Text|Fira+Code|Montserrat&amp;display=swap');
       div.main {
         width: 80%; border-style: outset; border-width: 1px; border-radius: 3px; border-color: rgb(224,224,224); margin-left: auto; margin-right: auto;
         padding-left: 1em; padding-right: 1em; padding-top: 0.25em; padding-bottom: 0.25em; background-color: rgb(224,224,224)
@@ -22,7 +22,13 @@
         border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); width: 60%; margin-left: auto; margin-right: auto
       }
       p.code {
-        font-family: 'Fira Mono', monospace; font-size: 12px; text-align: left; padding-left: 1rem
+        font-family: 'Fira Code', monospace; font-size: 12px; text-align: left; padding-left: 1rem
+      }
+      p.formula {
+        font-style: italic; font-family: 'Fira Code', monospace; text-align: center
+      }
+      span.formula {
+        font-style: italic; font-family: 'Fira Code', monospace;
       }
     </style>
   </head>
@@ -58,17 +64,26 @@
         </p>
       </div>
       <p class="section">
-        Above commands will compile the sources, run the tests and package the provider archive.
+        Above command will compile the sources, run the tests and package the provider archive.
       </p>
-      <p class="headline-1">The algorithm</p>
-      <p class="section">
+      <p class="headline-1">The Algorithm</p>
+      <p class="section" style="">
         Consider the polynom 
-        <span style="font-style: italic; font-family: 'Fira Mono', monospace;">
-          P<sub>k-1</sub>(x) = a<sub>k-1</sub>x<sup>k-1</sup> + ... + a<sub>2</sub>x<sup>2</sup> + a<sub>1</sub>x + a<sub>0</sub>
-        </span>
-        of degree
-        <span style="font-style: italic; font-family: 'Fira Mono', monospace;">k-1</span>.
       </p>
+      <p class="formula">
+        P<sub>k-1</sub>(x) = a<sub>k-1</sub>x<sup>k-1</sup> + ... + a<sub>2</sub>x<sup>2</sup> + a<sub>1</sub>x + a<sub>0</sub>
+      </p>
+      <p class="section" style="">
+        of degree <span class="formula">k-1</span>. Recall that you need <span class="formula">k</span> supporting points to recover a polynomial of
+        degree <span class="formula">k-1</span>. Shamir's <span class="formula">(k,n)</span> threshold scheme is building upon this property. A trusted 
+        authority randomly selects a polynomial <span class="formula">P<sub>k-1</sub></span> and computes <span class="formula">n</span> supporting points whereby 
+        <span class="formula">n >= k</span> applies. 
+        The to be shared secret <span class="formula">s</span> is encoded as <span class="formula">a<sub>0</sub></span>. The <span class="formula">n</span> supporting points 
+        are distributed among the participants. To compute the original secret <span class="formula">s</span> the participants must combine <span class="formula">k</span> of 
+        the supporting points. In order to avoid that an attacker gains any knowledge about the secret by merging less than <span class="formula">k</span> supporting points 
+        all computations will by implemented by using finite field arithmetic. That means we choose a finite field <span class="formula">&#120125;<sub>p</sub></span> whereby 
+        <span class="formula">p</span> is prime and <span class="formula">a<sub>0</sub> < p</span> applies.
+      </p> 
       <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px; margin-top: 1rem">
         <img style="" src="./impressum.png" alt="Impressum" />
       </div>
