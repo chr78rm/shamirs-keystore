@@ -10,16 +10,19 @@
         padding-left: 1em; padding-right: 1em; padding-top: 0.25em; padding-bottom: 0.25em; background-color: rgb(224,224,224)
       }
       p.headline-0 {
-        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em
+        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; padding-left: 1rem
       }
       p.headline-1 {
-        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em
+        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; padding-left: 1rem
       }
       p.section {
         color: rgb(26,26,26); font-family: 'Crimson Text', serif; text-align: justify
       }
-      hr {
-        color: rgb()
+      div.code {
+        border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); width: 60%; margin-left: auto; margin-right: auto
+      }
+      p.code {
+        font-family: 'Fira Mono', monospace; font-size: 12px; text-align: left; padding-left: 1rem
       }
     </style>
   </head>
@@ -36,7 +39,37 @@
         above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
         password with fewer shares as defined by the given threshold. In this way, it is possible to enforce the e.g. the four-eye-principle.
       </p>
-      <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px">
+      <p class="headline-1">Build</p>
+      <p class="section">
+        First clone the project:
+      </p>
+      <div class="code">
+        <p class="code">
+          git clone https://github.com/chr78rm/shamirs-keystore.git<br/>
+          cd shamirs-keystore
+        </p>
+      </div>
+      <p class="section">
+        <a href="https://maven.apache.org/">Maven</a> and a JDK11+ is required for the build of the multi-module project:
+      </p>
+      <div class="code">
+        <p class="code">
+          mvn clean package -P production
+        </p>
+      </div>
+      <p class="section">
+        Above commands will compile the sources, run the tests and package the provider archive.
+      </p>
+      <p class="headline-1">The algorithm</p>
+      <p class="section">
+        Consider the polynom 
+        <span style="font-style: italic; font-family: 'Fira Mono', monospace;">
+          P<sub>k-1</sub>(x) = a<sub>k-1</sub>x<sup>k-1</sup> + ... + a<sub>2</sub>x<sup>2</sup> + a<sub>1</sub>x + a<sub>0</sub>
+        </span>
+        of degree
+        <span style="font-style: italic; font-family: 'Fira Mono', monospace;">k-1</span>.
+      </p>
+      <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px; margin-top: 1rem">
         <img style="" src="./impressum.png" alt="Impressum" />
       </div>
     </div>
