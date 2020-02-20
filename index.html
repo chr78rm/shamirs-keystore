@@ -39,7 +39,7 @@
       <p class="section">
         This <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html">JCA provider</a> presently implements 
         <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
-        Newton's Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
+        Newton Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
         as defined by the <a href="https://docs.oracle.com/en/java/javase/11/security/howtoimplaprovider.html">Java Cryptographic Architecture</a> is provided. Such a keystore instance might 
         be unlocked - apart from the master password - by a previously computed subset of secret shares. In order to be able to reconstruct the master password a certain number of secret shares 
         above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
@@ -67,23 +67,38 @@
         Above command will compile the sources, run the tests and package the provider archive.
       </p>
       <p class="headline-1">The Algorithm</p>
-      <p class="section" style="">
+      <p class="section">
         Consider the polynomial
       </p>
       <p class="formula">
         P<sub>k-1</sub>(x) = a<sub>k-1</sub>x<sup>k-1</sup> + ... + a<sub>2</sub>x<sup>2</sup> + a<sub>1</sub>x + a<sub>0</sub>
       </p>
-      <p class="section" style="">
-        of degree <span class="formula">k-1</span>. Recall that you need <span class="formula">k</span> supporting points to recover a polynomial of
+      <p class="section">
+        of degree <span class="formula">k-1</span> given in the canonical form. Recall that you need <span class="formula">k</span> supporting points to recover a polynomial of
         degree <span class="formula">k-1</span>. Shamir's <span class="formula">(k,n)</span> threshold scheme is building upon this property. A trusted 
         authority randomly selects a polynomial <span class="formula">P<sub>k-1</sub></span> and computes <span class="formula">n</span> supporting points whereby 
-        <span class="formula">n >= k</span> applies. 
+        <span class="formula">n>=k</span> applies. 
         The to be shared secret <span class="formula">s</span> is encoded as <span class="formula">a<sub>0</sub></span>. The <span class="formula">n</span> supporting points 
         are distributed among the participants. To compute the original secret <span class="formula">s</span> the participants must combine <span class="formula">k</span> of 
-        the supporting points. In order to avoid that an attacker gains any knowledge about the secret by merging less than <span class="formula">k</span> supporting points 
+        the supporting points. In order to avoid that an adversary gains any knowledge about the secret by merging less than <span class="formula">k</span> supporting points 
         all computations will by implemented by using finite field arithmetic. That means we choose a finite field <span class="formula">&#120125;<sub>p</sub></span> whereby 
-        <span class="formula">p</span> is prime and <span class="formula">a<sub>0</sub> < p</span> applies.
+        <span class="formula">p</span> is prime and <span class="formula">a<sub>0</sub>&lt;p</span> applies.
       </p> 
+      <p class="section">
+        The simplest procedure for reconstructing a polynomial <span class="formula">P</span> of degree <span class="formula">k-1</span> with given <span class="formula">k</span> 
+        supporting points <span class="formula">(x<sub>0</sub>,y<sub>0</sub>),...,(x<sub>k-1</sub>,y<sub>k-1</sub>)</span> is by devising a system of 
+        <span class="formula">k</span> linear equations. A parabola, for instance, is defined by three supporting points 
+        <span class="formula">(x<sub>0</sub>,y<sub>0</sub>),(x<sub>1</sub>,y<sub>1</sub>),(x<sub>2</sub>,y<sub>2</sub>)</span>. The coefficients
+        <span class="formula">a<sub>0</sub>,a<sub>1</sub>,a<sub>2</sub></span> can be computed by solving the system of linear equations below:
+      </p>
+      <p class="formula">
+        y<sub>0</sub> = a<sub>2</sub>x<sub>0</sub><sup>2</sup> + a<sub>1</sub>x<sub>0</sub> + a<sub>0</sub><br/>
+        y<sub>1</sub> = a<sub>2</sub>x<sub>1</sub><sup>2</sup> + a<sub>1</sub>x<sub>1</sub> + a<sub>0</sub><br/>
+        y<sub>2</sub> = a<sub>2</sub>x<sub>2</sub><sup>2</sup> + a<sub>1</sub>x<sub>2</sub> + a<sub>0</sub><br/>
+      </p>
+      <p class="section">
+        There are other, more efficient, algorithms. This distribution uses the Newton interpolation method to recover the secret <span class="formula">s</span>.
+      </p>
       <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px; margin-top: 1rem">
         <img style="" src="./impressum.png" alt="Impressum" />
       </div>
