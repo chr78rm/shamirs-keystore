@@ -77,12 +77,12 @@
         of degree <span class="formula">k-1</span> given in the canonical form. Recall that you need <span class="formula">k</span> supporting points to recover a polynomial of
         degree <span class="formula">k-1</span>. Shamir's <span class="formula">(k,n)</span> threshold scheme is building upon this property. A trusted 
         authority randomly selects a polynomial <span class="formula">P<sub>k-1</sub></span> and computes <span class="formula">n</span> supporting points whereby 
-        <span class="formula">n>=k</span> applies. 
+        <span class="formula">n >= k</span> applies. 
         The to be shared secret <span class="formula">s</span> is encoded as <span class="formula">a<sub>0</sub></span>. The <span class="formula">n</span> supporting points 
         are distributed among the participants. To compute the original secret <span class="formula">s</span> the participants must combine <span class="formula">k</span> of 
         the supporting points. In order to avoid that an adversary gains any knowledge about the secret by merging less than <span class="formula">k</span> supporting points 
         all computations will by implemented by using finite field arithmetic. That means we choose a finite field <span class="formula">&#120125;<sub>p</sub></span> whereby 
-        <span class="formula">p</span> is prime and <span class="formula">a<sub>0</sub>&lt;p</span> applies.
+        <span class="formula">p</span> is prime and <span class="formula">a<sub>0</sub> &lt; p</span> applies.
       </p> 
       <p class="section">
         The simplest procedure for reconstructing a polynomial <span class="formula">P</span> of degree <span class="formula">k-1</span> with given <span class="formula">k</span> 
@@ -97,7 +97,54 @@
         y<sub>2</sub> = a<sub>2</sub>x<sub>2</sub><sup>2</sup> + a<sub>1</sub>x<sub>2</sub> + a<sub>0</sub><br/>
       </p>
       <p class="section">
-        There are other, more efficient, algorithms. This distribution uses the Newton interpolation method to recover the secret <span class="formula">s</span>.
+        There are, however, more efficient algorithms. This distribution uses the Newton interpolation method to recover the secret <span class="formula">s</span>.
+        A Newton polynomial of degree <span class="formula">k-1</span> is given by
+      </p>
+      <p class="formula">
+        P<sub>k-1</sub>(x) = <span style="font-size: 18px; font-style: normal">&#x1D768;</span>
+        <sub style="font-size: 10px; position: relative; top: 0.25em; left: -0.75em">i=0</sub>
+        <sup style="position: relative; left: -3.5em; top: -0.25em; font-size: 10px">k-1</sup>
+        <span style="position: relative; left: -2.25em;">c<sub>i</sub>N<sub>i</sub>(x)</span>
+      </p>
+      <p class="section">
+        with Newton coefficients <span class="formula">c<sub>0</sub>,c<sub>1</sub>,...,c<sub>k-1</sub></span> and the Newton basis polynomials
+        <span class="formula">N<sub>0</sub> = 1</span> and 
+        <span class="formula">
+          N<sub>i</sub> = <span style="font-size: 18px; font-style: normal">&#x1D79F;</span>
+          <sub style="font-size: 10px; position: relative; top: 0.25em; left: -1em">j=0</sub>
+          <sup style="position: relative; left: -3.75em; top: -0.25em; font-size: 10px">i-1</sup>
+          <span style="position: relative; left: -2.5em;">(x - x<sub>j</sub>).</span>
+        </span>
+      </p>
+      <p class="section">
+        This gives
+      </p>
+      <p class="formula">
+        P<sub>k-1</sub>(x) = c<sub>0</sub> + c<sub>1</sub>(x - x<sub>0</sub>) + c<sub>2</sub>(x - x<sub>0</sub>)(x - x<sub>1</sub>) + ... + c<sub>k-1</sub>(x - x<sub>0</sub>) &#x22EF; (x - x<sub>k-2</sub>)
+      </p>
+      <p class="section">
+        By applying <span class="formula">x &#x2190; x<sub>0</sub>,x &#x2190; x<sub>1</sub>,x &#x2190; x<sub>2</sub>,...</span> it follows
+      </p>
+      <p class="formula" style="text-align: left; padding-left: 10em">
+        P<sub>k-1</sub>(x<sub>0</sub>) = c<sub>0</sub><br/>
+        P<sub>k-1</sub>(x<sub>1</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>1</sub> - x<sub>0</sub>)<br/>
+        P<sub>k-1</sub>(x<sub>2</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>2</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>2</sub> - x<sub>0</sub>)(x<sub>2</sub> - x<sub>1</sub>)<br/>
+        P<sub>k-1</sub>(x<sub>3</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>3</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>) + c<sub>3</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>)(x<sub>3</sub> - x<sub>2</sub>)<br/>
+        <span style="font-style: normal; position: relative; left: 4em">&#x22EE;</span><span style="font-style: normal; position: relative; left: 6em">&#x22EE;</span>
+      </p>
+      <p class="section">
+        Since we are interested in recovering the Newton polynomial by using the supporting points we rearrange the equations above:
+      </p>
+      <p class="formula" style="text-align: left; padding-left: 10em">
+        c<sub>0</sub> = y<sub>0</sub><br/>
+        c<sub>1</sub> = (y<sub>1</sub> - c<sub>0</sub>)/(x<sub>1</sub> - x<sub>0</sub>)<br/>
+        c<sub>2</sub> = (y<sub>2</sub> - c<sub>0</sub> - c<sub>1</sub>(x<sub>2</sub> - x<sub>0</sub>))/(x<sub>2</sub> - x<sub>0</sub>)(x<sub>2</sub> - x<sub>1</sub>)<br/>
+        c<sub>3</sub> = (y<sub>3</sub> - c<sub>0</sub> - c<sub>1</sub>(x<sub>3</sub> - x<sub>0</sub>) - c<sub>2</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>))/(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>)(x<sub>3</sub> - x<sub>2</sub>)<br/>
+        <span style="font-style: normal; position: relative; left: 1em">&#x22EE;</span><span style="font-style: normal; position: relative; left: 3em">&#x22EE;</span>
+      </p>
+      <p class="section">
+        Now we can clearly see a recurring pattern. Thus, the Newton coefficients can be computed by a recursive procedure and by memoizing the already calculated 
+        coefficients (dynamic programming).
       </p>
       <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px; margin-top: 1rem">
         <img style="" src="./impressum.png" alt="Impressum" />
