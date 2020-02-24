@@ -3,17 +3,17 @@ package de.christofreichardt.jca;
 import java.security.NoSuchAlgorithmException;
 import java.security.ProviderException;
 
-public final class Provider extends java.security.Provider {
+public final class ShamirsProvider extends java.security.Provider {
 
 	private static final long serialVersionUID = 1L;
 	public static final String NAME = "Christofs Crypto Lib";
 
-	public Provider() {
+	public ShamirsProvider() {
 		super(NAME, "0.0.1", "A pkcs12 KeyStore implementation which supports shared passwords.");
 		put("KeyStore.ShamirsKeystore", "de.christofreichardt.jca.ShamirsKeystore");
 	}
 
-	private static final class ProviderService extends Provider.Service {
+	private static final class ProviderService extends ShamirsProvider.Service {
 
 		public ProviderService(java.security.Provider provider, String type, String algorithm, String className) {
 			super(provider, type, algorithm, className, null, null);

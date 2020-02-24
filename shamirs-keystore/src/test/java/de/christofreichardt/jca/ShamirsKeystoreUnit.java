@@ -52,8 +52,8 @@ public class ShamirsKeystoreUnit implements Traceable {
 		tracer.entry("void", this, "setupProvider()");
 
 		try {
-			Security.addProvider(new Provider());
-			assertThat(Security.getProvider(Provider.NAME)).isNotNull();
+			Security.addProvider(new ShamirsProvider());
+			assertThat(Security.getProvider(ShamirsProvider.NAME)).isNotNull();
 		} finally {
 			tracer.wayout();
 		}
@@ -137,7 +137,7 @@ public class ShamirsKeystoreUnit implements Traceable {
 			File keyStoreFile = Paths.get("pkcs12", "my-keystore-1.p12").toFile();
 			ShamirsProtection shamirsProtection = new ShamirsProtection(paths_1);
 			ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
-			KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(Provider.NAME));
+			KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
 			keyStore.load(shamirsLoadParameter);
 			Enumeration<String> aliases = keyStore.aliases();
 			while (aliases.hasMoreElements()) {
