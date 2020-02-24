@@ -120,17 +120,17 @@
         This gives
       </p>
       <p class="formula">
-        P<sub>k-1</sub>(x) = c<sub>0</sub> + c<sub>1</sub>(x - x<sub>0</sub>) + c<sub>2</sub>(x - x<sub>0</sub>)(x - x<sub>1</sub>) + ... + c<sub>k-1</sub>(x - x<sub>0</sub>) &#x22EF; (x - x<sub>k-2</sub>)
+        P<sub>k-1</sub>(x) = c<sub>0</sub> + c<sub>1</sub>(x - x<sub>0</sub>) + c<sub>2</sub>(x - x<sub>0</sub>)(x - x<sub>1</sub>) + &#x22EF; + c<sub>k-1</sub>(x - x<sub>0</sub>) &#x22EF; (x - x<sub>k-2</sub>)
       </p>
       <p class="section">
         By applying <span class="formula">x &#x2190; x<sub>0</sub>,x &#x2190; x<sub>1</sub>,x &#x2190; x<sub>2</sub>,...</span> it follows
       </p>
       <p class="formula" style="text-align: left; padding-left: 10em">
-        P<sub>k-1</sub>(x<sub>0</sub>) = c<sub>0</sub><br/>
-        P<sub>k-1</sub>(x<sub>1</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>1</sub> - x<sub>0</sub>)<br/>
-        P<sub>k-1</sub>(x<sub>2</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>2</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>2</sub> - x<sub>0</sub>)(x<sub>2</sub> - x<sub>1</sub>)<br/>
-        P<sub>k-1</sub>(x<sub>3</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>3</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>) + c<sub>3</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>)(x<sub>3</sub> - x<sub>2</sub>)<br/>
-        <span style="font-style: normal; position: relative; left: 4em">&#x22EE;</span><span style="font-style: normal; position: relative; left: 6em">&#x22EE;</span>
+        P(x<sub>0</sub>) = c<sub>0</sub><br/>
+        P(x<sub>1</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>1</sub> - x<sub>0</sub>)<br/>
+        P(x<sub>2</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>2</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>2</sub> - x<sub>0</sub>)(x<sub>2</sub> - x<sub>1</sub>)<br/>
+        P(x<sub>3</sub>) = c<sub>0</sub> + c<sub>1</sub>(x<sub>3</sub> - x<sub>0</sub>) + c<sub>2</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>) + c<sub>3</sub>(x<sub>3</sub> - x<sub>0</sub>)(x<sub>3</sub> - x<sub>1</sub>)(x<sub>3</sub> - x<sub>2</sub>)<br/>
+        <span style="font-style: normal; position: relative; left: 2em">&#x22EE;</span><span style="font-style: normal; position: relative; left: 5em">&#x22EE;</span>
       </p>
       <p class="section">
         Since we are interested in recovering the Newton polynomial by using the supporting points we rearrange the equations above:
@@ -144,7 +144,29 @@
       </p>
       <p class="section">
         Now we can clearly see a recurring pattern. Thus, the Newton coefficients can be computed by a recursive procedure and by memoizing the already calculated 
-        coefficients (dynamic programming).
+        coefficients (dynamic programming), 
+        see <a href="https://github.com/chr78rm/shamirs-keystore/blob/master/shamirs-secret-sharing/src/main/scala/de/christofreichardt/scala/shamir/NewtonInterpolation.scala">NewtonInterpolation.scala</a>
+        for details.
+      </p>
+      <p class="section">
+        We need to evaluate the interpolated polynom at least at one point, namely at <span class="formula">P(0) = a<sub>0</sub></span> to recover the original secret. An efficient
+        way of doing this is by applying Horner's scheme. The Newton polynomial <span class="formula">P</span> of degree <span class="formula">k-1</span> can be rewritten as
+      </p>
+      <p class="formula">
+        P<sub>k-1</sub>(x) = c<sub>0</sub> + (x - x<sub>0</sub>)[c<sub>1</sub> + (x - x<sub>1</sub>)[c<sub>2</sub> + &#x22EF; + c<sub>k-1</sub>(x - x<sub>k-2</sub>)] &#x22EF; ]
+      </p>
+      <p class="section">
+        so that <span class="formula">P(x)</span> can be calculated recursively:
+      </p>
+      <p class="formula" style="text-align: left; padding-left: 10em">
+        b<sub>0</sub> = c<sub>0</sub> + (x - x<sub>0</sub>)b<sub>1</sub><br/>
+        b<sub>1</sub> = c<sub>1</sub> + (x - x<sub>1</sub>)b<sub>2</sub><br/>
+        b<sub>2</sub> = c<sub>2</sub> + (x - x<sub>2</sub>)b<sub>3</sub><br/>
+        <span style="font-style: normal; position: relative; left: 1em">&#x22EE;</span><span style="font-style: normal; position: relative; left: 3em">&#x22EE;</span><br/>
+        b<sub>k-1</sub> = c<sub>k-1</sub>
+      </p>
+      <p class="section">
+        where <span class="formula">P(x) = b<sub>0</sub></span> .
       </p>
       <div style="text-align: center; border-top-style: solid; border-top-color: rgb(26,26,26); border-top-width: 1px; margin-top: 1rem">
         <img style="" src="./impressum.png" alt="Impressum" />
