@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>crypto-lib</artifactId>
+        <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
