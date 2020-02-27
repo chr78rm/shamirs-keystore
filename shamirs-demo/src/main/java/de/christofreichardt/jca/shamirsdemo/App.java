@@ -1,8 +1,9 @@
-package de.christofreichardt.jca;
+package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import de.christofreichardt.jca.ShamirsProvider;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -47,7 +47,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>de.christofreichardt.jca.App</mainClass>
+                    <mainClass>de.christofreichardt.jca.shamirsdemo.App</mainClass>
                 </configuration>
             </plugin>
             <plugin>
