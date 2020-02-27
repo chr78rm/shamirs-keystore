@@ -85,11 +85,12 @@ public class App implements Traceable {
             TracerFactory.getInstance().readConfiguration(resourceAsStream);
         }
         TracerFactory.getInstance().openPoolTracer();
-        AbstractTracer tracer = TracerFactory.getInstance().getCurrentPoolTracer();
-        tracer.initCurrentTracingContext();
-        tracer.entry("void", App.class, "main(String[] args)");
 
         try {
+            AbstractTracer tracer = TracerFactory.getInstance().getCurrentPoolTracer();
+            tracer.initCurrentTracingContext();
+            tracer.entry("void", App.class, "main(String[] args)");
+            
             List<String> propertyNames = new ArrayList<>(System.getProperties().stringPropertyNames());
             propertyNames.stream()
                     .sorted()
@@ -102,10 +103,10 @@ public class App implements Traceable {
                 app.printMenu();
                 System.console().printf("\n");
             } finally {
-                TracerFactory.getInstance().closePoolTracer();
+                tracer.wayout();
             }
         } finally {
-            tracer.wayout();
+            TracerFactory.getInstance().closePoolTracer();
         }
     }
 }
