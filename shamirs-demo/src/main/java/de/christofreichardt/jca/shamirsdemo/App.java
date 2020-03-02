@@ -20,34 +20,28 @@ import java.util.stream.Stream;
 public class App implements Traceable {
 
     final String currentDate = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-    Path currentWorkspace;
+    private Path currentWorkspace;
+    private Menu menu;
 
     public App() throws IOException {
-        this.currentWorkspace = initWorkspace();
+        this.setCurrentWorkspace(initWorkspace());
+        this.menu = new MainMenu(this);
     }
 
-    void printMenu() {
-        AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("void", this, "printMenu()");
-        try {
-            System.console().printf("\n");
-            System.console().printf("+---------------+\n");
-            System.console().printf("| Shamir's Demo |\n");
-            System.console().printf("+---------------+\n");
-            System.console().printf("\n");
-            System.console().printf("Current time: %s\n", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            System.console().printf("   Workspace: %s\n", this.currentDate);
-            System.console().printf("\n");
-            System.console().printf("   %20s", "(S)plit password");
-            System.console().printf("   %20s", "(M)erge password");
-            System.console().printf("   %20s", "(O)pen Workspace");
-            System.console().printf("\n");
-            System.console().printf("   %20s", "(C)reate Keystore");
-            System.console().printf("   %20s", "(L)oad Keystore");
-            System.console().printf("\n");
-        } finally {
-            tracer.wayout();
-        }
+    public Path getCurrentWorkspace() {
+        return currentWorkspace;
+    }
+
+    public void setCurrentWorkspace(Path currentWorkspace) {
+        this.currentWorkspace = currentWorkspace;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     Path initWorkspace() throws IOException {
@@ -69,6 +63,20 @@ public class App implements Traceable {
             }
 
             return workspace;
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    private void mainLoop() throws IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "mainLoop()");
+        try {
+            do {
+                this.menu.print();
+                Menu.Command command = this.menu.readCommand();
+                this.menu.execute(command);
+            } while(!this.menu.isExit());
         } finally {
             tracer.wayout();
         }
@@ -101,7 +109,7 @@ public class App implements Traceable {
             try {
                 Security.addProvider(new ShamirsProvider());
                 App app = new App();
-                app.printMenu();
+                app.mainLoop();
                 System.console().printf("\n");
             } finally {
                 tracer.wayout();
