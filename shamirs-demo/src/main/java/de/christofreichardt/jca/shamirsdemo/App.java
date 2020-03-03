@@ -73,10 +73,15 @@ public class App implements Traceable {
         tracer.entry("void", this, "mainLoop()");
         try {
             do {
-                this.menu.print();
-                Menu.Command command = this.menu.readCommand();
-                if (command != null) {
-                    this.menu.execute(command);
+                try {
+                    this.menu.print();
+                    Menu.Command command = this.menu.readCommand();
+                    if (command != null) {
+                        System.console().printf("%s-> %s\n", this.currentWorkspace.getFileName(), command.getFullName());
+                        this.menu.execute(command);
+                    }
+                } catch (IOException | IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             } while(!this.menu.isExit());
         } finally {

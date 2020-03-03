@@ -43,7 +43,7 @@ object SecretMerging {
   def apply(paths: Iterable[Path]): SecretMerging = {
     val jsonObjects = paths.map(path => Json.createReader(new FileInputStream(path.toFile)).readObject())
     val ids = jsonObjects.map(jsonObject => jsonObject.getString("Id"))
-    require(ids.forall(id => id == ids.head))
+    require(ids.forall(id => id == ids.head), "Inconsistent Ids.")
     val (prime, threshold) = jsonObjects.view.map(jsonObject => (BigInt(jsonObject.getJsonNumber("Prime").bigIntegerValue()), jsonObject.getInt("Threshold"))).head
     val ps = jsonObjects
       .map(jsonObject => jsonObject.getJsonArray("SharePoints"))
@@ -52,7 +52,7 @@ object SecretMerging {
       .map(jsonObject => jsonObject.getJsonObject("SharePoint"))
       .map(sp => (BigInt(sp.getJsonNumber("x").bigIntegerValue()), BigInt(sp.getJsonNumber("y").bigIntegerValue())))
       .toIndexedSeq
-    require(ps.length >= threshold)
+    require(ps.length >= threshold, "Too few sharepoints.")
     new SecretMerging(ps.take(threshold), prime)
   }
 

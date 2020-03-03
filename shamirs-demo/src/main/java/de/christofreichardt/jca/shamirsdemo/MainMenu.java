@@ -184,7 +184,7 @@ public class MainMenu implements Menu, Traceable {
             }
             String password = new String(SecretMerging.apply(paths).password());
 
-            tracer.out().printfIndentln("password = %s", password);
+            System.console().printf("password = %s\n", password);
         } finally {
             tracer.wayout();
         }
