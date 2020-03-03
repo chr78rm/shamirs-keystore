@@ -3,14 +3,20 @@ package de.christofreichardt.jca.shamirsdemo;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import de.christofreichardt.scala.shamir.SecretMerging;
+import de.christofreichardt.scala.shamir.SecretSharing;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MainMenu implements Menu, Traceable {
 
@@ -121,7 +127,9 @@ public class MainMenu implements Menu, Traceable {
 
             MainCommand mainCommand = MainCommand.valueOf(command.toString());
             if (mainCommand == MainCommand.SPLIT_PASSWORD) {
-                tracer.out().printfIndentln("Splitting ...");
+                splitPassword();
+            } else if (mainCommand == MainCommand.MERGE_PASSWORD) {
+                mergePassword();
             } else if (mainCommand == MainCommand.EXIT) {
                 this.exit = true;
             }
@@ -133,6 +141,53 @@ public class MainMenu implements Menu, Traceable {
     @Override
     public boolean isExit() {
         return this.exit;
+    }
+
+    void splitPassword() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "splitPassword()");
+        try {
+            String password = System.console().readLine("Password: ");
+            int shares = Integer.parseInt(System.console().readLine("Number of shares: "));
+            int threshold = Integer.parseInt(System.console().readLine("Threshold: "));
+            String partition = System.console().readLine("Name of partition: ");
+            int partitions = Integer.parseInt(System.console().readLine("Number of partitions: "));
+            int[] sizes = new int[partitions];
+            int sum = 0;
+            for (int i = 0; i < partitions; i++) {
+                int size = Integer.parseInt(System.console().readLine("Size[i=%d, sum=%d]: ", i, sum));
+                sizes[i] = size;
+                sum += size;
+            }
+            SecretSharing secretSharing = new SecretSharing(shares, threshold, password.getBytes(StandardCharsets.UTF_8));
+
+            tracer.out().printfIndentln("secretSharing = %s", secretSharing);
+
+            secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void mergePassword() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "mergePassword()");
+        try {
+            String partitions = System.console().readLine("Partitions: ");
+            String[] files = partitions.split(",");
+            Path[] paths = new Path[files.length];
+            int i = 0;
+            for (String file : files) {
+                Path path = this.app.getCurrentWorkspace().resolve(file);
+                tracer.out().printfIndentln("path = %s", path);
+                paths[i++] = path;
+            }
+            String password = new String(SecretMerging.apply(paths).password());
+
+            tracer.out().printfIndentln("password = %s", password);
+        } finally {
+            tracer.wayout();
+        }
     }
 
     @Override

@@ -7,3 +7,4 @@ shamirs-secret-sharing/json/**/*.json
 shamirs-secret-sharing/json/jws/encoded-secret-share.txt
 dependency-reduced-pom.xml
 *.iml
+shamirs-demo/workspace/**/*.json

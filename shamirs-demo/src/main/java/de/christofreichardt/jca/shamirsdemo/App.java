@@ -75,7 +75,9 @@ public class App implements Traceable {
             do {
                 this.menu.print();
                 Menu.Command command = this.menu.readCommand();
-                this.menu.execute(command);
+                if (command != null) {
+                    this.menu.execute(command);
+                }
             } while(!this.menu.isExit());
         } finally {
             tracer.wayout();
