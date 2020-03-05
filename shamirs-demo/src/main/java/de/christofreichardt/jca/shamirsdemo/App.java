@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 public class App implements Traceable {
@@ -80,8 +81,8 @@ public class App implements Traceable {
                         System.console().printf("%s-> %s\n", this.currentWorkspace.getFileName(), command.getFullName());
                         this.menu.execute(command);
                     }
-                } catch (IOException | IllegalArgumentException e) {
-                    e.printStackTrace();
+                } catch (IOException | IllegalArgumentException | NoSuchElementException ex) {
+                    ex.printStackTrace();
                 }
             } while(!this.menu.isExit());
         } finally {

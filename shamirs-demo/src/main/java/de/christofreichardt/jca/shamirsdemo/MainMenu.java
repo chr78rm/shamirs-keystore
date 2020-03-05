@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +24,8 @@ public class MainMenu implements Menu, Traceable {
     public enum MainCommand implements Command {
         SPLIT_PASSWORD("s", "split password"), MERGE_PASSWORD("m", "merge password"),
         OPEN_WORKSPACE("o", "open workspace"), CREATE_KEYSTOE("c", "create keystore"),
-        LOAD_KEYSTORE("l", "load keystore"), EXIT("e", "exit");
+        LIST_WORKSPACE("li", "list workspace"),
+        LOAD_KEYSTORE("lo", "load keystore"), EXIT("e", "exit");
 
         String shortCut;
         String fullName;
@@ -75,6 +77,8 @@ public class MainMenu implements Menu, Traceable {
             System.console().printf("\n");
             System.console().printf("   %20s", MainCommand.CREATE_KEYSTOE.getDisplayName());
             System.console().printf("   %20s", MainCommand.LOAD_KEYSTORE.getDisplayName());
+            System.console().printf("   %20s", MainCommand.LIST_WORKSPACE.getDisplayName());
+            System.console().printf("\n");
             System.console().printf("   %20s", MainCommand.EXIT.getDisplayName());
             System.console().printf("\n");
         } finally {
@@ -91,26 +95,29 @@ public class MainMenu implements Menu, Traceable {
 
             tracer.out().printfIndentln("mainCommands = %s", mainCommands);
 
-            Map<Character, MainCommand> shortCuts = mainCommands.stream()
-                    .collect(Collectors.toMap(mainCommand -> mainCommand.shortCut.charAt(0), Function.identity()));
+            Map<String, MainCommand> shortCuts = mainCommands.stream()
+                    .collect(Collectors.toMap(mainCommand -> mainCommand.getShortCut(), Function.identity()));
 
             tracer.out().printfIndentln("shortCuts = %s", shortCuts);
 
-            String line = null;
             MainCommand mainCommand = null;
             System.console().printf("\n");
             do {
-                line = System.console().readLine("%s-> ", this.app.getCurrentWorkspace().getFileName());
+                String line = System.console().readLine("%s-> ", this.app.getCurrentWorkspace().getFileName());
                 tracer.out().printfIndentln("line = %s, %d", line, (line != null ? line.length() : -1));
                 tracer.out().flush();
                 if (line != null) {
-                    if (line.length() == 1) {
-                        tracer.out().printfIndentln("%s, %b", line.charAt(0), shortCuts.containsKey(line.charAt(0)));
-                        mainCommand = shortCuts.get(line.charAt(0));
-                        break;
-                    }
+                     String found = shortCuts.keySet().stream()
+                            .filter(shortCut -> line.startsWith(shortCut))
+                            .findFirst()
+                            .orElseThrow();
+
+                    tracer.out().printfIndentln("found = %s, %b, %s", found, shortCuts.containsKey(found), shortCuts.get(found));
+                    tracer.out().flush();
+
+                    mainCommand = shortCuts.get(found);
                 }
-            } while (line != null);
+            } while (mainCommand == null);
 
             return mainCommand;
         } finally {
@@ -130,6 +137,10 @@ public class MainMenu implements Menu, Traceable {
                 splitPassword();
             } else if (mainCommand == MainCommand.MERGE_PASSWORD) {
                 mergePassword();
+            } else if (mainCommand == MainCommand.LOAD_KEYSTORE) {
+                loadKeystore();
+            } else if (mainCommand == MainCommand.LIST_WORKSPACE) {
+                listWorkspace();
             } else if (mainCommand == MainCommand.EXIT) {
                 this.exit = true;
             }
@@ -185,6 +196,24 @@ public class MainMenu implements Menu, Traceable {
             String password = new String(SecretMerging.apply(paths).password());
 
             System.console().printf("password = %s\n", password);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void loadKeystore() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "loadKeystore()");
+        try {
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void listWorkspace() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "listWorkspace()");
+        try {
         } finally {
             tracer.wayout();
         }
