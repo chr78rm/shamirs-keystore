@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -158,15 +159,56 @@ public class MainMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "splitPassword()");
         try {
-            String password = System.console().readLine("Password: ");
-            int shares = Integer.parseInt(System.console().readLine("Number of shares: "));
-            int threshold = Integer.parseInt(System.console().readLine("Threshold: "));
-            String partition = System.console().readLine("Name of partition: ");
-            int partitions = Integer.parseInt(System.console().readLine("Number of partitions: "));
+            String password;
+            String regex = "[A-Za-z0-9]{8,15}";
+            do {
+                password = System.console().readLine("Password (%s): ", regex);
+            } while(!Pattern.matches(regex, password));
+
+            int shares = -1;
+            regex = "[0-9]+";
+            do {
+                String line = System.console().readLine("Number of shares (%s): ", regex);
+                if (Pattern.matches(regex, line)) {
+                    shares = Integer.parseInt(line);
+                }
+            } while(shares == -1);
+
+            int threshold = -1;
+            regex = "[0-9]+";
+            do {
+                String line = System.console().readLine("Threshold (%s): ", regex);
+                if (Pattern.matches(regex, line)) {
+                    threshold = Integer.parseInt(line);
+                }
+            } while(threshold == -1);
+
+            String partition;
+            regex = "[A-Za-z]{1,10}";
+            do {
+                partition = System.console().readLine("Name of partition (%s): ", regex);
+            } while (!Pattern.matches(regex, partition));
+
+            int partitions = -1;
+            regex = "[0-9]+";
+            do {
+                String line = System.console().readLine("Number of partitions (%s): ", regex);
+                if (Pattern.matches(regex, line)) {
+                    partitions = Integer.parseInt(line);
+                }
+            } while(partitions == -1);
+
             int[] sizes = new int[partitions];
             int sum = 0;
+            regex = "[0-9]+";
             for (int i = 0; i < partitions; i++) {
-                int size = Integer.parseInt(System.console().readLine("Size[i=%d, sum=%d]: ", i, sum));
+                int size = -1;
+                do {
+                    String line = System.console().readLine("Size[i=%d, sum=%d] (%s): ", i, sum, regex);
+                    if (Pattern.matches(regex, line)) {
+                        size = Integer.parseInt(line);
+                    }
+                } while(size == -1);
                 sizes[i] = size;
                 sum += size;
             }
