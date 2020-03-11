@@ -189,19 +189,19 @@ public class MainMenu implements Menu, Traceable {
                 partition = System.console().readLine("Name of partition (%s): ", regex);
             } while (!Pattern.matches(regex, partition));
 
-            int partitions = -1;
+            int slices = -1;
             regex = "[0-9]+";
             do {
-                String line = System.console().readLine("Number of partitions (%s): ", regex);
+                String line = System.console().readLine("Number of slices (%s): ", regex);
                 if (Pattern.matches(regex, line)) {
-                    partitions = Integer.parseInt(line);
+                    slices = Integer.parseInt(line);
                 }
-            } while(partitions == -1);
+            } while(slices == -1);
 
-            int[] sizes = new int[partitions];
+            int[] sizes = new int[slices];
             int sum = 0;
             regex = "[0-9]+";
-            for (int i = 0; i < partitions; i++) {
+            for (int i = 0; i < slices; i++) {
                 int size = -1;
                 do {
                     String line = System.console().readLine("Size[i=%d, sum=%d] (%s): ", i, sum, regex);
@@ -226,8 +226,8 @@ public class MainMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "mergePassword()");
         try {
-            String partitions = System.console().readLine("Partitions: ");
-            String[] files = partitions.split(",");
+            String slices = System.console().readLine("Slices: ");
+            String[] files = slices.split(",");
             Path[] paths = new Path[files.length];
             int i = 0;
             for (String file : files) {
