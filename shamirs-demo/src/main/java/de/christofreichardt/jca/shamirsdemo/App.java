@@ -75,6 +75,10 @@ public class App implements Traceable {
         try {
             do {
                 try {
+                    System.console().printf("\n");
+                    System.console().printf("+---------------+\n");
+                    System.console().printf("| Shamir's Demo |\n");
+                    System.console().printf("+---------------+\n");
                     this.menu.print();
                     Menu.Command command = this.menu.readCommand();
                     if (command != null) {

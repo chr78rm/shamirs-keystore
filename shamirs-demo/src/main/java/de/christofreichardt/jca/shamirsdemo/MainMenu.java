@@ -65,12 +65,10 @@ public class MainMenu implements Menu, Traceable {
         tracer.entry("void", this, "printMenu()");
         try {
             System.console().printf("\n");
-            System.console().printf("+---------------+\n");
-            System.console().printf("| Shamir's Demo |\n");
-            System.console().printf("+---------------+\n");
-            System.console().printf("\n");
             System.console().printf("Current time: %s\n", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             System.console().printf("   Workspace: %s\n", this.app.getCurrentWorkspace().getFileName());
+            System.console().printf("\n");
+            System.console().printf("%s-> Main menu\n", this.app.getCurrentWorkspace().getFileName());
             System.console().printf("\n");
             System.console().printf("   %20s", MainCommand.SPLIT_PASSWORD.getDisplayName());
             System.console().printf("   %20s", MainCommand.MERGE_PASSWORD.getDisplayName());
@@ -160,15 +158,15 @@ public class MainMenu implements Menu, Traceable {
         tracer.entry("void", this, "splitPassword()");
         try {
             String password;
-            String regex = "[A-Za-z0-9]{8,15}";
+            String regex = "[A-Za-z0-9-]{8,45}";
             do {
-                password = System.console().readLine("Password (%s): ", regex);
+                password = System.console().readLine("%s-> Password (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
             } while(!Pattern.matches(regex, password));
 
             int shares = -1;
             regex = "[0-9]+";
             do {
-                String line = System.console().readLine("Number of shares (%s): ", regex);
+                String line = System.console().readLine("%s-> Number of shares (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
                 if (Pattern.matches(regex, line)) {
                     shares = Integer.parseInt(line);
                 }
@@ -177,7 +175,7 @@ public class MainMenu implements Menu, Traceable {
             int threshold = -1;
             regex = "[0-9]+";
             do {
-                String line = System.console().readLine("Threshold (%s): ", regex);
+                String line = System.console().readLine("%s-> Threshold (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
                 if (Pattern.matches(regex, line)) {
                     threshold = Integer.parseInt(line);
                 }
@@ -186,13 +184,13 @@ public class MainMenu implements Menu, Traceable {
             String partition;
             regex = "[A-Za-z]{1,10}";
             do {
-                partition = System.console().readLine("Name of partition (%s): ", regex);
+                partition = System.console().readLine("%s-> Name of partition (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
             } while (!Pattern.matches(regex, partition));
 
             int slices = -1;
             regex = "[0-9]+";
             do {
-                String line = System.console().readLine("Number of slices (%s): ", regex);
+                String line = System.console().readLine("%s-> Number of slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
                 if (Pattern.matches(regex, line)) {
                     slices = Integer.parseInt(line);
                 }
@@ -204,7 +202,7 @@ public class MainMenu implements Menu, Traceable {
             for (int i = 0; i < slices; i++) {
                 int size = -1;
                 do {
-                    String line = System.console().readLine("Size[i=%d, sum=%d] (%s): ", i, sum, regex);
+                    String line = System.console().readLine("%s-> Size[i=%d, sum=%d] (%s): ", this.app.getCurrentWorkspace().getFileName(), i, sum, regex);
                     if (Pattern.matches(regex, line)) {
                         size = Integer.parseInt(line);
                     }
@@ -226,7 +224,7 @@ public class MainMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "mergePassword()");
         try {
-            String slices = System.console().readLine("Slices: ");
+            String slices = System.console().readLine("%s-> Slices: ", this.app.getCurrentWorkspace().getFileName());
             String[] files = slices.split(",");
             Path[] paths = new Path[files.length];
             int i = 0;
