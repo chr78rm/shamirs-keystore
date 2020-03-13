@@ -7,20 +7,24 @@ import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MainMenu implements Menu, Traceable {
+
+    final static Pattern PARTITION_PATTERN = Pattern.compile("[A-Za-z]{1,10}");
 
     public enum MainCommand implements Command {
         SPLIT_PASSWORD("s", "split password"), MERGE_PASSWORD("m", "merge password"),
@@ -106,7 +110,7 @@ public class MainMenu implements Menu, Traceable {
                 tracer.out().printfIndentln("line = %s, %d", line, (line != null ? line.length() : -1));
                 tracer.out().flush();
                 if (line != null) {
-                     String found = shortCuts.keySet().stream()
+                    String found = shortCuts.keySet().stream()
                             .filter(shortCut -> line.startsWith(shortCut))
                             .findFirst()
                             .orElseThrow();
@@ -125,7 +129,7 @@ public class MainMenu implements Menu, Traceable {
     }
 
     @Override
-    public <T extends Command> void execute(T command) {
+    public <T extends Command> void execute(T command) throws IOException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("MainCommand", this, "execute(Command command)");
         try {
@@ -161,7 +165,7 @@ public class MainMenu implements Menu, Traceable {
             String regex = "[A-Za-z0-9-]{8,45}";
             do {
                 password = System.console().readLine("%s-> Password (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while(!Pattern.matches(regex, password));
+            } while (!Pattern.matches(regex, password));
 
             int shares = -1;
             regex = "[0-9]+";
@@ -170,7 +174,7 @@ public class MainMenu implements Menu, Traceable {
                 if (Pattern.matches(regex, line)) {
                     shares = Integer.parseInt(line);
                 }
-            } while(shares == -1);
+            } while (shares == -1);
 
             int threshold = -1;
             regex = "[0-9]+";
@@ -179,13 +183,12 @@ public class MainMenu implements Menu, Traceable {
                 if (Pattern.matches(regex, line)) {
                     threshold = Integer.parseInt(line);
                 }
-            } while(threshold == -1);
+            } while (threshold == -1);
 
             String partition;
-            regex = "[A-Za-z]{1,10}";
             do {
-                partition = System.console().readLine("%s-> Name of partition (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, partition));
+                partition = System.console().readLine("%s-> Name of partition (%s): ", this.app.getCurrentWorkspace().getFileName(), PARTITION_PATTERN.pattern());
+            } while (!PARTITION_PATTERN.matcher(partition).matches());
 
             int slices = -1;
             regex = "[0-9]+";
@@ -194,7 +197,7 @@ public class MainMenu implements Menu, Traceable {
                 if (Pattern.matches(regex, line)) {
                     slices = Integer.parseInt(line);
                 }
-            } while(slices == -1);
+            } while (slices == -1);
 
             int[] sizes = new int[slices];
             int sum = 0;
@@ -206,7 +209,7 @@ public class MainMenu implements Menu, Traceable {
                     if (Pattern.matches(regex, line)) {
                         size = Integer.parseInt(line);
                     }
-                } while(size == -1);
+                } while (size == -1);
                 sizes[i] = size;
                 sum += size;
             }
@@ -229,13 +232,13 @@ public class MainMenu implements Menu, Traceable {
             Path[] paths = new Path[files.length];
             int i = 0;
             for (String file : files) {
-                Path path = this.app.getCurrentWorkspace().resolve(file);
+                Path path = this.app.getCurrentWorkspace().resolve(file.trim());
                 tracer.out().printfIndentln("path = %s", path);
                 paths[i++] = path;
             }
             String password = new String(SecretMerging.apply(paths).password());
 
-            System.console().printf("password = %s\n", password);
+            System.console().printf("%s-> password = %s\n", this.app.getCurrentWorkspace().getFileName(), password);
         } finally {
             tracer.wayout();
         }
@@ -250,10 +253,41 @@ public class MainMenu implements Menu, Traceable {
         }
     }
 
-    void listWorkspace() {
+    void listWorkspace() throws IOException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "listWorkspace()");
         try {
+            Set<String> partitions;
+            try (Stream<Path> paths = Files.list(this.app.getCurrentWorkspace())) {
+                partitions = paths
+                        .map(path -> path.getFileName().toString())
+                        .filter(fileName -> fileName.endsWith(".json"))
+                        .map(fileName -> fileName.substring(0, fileName.length() - ".json".length()))
+                        .filter(fileName -> PARTITION_PATTERN.matcher(fileName).matches())
+                        .peek(partition -> tracer.out().printfIndentln("partition = %s", partition))
+                        .collect(Collectors.toSet());
+                System.console().printf("%s-> Partitions: %s\n", this.app.getCurrentWorkspace().getFileName(), partitions);
+            }
+
+            partitions.stream()
+                    .forEach(partition -> {
+                        Pattern pattern = Pattern.compile(partition + "-[0-9]+\\.json");
+                        try {
+                            try (Stream<Path> paths = Files.list(this.app.getCurrentWorkspace())) {
+                                List<String> slices = paths
+                                        .map(path -> path.getFileName().toString())
+                                        .filter(fileName -> pattern.matcher(fileName).matches())
+                                        .sorted()
+                                        .collect(Collectors.toList());
+                                System.console().printf("%s-> Slices(%s): %s\n", this.app.getCurrentWorkspace().getFileName(), partition, slices);
+                            }
+                        } catch (IOException ex) {
+                            throw new UncheckedIOException(ex);
+                        }
+                    });
+            try (Stream<Path> paths = Files.list(this.app.getCurrentWorkspace())) {
+
+            }
         } finally {
             tracer.wayout();
         }

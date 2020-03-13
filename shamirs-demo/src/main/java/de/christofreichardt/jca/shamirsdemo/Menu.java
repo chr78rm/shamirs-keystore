@@ -12,6 +12,6 @@ public interface Menu {
 
     void print();
     Command readCommand() throws IOException;
-    <T extends Command> void execute(T command);
+    <T extends Command> void execute(T command) throws IOException;
     boolean isExit();
 }
