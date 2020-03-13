@@ -227,7 +227,11 @@ public class MainMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "mergePassword()");
         try {
-            String slices = System.console().readLine("%s-> Slices: ", this.app.getCurrentWorkspace().getFileName());
+            String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
+            String slices;
+            do {
+                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
+            } while (!Pattern.matches(regex, slices));
             String[] files = slices.split(",");
             Path[] paths = new Path[files.length];
             int i = 0;
