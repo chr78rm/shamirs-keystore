@@ -3,14 +3,23 @@ package de.christofreichardt.jca.shamirsdemo;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import de.christofreichardt.jca.ShamirsLoadParameter;
+import de.christofreichardt.jca.ShamirsProtection;
+import de.christofreichardt.jca.ShamirsProvider;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
@@ -129,7 +138,7 @@ public class MainMenu implements Menu, Traceable {
     }
 
     @Override
-    public <T extends Command> void execute(T command) throws IOException {
+    public <T extends Command> void execute(T command) throws IOException, GeneralSecurityException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("MainCommand", this, "execute(Command command)");
         try {
@@ -144,6 +153,8 @@ public class MainMenu implements Menu, Traceable {
                 loadKeystore();
             } else if (mainCommand == MainCommand.LIST_WORKSPACE) {
                 listWorkspace();
+            } else if (mainCommand == MainCommand.CREATE_KEYSTOE) {
+                createKeystore();
             } else if (mainCommand == MainCommand.EXIT) {
                 this.exit = true;
             }
@@ -252,6 +263,46 @@ public class MainMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "loadKeystore()");
         try {
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void createKeystore() throws GeneralSecurityException, IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "createKeystore()");
+        try {
+            String regex = "[A-Za-z-]{1,20}";
+            String keystoreName;
+            do {
+                keystoreName = System.console().readLine("%s-> Keystore name (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
+            } while (!Pattern.matches(regex, keystoreName));
+            File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
+
+            String slices;
+            regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
+            do {
+                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
+            } while (!Pattern.matches(regex, slices));
+            String[] files = slices.split(",");
+            Path[] paths = new Path[files.length];
+            int i = 0;
+            for (String file : files) {
+                Path path = this.app.getCurrentWorkspace().resolve(file.trim());
+                tracer.out().printfIndentln("path = %s", path);
+                paths[i++] = path;
+            }
+
+            KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
+            ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
+            ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
+            keyStore.load(null, null);
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator.init(256);
+            SecretKey secretKey = keyGenerator.generateKey();
+            KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
+            keyStore.setEntry("my-secret-key", secretKeyEntry, shamirsProtection);
+            keyStore.store(shamirsLoadParameter);
         } finally {
             tracer.wayout();
         }

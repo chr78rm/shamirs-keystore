@@ -1,24 +1,16 @@
 package de.christofreichardt.jca;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
-import java.security.KeyStore;
+import de.christofreichardt.diagnosis.AbstractTracer;
+import de.christofreichardt.diagnosis.Traceable;
+import de.christofreichardt.diagnosis.TracerFactory;
+
+import java.io.*;
+import java.security.*;
 import java.security.KeyStore.LoadStoreParameter;
-import java.security.KeyStoreException;
-import java.security.KeyStoreSpi;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Enumeration;
-
-import de.christofreichardt.diagnosis.AbstractTracer;
-import de.christofreichardt.diagnosis.Traceable;
-import de.christofreichardt.diagnosis.TracerFactory;
 
 public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 
@@ -77,6 +69,17 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
     @Override
     public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) throws KeyStoreException {
         this.keyStore.setKeyEntry(alias, key, chain);
+    }
+
+    @Override
+    public void engineSetEntry(String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
+        if (!(protectionParameter instanceof ShamirsProtection)) {
+            throw new IllegalArgumentException("ShamirsProtection required.");
+        }
+
+        ShamirsProtection shamirsProtection = (ShamirsProtection) protectionParameter;
+        KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
+        this.keyStore.setEntry(alias, entry, passwordProtection);
     }
 
     @Override
@@ -149,6 +152,19 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
             this.keyStore.store(stream, password);
         } catch (KeyStoreException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public void engineStore(LoadStoreParameter loadStoreParameter) throws IOException, NoSuchAlgorithmException, CertificateException {
+        if (!(loadStoreParameter instanceof ShamirsLoadParameter)) {
+            throw new IllegalArgumentException("ShamirsLoadParameter required.");
+        }
+
+        ShamirsLoadParameter shamirsLoadParameter = (ShamirsLoadParameter) loadStoreParameter;
+        ShamirsProtection shamirsProtection = (ShamirsProtection) shamirsLoadParameter.getProtectionParameter();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(shamirsLoadParameter.getFile())) {
+            engineStore(fileOutputStream, shamirsProtection.getPassword());
         }
     }
 

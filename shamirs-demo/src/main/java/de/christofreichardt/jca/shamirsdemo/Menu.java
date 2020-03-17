@@ -1,6 +1,7 @@
 package de.christofreichardt.jca.shamirsdemo;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public interface Menu {
 
@@ -12,6 +13,6 @@ public interface Menu {
 
     void print();
     Command readCommand() throws IOException;
-    <T extends Command> void execute(T command) throws IOException;
+    <T extends Command> void execute(T command) throws IOException, GeneralSecurityException;
     boolean isExit();
 }

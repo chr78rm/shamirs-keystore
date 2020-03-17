@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,7 +70,7 @@ public class App implements Traceable {
         }
     }
 
-    private void mainLoop() throws IOException {
+    private void mainLoop() {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "mainLoop()");
         try {
@@ -85,7 +86,7 @@ public class App implements Traceable {
                         System.console().printf("%s-> %s\n", this.currentWorkspace.getFileName(), command.getFullName());
                         this.menu.execute(command);
                     }
-                } catch (IOException | IllegalArgumentException | NoSuchElementException ex) {
+                } catch (IOException | IllegalArgumentException | NoSuchElementException | GeneralSecurityException ex) {
                     ex.printStackTrace();
                 }
             } while(!this.menu.isExit());
