@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -139,12 +140,22 @@ public class ShamirsKeystoreUnit implements Traceable {
 			ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
 			KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
 			keyStore.load(shamirsLoadParameter);
+			KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
 			Enumeration<String> aliases = keyStore.aliases();
 			while (aliases.hasMoreElements()) {
 				String alias = aliases.nextElement();
-				KeyStore.Entry entry = keyStore.getEntry(alias, new KeyStore.PasswordProtection(shamirsProtection.getPassword()));
+				KeyStore.Entry entry = keyStore.getEntry(alias, passwordProtection);
 				tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
 			}
+
+			KeyStore.Entry keyStoreEntry = keyStore.getEntry("my-test-keypair", passwordProtection);
+			assertThat(keyStoreEntry).isNotNull();
+			assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
+			X509Certificate x509Certificate = (X509Certificate) privateKeyEntry.getCertificate();
+			String distinguishedName = "CN=Christof,L=Rodgau,ST=Hessen,C=DE";
+			assertThat(x509Certificate.getIssuerX500Principal().getName()).isEqualTo(distinguishedName);
+			assertThat(x509Certificate.getSubjectX500Principal().getName()).isEqualTo(distinguishedName);
 		} finally {
 			tracer.wayout();
 		}
