@@ -22,10 +22,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -171,11 +170,8 @@ public class ShamirsKeystoreUnit implements Traceable {
 
         try {
             String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
-            Path[] paths = new Path[slices.length];
-            int i = 0;
-            for (String slice : slices) {
-                paths[i++] = Paths.get("json", "keystore-2").resolve(slice);
-            }
+            Set<Path> paths = Stream.of(slices).map(slice -> Paths.get("json", "keystore-2").resolve(slice))
+                    .collect(Collectors.toSet());
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
             File keyStoreFile = Paths.get("pkcs12", "my-keystore-2.p12").toFile();

@@ -285,13 +285,9 @@ public class MainMenu implements Menu, Traceable {
                 slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
             } while (!Pattern.matches(regex, slices));
             String[] files = slices.split(",");
-            Path[] paths = new Path[files.length];
-            int i = 0;
-            for (String file : files) {
-                Path path = this.app.getCurrentWorkspace().resolve(file.trim());
-                tracer.out().printfIndentln("path = %s", path);
-                paths[i++] = path;
-            }
+            Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
+                    .peek(path -> tracer.out().printfIndentln("path = %s", path))
+                    .collect(Collectors.toSet());
 
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);

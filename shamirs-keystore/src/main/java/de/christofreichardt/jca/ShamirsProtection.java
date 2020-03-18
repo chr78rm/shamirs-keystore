@@ -4,6 +4,7 @@ import de.christofreichardt.scala.shamir.SecretMerging;
 
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.util.Collection;
 
 public class ShamirsProtection implements KeyStore.ProtectionParameter {
     final Path[] paths;
@@ -11,6 +12,11 @@ public class ShamirsProtection implements KeyStore.ProtectionParameter {
 
     public ShamirsProtection(Path[] paths) {
         this.paths = paths;
+        this.password = mergePassword();
+    }
+
+    public ShamirsProtection(Collection<Path> paths) {
+        this.paths = paths.toArray(new Path[0]);
         this.password = mergePassword();
     }
 
