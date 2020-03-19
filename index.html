@@ -10,7 +10,8 @@
         padding-left: 1em; padding-right: 1em; padding-top: 0.25em; padding-bottom: 0.25em; background-color: rgb(224,224,224)
       }
       p.headline-0 {
-        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; padding-left: 1rem
+        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; 
+        padding-left: 1rem; padding-right: 0.75rem
       }
       p.headline-1 {
         background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; padding-left: 1rem
@@ -30,14 +31,43 @@
       span.formula {
         font-style: italic; font-family: 'Fira Code', monospace;
       }
+      div.drop-down-button {
+        height: 0rem; padding-right: 1rem; position: relative; float: right;
+      }
+      img.menu {
+        height: 1.5rem; margin-top: 0.8rem;
+      }
+      div.drop-down-content {
+        display: none; background-color: rgb(253,219,199); padding: 1rem; position: absolute; top: 0; left: -5rem; width: 9rem;
+        border-radius: 0.25rem; border-color: rgb(77,77,77); border-style: solid; border-width: 1px
+      }
+      div.drop-down-button:hover div.drop-down-content {
+        display: inline-block;
+      }
+      a.menu {
+        color: rgb(77,77,77); font-size: 0.9rem; 
+      }
+      p.menu {
+        line-height: 0.8rem
+      }
     </style>
   </head>
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-03-11</p>
-      <p class="headline-0">Shamir's Keystore</p>
-      <p class="headline-1">Abstract</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-03-19</p>
+      <div class="drop-down-button">
+        <img class="menu" src="menu-widget.png" alt="menu"/>
+        <div class="drop-down-content">
+          <p class="menu"><a class="menu" href="#1">Shamir's Keystore</a></p>
+          <p class="menu"><a class="menu" href="#2">Abstract</a></p>
+          <p class="menu"><a class="menu" href="#3">Build</a></p>
+          <p class="menu"><a class="menu" href="#4">Source Control</a></p>
+          <p class="menu"><a class="menu" href="#5">The Algorithm</a></p>
+        </div>
+      </div>
+      <p id="1" class="headline-0">Shamir's Keystore</p>
+      <p id="2" class="headline-1">Abstract</p>
       <p class="section">
         This <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html">JCA provider</a> presently implements 
         <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
@@ -47,7 +77,7 @@
         above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
         password with fewer shares as defined by the given threshold. In this way, it is possible to enforce the e.g. the four-eye-principle.
       </p>
-      <p class="headline-1">Build</p>
+      <p id="3" class="headline-1">Build</p>
       <p class="section">
         First clone the project:
       </p>
@@ -68,14 +98,14 @@
       <p class="section">
         Above command will compile the sources, run the tests and install the provider into the local Maven repo.
       </p>
-      <p class="headline-1">Source Control</p>
+      <p id="4" class="headline-1">Source Control</p>
       <p class="section">
         The source code is hosted in GitHub: <a href="https://github.com/chr78rm/shamirs-keystore">https://github.com/chr78rm/shamirs-keystore</a>.
         <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" style="float: right">
           <img style="height: 1.5rem" src="https://www.gnu.org/graphics/gplv3-with-text-84x42.png" alt="gplv3"/>
         </a>
       </p>
-      <p class="headline-1">The Algorithm</p>
+      <p id="5" class="headline-1">The Algorithm</p>
       <p class="section">
         Consider the polynomial
       </p>
