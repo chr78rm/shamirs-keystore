@@ -293,12 +293,7 @@ public class MainMenu implements Menu, Traceable {
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             keyStore.load(null, null);
-            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-            keyGenerator.init(256);
-            SecretKey secretKey = keyGenerator.generateKey();
-            KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
-            keyStore.setEntry("my-secret-key", secretKeyEntry, shamirsProtection);
-            keyStore.store(shamirsLoadParameter);
+            this.app.setMenu(new KeyStoreMenu(this.app, keyStore, shamirsLoadParameter));
         } finally {
             tracer.wayout();
         }
@@ -336,8 +331,14 @@ public class MainMenu implements Menu, Traceable {
                             throw new UncheckedIOException(ex);
                         }
                     });
-            try (Stream<Path> paths = Files.list(this.app.getCurrentWorkspace())) {
 
+            try (Stream<Path> paths = Files.list(this.app.getCurrentWorkspace())) {
+                Set<String> keystoreFiles = paths
+                        .map(path -> path.getFileName().toString())
+                        .filter(fileName -> fileName.endsWith(".p12"))
+                        .map(fileName -> fileName.substring(0, fileName.length() - ".p12".length()))
+                        .collect(Collectors.toSet());
+                System.console().printf("%s-> Keystores: %s\n", this.app.getCurrentWorkspace().getFileName(), keystoreFiles);
             }
         } finally {
             tracer.wayout();
