@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class KeyStoreMenu implements Menu, Traceable {
+public class KeyStoreMenu extends AbstractMenu {
 
     public enum KeystoreCommand implements Command {
         LIST_ENTRIES("l", "list entries"), SECRET_KEY("s", "secret key"),
@@ -50,12 +50,11 @@ public class KeyStoreMenu implements Menu, Traceable {
         }
     }
 
-    private final App app;
     private final KeyStore keyStore;
     private final ShamirsLoadParameter shamirsLoadParameter;
 
     public KeyStoreMenu(App app, KeyStore keyStore, ShamirsLoadParameter shamirsLoadParameter) {
-        this.app = app;
+        super(app);
         this.keyStore = keyStore;
         this.shamirsLoadParameter = shamirsLoadParameter;
     }
@@ -84,9 +83,9 @@ public class KeyStoreMenu implements Menu, Traceable {
     }
 
     @Override
-    public Command readCommand() throws IOException {
+    public Map<String, Command> computeShortCutMap() {
         AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("Command", this, "readCommand()");
+        tracer.entry("Map<String, Command>", this, "computeShortCutMap()");
         try {
             EnumSet<KeystoreCommand> keystoreCommands = EnumSet.allOf(KeystoreCommand.class);
 
@@ -97,26 +96,7 @@ public class KeyStoreMenu implements Menu, Traceable {
 
             tracer.out().printfIndentln("shortCuts = %s", shortCuts);
 
-            Command command = null;
-            System.console().printf("\n");
-            do {
-                String line = System.console().readLine("%s-> ", this.app.getCurrentWorkspace().getFileName());
-                tracer.out().printfIndentln("line = %s, %d", line, (line != null ? line.length() : -1));
-                tracer.out().flush();
-                if (line != null) {
-                    String found = shortCuts.keySet().stream()
-                            .filter(shortCut -> line.startsWith(shortCut))
-                            .findFirst()
-                            .orElseThrow();
-
-                    tracer.out().printfIndentln("found = %s, %b, %s", found, shortCuts.containsKey(found), shortCuts.get(found));
-                    tracer.out().flush();
-
-                    command = shortCuts.get(found);
-                }
-            } while (command == null);
-
-            return command;
+            return shortCuts;
         } finally {
             tracer.wayout();
         }
@@ -180,10 +160,5 @@ public class KeyStoreMenu implements Menu, Traceable {
     @Override
     public boolean isExit() {
         return false;
-    }
-
-    @Override
-    public AbstractTracer getCurrentTracer() {
-        return TracerFactory.getInstance().getCurrentPoolTracer();
     }
 }

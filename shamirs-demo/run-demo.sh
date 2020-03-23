@@ -2,9 +2,17 @@
 
 MAVEN_REPO=$HOME/.m2/repository/
 echo Using ${MAVEN_REPO} ...
+
 echo
-java -version
-java -cp target/shamirs-demo-0.0.1-SNAPSHOT.jar:\
+if [ "x${JAVA_HOME}" == "x" ]
+  then
+    BIN_JAVA=$(which java)
+  else
+    BIN_JAVA=${JAVA_HOME}/bin/java
+fi
+${BIN_JAVA} -version
+
+${BIN_JAVA} -cp target/shamirs-demo-0.0.1-SNAPSHOT.jar:\
 ${MAVEN_REPO}/de/christofreichardt/tracelogger/1.8.0/tracelogger-1.8.0.jar:\
 ${MAVEN_REPO}/de/christofreichardt/shamirs-keystore/0.0.1-SNAPSHOT/shamirs-keystore-0.0.1-SNAPSHOT.jar:\
 ${MAVEN_REPO}/de/christofreichardt/shamirs-secret-sharing/0.0.1-SNAPSHOT/shamirs-secret-sharing-0.0.1-SNAPSHOT.jar:\

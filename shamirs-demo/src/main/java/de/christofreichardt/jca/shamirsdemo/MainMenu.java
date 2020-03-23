@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MainMenu implements Menu, Traceable {
+public class MainMenu  extends AbstractMenu {
 
     final static Pattern PARTITION_PATTERN = Pattern.compile("[A-Za-z]{1,10}");
 
@@ -65,11 +65,10 @@ public class MainMenu implements Menu, Traceable {
         }
     }
 
-    private final App app;
     private boolean exit = false;
 
     public MainMenu(App app) {
-        this.app = app;
+        super(app);
     }
 
     @Override
@@ -99,39 +98,20 @@ public class MainMenu implements Menu, Traceable {
     }
 
     @Override
-    public MainCommand readCommand() throws IOException {
+    public Map<String, Command> computeShortCutMap() {
         AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("MainCommand", this, "readCommand()");
+        tracer.entry("Map<String, Command>", this, "computeShortCutMap()");
         try {
             EnumSet<MainCommand> mainCommands = EnumSet.allOf(MainCommand.class);
 
             tracer.out().printfIndentln("mainCommands = %s", mainCommands);
 
-            Map<String, MainCommand> shortCuts = mainCommands.stream()
+            Map<String, Command> shortCuts = mainCommands.stream()
                     .collect(Collectors.toMap(mainCommand -> mainCommand.getShortCut(), Function.identity()));
 
             tracer.out().printfIndentln("shortCuts = %s", shortCuts);
 
-            MainCommand mainCommand = null;
-            System.console().printf("\n");
-            do {
-                String line = System.console().readLine("%s-> ", this.app.getCurrentWorkspace().getFileName());
-                tracer.out().printfIndentln("line = %s, %d", line, (line != null ? line.length() : -1));
-                tracer.out().flush();
-                if (line != null) {
-                    String found = shortCuts.keySet().stream()
-                            .filter(shortCut -> line.startsWith(shortCut))
-                            .findFirst()
-                            .orElseThrow();
-
-                    tracer.out().printfIndentln("found = %s, %b, %s", found, shortCuts.containsKey(found), shortCuts.get(found));
-                    tracer.out().flush();
-
-                    mainCommand = shortCuts.get(found);
-                }
-            } while (mainCommand == null);
-
-            return mainCommand;
+            return shortCuts;
         } finally {
             tracer.wayout();
         }
@@ -343,10 +323,5 @@ public class MainMenu implements Menu, Traceable {
         } finally {
             tracer.wayout();
         }
-    }
-
-    @Override
-    public AbstractTracer getCurrentTracer() {
-        return TracerFactory.getInstance().getCurrentPoolTracer();
     }
 }

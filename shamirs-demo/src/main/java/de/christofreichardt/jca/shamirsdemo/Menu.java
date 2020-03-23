@@ -2,6 +2,7 @@ package de.christofreichardt.jca.shamirsdemo;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Map;
 
 public interface Menu {
 
@@ -15,4 +16,5 @@ public interface Menu {
     Command readCommand() throws IOException;
     <T extends Command> void execute(T command) throws IOException, GeneralSecurityException;
     boolean isExit();
+    Map<String, Command> computeShortCutMap();
 }
