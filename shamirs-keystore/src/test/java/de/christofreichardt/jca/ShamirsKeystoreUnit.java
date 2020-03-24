@@ -141,15 +141,14 @@ public class ShamirsKeystoreUnit implements Traceable {
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             keyStore.load(shamirsLoadParameter);
-            KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
             Enumeration<String> aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                KeyStore.Entry entry = keyStore.getEntry(alias, passwordProtection);
+                KeyStore.Entry entry = keyStore.getEntry(alias, shamirsProtection);
                 tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
             }
 
-            KeyStore.Entry keyStoreEntry = keyStore.getEntry("my-test-keypair", passwordProtection);
+            KeyStore.Entry keyStoreEntry = keyStore.getEntry("my-test-keypair", shamirsProtection);
             assertThat(keyStoreEntry).isNotNull();
             assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
@@ -187,8 +186,7 @@ public class ShamirsKeystoreUnit implements Traceable {
             keyStore.setEntry(ALIAS, secretKeyEntry, shamirsProtection);
             keyStore.store(shamirsLoadParameter);
             keyStore.load(shamirsLoadParameter);
-            KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
-            KeyStore.Entry keyStoreEntry = keyStore.getEntry(ALIAS, passwordProtection);
+            KeyStore.Entry keyStoreEntry = keyStore.getEntry(ALIAS, shamirsProtection);
             assertThat(keyStoreEntry).isNotNull();
             assertThat(keyStoreEntry).isInstanceOf(KeyStore.SecretKeyEntry.class);
             secretKeyEntry = (KeyStore.SecretKeyEntry) keyStoreEntry;

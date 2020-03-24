@@ -72,6 +72,18 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
     }
 
     @Override
+    public KeyStore.Entry engineGetEntry(String alias, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+        if (!(protectionParameter instanceof ShamirsProtection)) {
+            throw new IllegalArgumentException("ShamirsProtection required.");
+        }
+
+        ShamirsProtection shamirsProtection = (ShamirsProtection) protectionParameter;
+        KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
+
+        return this.keyStore.getEntry(alias, passwordProtection);
+    }
+
+    @Override
     public void engineSetEntry(String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
         if (!(protectionParameter instanceof ShamirsProtection)) {
             throw new IllegalArgumentException("ShamirsProtection required.");

@@ -1,16 +1,12 @@
 package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
-import de.christofreichardt.diagnosis.Traceable;
-import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.ShamirsLoadParameter;
 import de.christofreichardt.jca.ShamirsProtection;
 import de.christofreichardt.jca.ShamirsProvider;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -239,10 +235,32 @@ public class MainMenu  extends AbstractMenu {
         }
     }
 
-    void loadKeystore() {
+    void loadKeystore() throws GeneralSecurityException, IOException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "loadKeystore()");
         try {
+            String regex = "[A-Za-z-]{1,20}";
+            String keystoreName;
+            do {
+                keystoreName = System.console().readLine("%s-> Keystore name (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
+            } while (!Pattern.matches(regex, keystoreName));
+            File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
+
+            String slices;
+            regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
+            do {
+                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
+            } while (!Pattern.matches(regex, slices));
+            String[] files = slices.split(",");
+            Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
+                    .peek(path -> tracer.out().printfIndentln("path = %s", path))
+                    .collect(Collectors.toSet());
+
+            KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
+            ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
+            ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
+            keyStore.load(shamirsLoadParameter);
+            this.app.setMenu(new KeyStoreMenu(this.app, keyStore, shamirsLoadParameter));
         } finally {
             tracer.wayout();
         }

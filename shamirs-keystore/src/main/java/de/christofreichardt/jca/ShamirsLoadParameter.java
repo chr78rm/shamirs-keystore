@@ -23,7 +23,4 @@ public class ShamirsLoadParameter implements KeyStore.LoadStoreParameter {
         return file;
     }
 
-    public ShamirsProtection getShamirsProtection() {
-        return shamirsProtection;
-    }
 }
