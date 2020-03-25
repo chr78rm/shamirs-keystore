@@ -6,11 +6,46 @@ import de.christofreichardt.diagnosis.TracerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 abstract public class AbstractMenu implements Menu, Traceable {
 
     final App app;
     final Map<String, Command> shortCuts;
+
+    class Console {
+        String readString(String regex, String label) {
+            String input;
+            do {
+                input = System.console().readLine("%s-> %s (%s): ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex);
+            } while (!Pattern.matches(regex, input));
+
+            return input;
+        }
+
+        String readString(Pattern pattern, String label) {
+            String input;
+            do {
+                input = System.console().readLine("%s-> %s (%s): ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, pattern.pattern());
+            } while (!pattern.matcher(input).matches());
+
+            return input;
+        }
+
+        int readInt(String regex, String label) {
+            Integer input = null;
+            do {
+                String line = System.console().readLine("%s-> %s (%s): ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex);
+                if (Pattern.matches(regex, line)) {
+                    input = Integer.parseInt(line);
+                }
+            } while (input == null);
+
+            return input;
+        }
+    }
+
+    final Console console = new Console();
 
     public AbstractMenu(App app) {
         this.app = app;

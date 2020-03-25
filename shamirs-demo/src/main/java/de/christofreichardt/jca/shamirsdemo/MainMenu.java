@@ -148,47 +148,15 @@ public class MainMenu  extends AbstractMenu {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "splitPassword()");
         try {
-            String password;
-            String regex = "[A-Za-z0-9-]{8,45}";
-            do {
-                password = System.console().readLine("%s-> Password (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, password));
-
-            int shares = -1;
-            regex = "[0-9]+";
-            do {
-                String line = System.console().readLine("%s-> Number of shares (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-                if (Pattern.matches(regex, line)) {
-                    shares = Integer.parseInt(line);
-                }
-            } while (shares == -1);
-
-            int threshold = -1;
-            regex = "[0-9]+";
-            do {
-                String line = System.console().readLine("%s-> Threshold (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-                if (Pattern.matches(regex, line)) {
-                    threshold = Integer.parseInt(line);
-                }
-            } while (threshold == -1);
-
-            String partition;
-            do {
-                partition = System.console().readLine("%s-> Name of partition (%s): ", this.app.getCurrentWorkspace().getFileName(), PARTITION_PATTERN.pattern());
-            } while (!PARTITION_PATTERN.matcher(partition).matches());
-
-            int slices = -1;
-            regex = "[0-9]+";
-            do {
-                String line = System.console().readLine("%s-> Number of slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-                if (Pattern.matches(regex, line)) {
-                    slices = Integer.parseInt(line);
-                }
-            } while (slices == -1);
+            String password = this.console.readString("[A-Za-z0-9-]{8,45}", "Password");
+            int shares = this.console.readInt("[0-9]+", "Number of shares");
+            int threshold = this.console.readInt("[0-9]+", "Threshold");
+            String partition = this.console.readString(PARTITION_PATTERN, "Name of partition");
+            int slices = this.console.readInt("[0-9]+", "Number of slices");
 
             int[] sizes = new int[slices];
             int sum = 0;
-            regex = "[0-9]+";
+            String regex = "[0-9]+";
             for (int i = 0; i < slices; i++) {
                 int size = -1;
                 do {
@@ -215,10 +183,7 @@ public class MainMenu  extends AbstractMenu {
         tracer.entry("void", this, "mergePassword()");
         try {
             String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
-            String slices;
-            do {
-                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, slices));
+            String slices = this.console.readString(regex, "Slices");
             String[] files = slices.split(",");
             Path[] paths = new Path[files.length];
             int i = 0;
@@ -239,18 +204,11 @@ public class MainMenu  extends AbstractMenu {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "loadKeystore()");
         try {
-            String regex = "[A-Za-z-]{1,20}";
-            String keystoreName;
-            do {
-                keystoreName = System.console().readLine("%s-> Keystore name (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, keystoreName));
+            String keystoreName = this.console.readString("[A-Za-z-]{1,20}", "Keystore name");
             File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
 
-            String slices;
-            regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
-            do {
-                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, slices));
+            String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
+            String slices = this.console.readString(regex, "Slićes");
             String[] files = slices.split(",");
             Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
                     .peek(path -> tracer.out().printfIndentln("path = %s", path))
@@ -260,6 +218,7 @@ public class MainMenu  extends AbstractMenu {
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             keyStore.load(shamirsLoadParameter);
+
             this.app.setMenu(new KeyStoreMenu(this.app, keyStore, shamirsLoadParameter));
         } finally {
             tracer.wayout();
@@ -270,18 +229,11 @@ public class MainMenu  extends AbstractMenu {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "createKeystore()");
         try {
-            String regex = "[A-Za-z-]{1,20}";
-            String keystoreName;
-            do {
-                keystoreName = System.console().readLine("%s-> Keystore name (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, keystoreName));
+            String keystoreName = this.console.readString("[A-Za-z-]{1,20}", "Keystore name");
             File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
 
-            String slices;
-            regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
-            do {
-                slices = System.console().readLine("%s-> Slices (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, slices));
+            String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
+            String slices = this.console.readString(regex, "Slićes");
             String[] files = slices.split(",");
             Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
                     .peek(path -> tracer.out().printfIndentln("path = %s", path))
@@ -291,6 +243,7 @@ public class MainMenu  extends AbstractMenu {
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             keyStore.load(null, null);
+
             this.app.setMenu(new KeyStoreMenu(this.app, keyStore, shamirsLoadParameter));
         } finally {
             tracer.wayout();

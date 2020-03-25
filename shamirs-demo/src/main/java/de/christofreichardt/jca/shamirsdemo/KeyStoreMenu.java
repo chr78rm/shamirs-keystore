@@ -132,26 +132,9 @@ public class KeyStoreMenu extends AbstractMenu {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "addSecretKey()");
         try {
-            String regex = "AES|ChaCha20|HmacSHA512";
-            String algorithm;
-            do {
-                algorithm = System.console().readLine("%s-> Algorithm (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, algorithm));
-
-            regex = "128|256|512";
-            int keySize = -1;
-            do {
-                String line = System.console().readLine("%s-> Keysize (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-                if (Pattern.matches(regex, line)) {
-                    keySize = Integer.parseInt(line);
-                }
-            } while (keySize == -1);
-
-            regex = "[A-Za-z0-9-]{5,25}";
-            String alias;
-            do {
-                alias = System.console().readLine("%s-> Alias (%s): ", this.app.getCurrentWorkspace().getFileName(), regex);
-            } while (!Pattern.matches(regex, alias));
+            String algorithm = this.console.readString("AES|ChaCha20|HmacSHA512", "Algorithm");
+            int keySize = this.console.readInt("128|256|512", "Keysize");
+            String alias = this.console.readString("[A-Za-z0-9-]{5,25}", "Alias");
 
             KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
             keyGenerator.init(keySize);
