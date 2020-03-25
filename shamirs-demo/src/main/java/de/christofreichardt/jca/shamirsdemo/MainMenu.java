@@ -11,17 +11,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -136,6 +135,9 @@ public class MainMenu  extends AbstractMenu {
                     break;
                 case CREATE_KEYSTORE:
                     createKeystore();
+                    break;
+                case OPEN_WORKSPACE:
+                    openWorkspace();
                     break;
                 case EXIT:
                     this.exit = true;
@@ -298,6 +300,45 @@ public class MainMenu  extends AbstractMenu {
                         .collect(Collectors.toSet());
                 System.console().printf("%s-> Keystores: %s\n", this.app.getCurrentWorkspace().getFileName(), keystoreFiles);
             }
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void openWorkspace() throws IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "openWorkspace()");
+        try {
+            final int LIMIT = 2;
+            Path workspaceDir = Paths.get(".", "workspace");
+            System.console().printf("%s-> Workspaces:\n\n", this.app.getCurrentWorkspace().getFileName());
+            try (DirectoryStream<Path> paths = Files.newDirectoryStream(workspaceDir, path -> path.toFile().isDirectory())) {
+                int count = 0;
+                Iterator<Path> iter = paths.iterator();
+                while (iter.hasNext()) {
+                    Path path = iter.next();
+                    System.console().printf("   %20s", path.getFileName());
+                    if (++count == LIMIT) {
+                        System.console().printf("\n");
+                        count = 0;
+                    }
+                }
+                if (count == 0) {
+                    System.console().printf("\n");
+                } else {
+                    System.console().printf("\n\n");
+                }
+            }
+
+            Path workspace = Path.of(this.console.readString("[A-Za-z0-9-]{8,45}", "Workspace"));
+            workspace = workspaceDir.resolve(workspace);
+            if (Files.exists(workspace) && !Files.isDirectory(workspace)) {
+                throw new IOException(String.format("%s isn't a directory.", workspace));
+            }
+            if (!Files.exists(workspace)) {
+                Files.createDirectory(workspace);
+            }
+            this.app.setCurrentWorkspace(workspace);
         } finally {
             tracer.wayout();
         }
