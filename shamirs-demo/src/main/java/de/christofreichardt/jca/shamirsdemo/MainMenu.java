@@ -33,7 +33,7 @@ public class MainMenu  extends AbstractMenu {
 
     public enum MainCommand implements Command {
         SPLIT_PASSWORD("s", "split password"), MERGE_PASSWORD("m", "merge password"),
-        OPEN_WORKSPACE("o", "open workspace"), CREATE_KEYSTOE("c", "create keystore"),
+        OPEN_WORKSPACE("o", "open workspace"), CREATE_KEYSTORE("c", "create keystore"),
         LIST_WORKSPACE("li", "list workspace"),
         LOAD_KEYSTORE("lo", "load keystore"), EXIT("e", "exit");
 
@@ -82,7 +82,7 @@ public class MainMenu  extends AbstractMenu {
             System.console().printf("   %20s", MainCommand.MERGE_PASSWORD.getDisplayName());
             System.console().printf("   %20s", MainCommand.OPEN_WORKSPACE.getDisplayName());
             System.console().printf("\n");
-            System.console().printf("   %20s", MainCommand.CREATE_KEYSTOE.getDisplayName());
+            System.console().printf("   %20s", MainCommand.CREATE_KEYSTORE.getDisplayName());
             System.console().printf("   %20s", MainCommand.LOAD_KEYSTORE.getDisplayName());
             System.console().printf("   %20s", MainCommand.LIST_WORKSPACE.getDisplayName());
             System.console().printf("\n");
@@ -121,18 +121,25 @@ public class MainMenu  extends AbstractMenu {
             tracer.out().printfIndentln("command = %s", command);
 
             MainCommand mainCommand = MainCommand.valueOf(command.toString());
-            if (mainCommand == MainCommand.SPLIT_PASSWORD) {
-                splitPassword();
-            } else if (mainCommand == MainCommand.MERGE_PASSWORD) {
-                mergePassword();
-            } else if (mainCommand == MainCommand.LOAD_KEYSTORE) {
-                loadKeystore();
-            } else if (mainCommand == MainCommand.LIST_WORKSPACE) {
-                listWorkspace();
-            } else if (mainCommand == MainCommand.CREATE_KEYSTOE) {
-                createKeystore();
-            } else if (mainCommand == MainCommand.EXIT) {
-                this.exit = true;
+            switch (mainCommand) {
+                case SPLIT_PASSWORD:
+                    splitPassword();
+                    break;
+                case MERGE_PASSWORD:
+                    mergePassword();
+                    break;
+                case LOAD_KEYSTORE:
+                    loadKeystore();
+                    break;
+                case LIST_WORKSPACE:
+                    listWorkspace();
+                    break;
+                case CREATE_KEYSTORE:
+                    createKeystore();
+                    break;
+                case EXIT:
+                    this.exit = true;
+                    break;
             }
         } finally {
             tracer.wayout();
