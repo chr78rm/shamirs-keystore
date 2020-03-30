@@ -55,6 +55,19 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.1.1</version>
             </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M4</version>
+                <configuration>
+                    <includes>
+                        <include>de/christofreichardt/jca/shamirsdemo/ShamirsDemoUnit.java</include>
+                    </includes>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
+                    <systemPropertyVariables>
+                        <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/shamirsdemo/trace-config.xml</de.christofreichardt.junit5.traceConfig>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -69,6 +82,36 @@
             <artifactId>shamirs-keystore</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.15.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.christofreichardt</groupId>
+            <artifactId>junit5-ext</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

@@ -24,11 +24,11 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 	@Override
 	public void testPlanExecutionStarted(TestPlan testPlan) {
 		System.out.printf("%s: Testplan execution has been started ...\n", Thread.currentThread().getName());
-		System.out.printf("Using de.christofreichardt.junit5.traceConfig = %s ...\n", System.getProperty("de.christofreichardt.junit5.traceConfig"));
+		System.out.printf("Using de.christofreichardt.junit5.traceConfig = %s...\n", System.getProperty("de.christofreichardt.junit5.traceConfig"));
 
 		try {
 			TracerFactory.getInstance().reset();
-			if (System.getProperties().contains("de.christofreichardt.junit5.traceConfig")) {
+			if (System.getProperties().containsKey("de.christofreichardt.junit5.traceConfig")) {
 				InputStream resourceAsStream = MyTestExecutionListener.class.getClassLoader()
 						.getResourceAsStream(System.getProperty("de.christofreichardt.junit5.traceConfig"));
 				if (resourceAsStream != null) {
