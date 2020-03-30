@@ -43,6 +43,9 @@
                         <include>de/christofreichardt/jca/ShamirsKeystoreUnit.java</include>
                     </includes>
                     <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
+                    <systemPropertyVariables>
+                        <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/trace-config.xml</de.christofreichardt.junit5.traceConfig>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
