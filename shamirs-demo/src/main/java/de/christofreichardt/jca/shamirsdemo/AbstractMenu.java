@@ -22,6 +22,15 @@ abstract public class AbstractMenu implements Menu, Traceable {
 
             return input;
         }
+        String readString(String regex, String label, String proposal) {
+            String input;
+            do {
+                input = (System.console().readLine("%s-> %s (%s): %s ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal));
+                input = input.length() == 0 ? proposal : input;
+            } while (!Pattern.matches(regex, input));
+
+            return input;
+        }
 
         String readString(Pattern pattern, String label) {
             String input;

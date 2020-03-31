@@ -65,6 +65,7 @@
                     <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
                     <systemPropertyVariables>
                         <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/shamirsdemo/trace-config.xml</de.christofreichardt.junit5.traceConfig>
+                        <java.security.egd>file:/dev/urandom</java.security.egd>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

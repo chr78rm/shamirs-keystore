@@ -153,11 +153,15 @@ public class MainMenu  extends AbstractMenu {
         return this.exit;
     }
 
-    void splitPassword() {
+    void splitPassword() throws GeneralSecurityException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "splitPassword()");
         try {
-            String password = this.console.readString("[A-Za-z0-9-]{8,45}", "Password");
+            final int LENGTH = 25;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
+            String proposal = passwordGenerator.generate().findFirst().get();
+
+            String password = this.console.readString("[A-Za-z0-9-]{8,45}", "Password", proposal);
             int shares = this.console.readInt("[0-9]+", "Number of shares");
             int threshold = this.console.readInt("[0-9]+", "Threshold");
             String partition = this.console.readString(PARTITION_PATTERN, "Name of partition");
