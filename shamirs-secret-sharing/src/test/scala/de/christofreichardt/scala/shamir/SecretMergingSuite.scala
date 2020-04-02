@@ -1,6 +1,8 @@
 package de.christofreichardt.scala
 package shamir
 
+import java.nio.charset.StandardCharsets
+
 import de.christofreichardt.scalatest.MyFunSuite
 import de.christofreichardt.scala.utils.RandomGenerator
 import java.security.SecureRandom
@@ -193,4 +195,30 @@ class SecretMergingSuite extends MyFunSuite {
 //    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
 //    assert(secretSharing.verified)
 //  }
-}
+
+    /*
+     * A password containing several characters from the range 0080–00FF (Latin-1 Supplement), in particular
+     * some german umlauts. The sharing and merging algorithms are defaulting to UTF-8 when encoding respective
+     * decoding the characters.
+     */
+    testWithTracing(this, "Password-1") {
+      val tracer = getCurrentTracer()
+      val SHARES = 12
+      val THRESHOLD = 4
+      val password = "secret-\u00E4\u00F6\u00FC-with-umlauts"
+      tracer.out().printfIndentln("password = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
+      val secretSharing = new SecretSharing(SHARES, THRESHOLD, password)
+      assert(secretSharing.n == SHARES && secretSharing.k == THRESHOLD)
+      tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+      val chosenSharePoints = randomGenerator.intStream(SHARES)
+        .distinct
+        .take(THRESHOLD)
+        .map(i => secretSharing.sharePoints(i))
+        .toIndexedSeq
+      val secretMerging = SecretMerging(chosenSharePoints, secretSharing.prime)
+      tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
+      val recoveredPassword = new String(secretMerging.password)
+      tracer.out().printfIndentln("recoveredPassword = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", recoveredPassword, formatBytes(recoveredPassword.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
+      assert(password == recoveredPassword)
+    }
+  }
