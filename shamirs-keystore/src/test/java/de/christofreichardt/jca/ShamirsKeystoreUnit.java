@@ -89,7 +89,7 @@ public class ShamirsKeystoreUnit implements Traceable {
             String myPassword = "Dies-ist-streng-geheim";
             final int SHARES = 8;
             final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword.getBytes(StandardCharsets.UTF_8));
+            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
             SecretMerging secretMerging = new SecretMerging(secretSharing.sharePoints(), secretSharing.prime());
             assertThat(secretMerging.password()).isEqualTo(myPassword.toCharArray());
         } finally {
@@ -107,7 +107,7 @@ public class ShamirsKeystoreUnit implements Traceable {
             String myPassword = "Dies-ist-streng-geheim";
             final int SHARES = 8;
             final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword.getBytes(StandardCharsets.UTF_8));
+            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
             final int[] SIZES = {4, 2, 2};
             secretSharing.savePartition(SIZES, Paths.get("json", "roundtrip-2", "partition"));
             Path[] paths_1 = {Paths.get("json", "roundtrip-2", "partition-0.json")};
@@ -132,7 +132,7 @@ public class ShamirsKeystoreUnit implements Traceable {
             String myPassword = "Super-sicheres-Passwort";
             final int SHARES = 8;
             final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword.getBytes(StandardCharsets.UTF_8));
+            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
             final int[] SIZES = {4, 2, 2};
             secretSharing.savePartition(SIZES, Paths.get("json", "keystore-1", "partition"));
             Path[] paths_1 = {Paths.get("json", "keystore-1", "partition-0.json")};

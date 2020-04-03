@@ -181,7 +181,7 @@ public class MainMenu  extends AbstractMenu {
                 sizes[i] = size;
                 sum += size;
             }
-            SecretSharing secretSharing = new SecretSharing(shares, threshold, password.getBytes(StandardCharsets.UTF_8));
+            SecretSharing secretSharing = new SecretSharing(shares, threshold, password);
 
             tracer.out().printfIndentln("secretSharing = %s", secretSharing);
 
