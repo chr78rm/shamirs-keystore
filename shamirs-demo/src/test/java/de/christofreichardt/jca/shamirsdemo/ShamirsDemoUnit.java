@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,7 +79,7 @@ public class ShamirsDemoUnit implements Traceable {
 
     @Test
     @DisplayName("passwordStream")
-    void dummy() throws GeneralSecurityException {
+    void passwordStream() throws GeneralSecurityException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "passwordStream()");
 
@@ -86,7 +88,7 @@ public class ShamirsDemoUnit implements Traceable {
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
             boolean exactlyOnce = passwordGenerator.generate()
                     .limit(LIMIT)
-                    .peek(password -> tracer.out().printfIndentln(password))
+                    .peek(password -> tracer.out().printfIndentln("%s", password))
                     .collect(new PasswordCollector())
                     .entrySet().stream()
                     .allMatch(entry -> entry.getValue() == 1);
@@ -95,6 +97,42 @@ public class ShamirsDemoUnit implements Traceable {
         } finally {
             tracer.wayout();
         }
+    }
+
+    @Test
+    @DisplayName("encoding")
+    void encoding() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "encoding()");
+
+        try {
+            final int LIMIT = 100, LENGTH = 25;
+            final char[] SYMBOLS = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                    'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7',
+                    '8', '9', '0', 'Ä', 'Ö', 'Ü', 'ä', 'ö', 'ü', '#', '$', '%', '&', '(', ')', '*', '+', '-', '<', '=', '>',
+                    '?', '§', '\u00C2', '\u00D4', '\u00DB'};
+            final String[] LATIN1_SUPPLEMENT_SYMBOLS = {"Ä", "Ö", "Ü", "ä", "ö", "ü", "§", "\u00C2", "\u00D4", "\u00DB"};
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, SYMBOLS);
+            passwordGenerator.generate()
+                    .filter(password -> Stream.of(LATIN1_SUPPLEMENT_SYMBOLS).anyMatch(seq -> password.contains(seq)))
+                    .limit(LIMIT)
+                    .forEach(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))));
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    private String formatBytes(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i=0; i<bytes.length; i++) {
+            stringBuilder.append(String.format("0x%02X", bytes[i]));
+            if (i < bytes.length - 1) {
+                stringBuilder.append(",");
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     @Override

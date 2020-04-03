@@ -15,18 +15,23 @@ import java.util.stream.Stream;
 import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
 public class PasswordGenerator implements Traceable {
-    static public final String[] SYMBOLS = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
-            "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
-            "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7",
-            "8", "9", "0"};
 
     final SecureRandom secureRandom;
     final int length;
+    final char[] symbols;
 
     public PasswordGenerator(int length) throws GeneralSecurityException {
+        this(length, new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', '0'});
+    }
+
+    public PasswordGenerator(int length, char[] symbols) throws GeneralSecurityException {
         this.secureRandom = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(
                 256, PR_AND_RESEED, "christof".getBytes()));
         this.length = length;
+        this.symbols = symbols;
     }
 
     Stream<String> generate() {
@@ -45,8 +50,8 @@ public class PasswordGenerator implements Traceable {
         try {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i=0; i<this.length; i++) {
-                int index = secureRandom.nextInt(SYMBOLS.length);
-                stringBuilder.append(SYMBOLS[index]);
+                int index = secureRandom.nextInt(this.symbols.length);
+                stringBuilder.append(this.symbols[index]);
             }
 
             return stringBuilder.toString();
