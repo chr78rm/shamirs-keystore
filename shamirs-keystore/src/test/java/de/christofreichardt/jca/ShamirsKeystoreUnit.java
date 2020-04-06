@@ -111,12 +111,13 @@ public class ShamirsKeystoreUnit implements Traceable {
             final int[] SIZES = {4, 2, 2};
             secretSharing.savePartition(SIZES, Paths.get("json", "roundtrip-2", "partition"));
             Path[] paths_1 = {Paths.get("json", "roundtrip-2", "partition-0.json")};
-            assertThat(SecretMerging.apply(paths_1).password()).isEqualTo(myPassword.toCharArray());
+            assertThat(new ShamirsProtection(paths_1).getPassword()).isEqualTo(myPassword.toCharArray());
             Path[] paths_2 = {Paths.get("json", "roundtrip-2", "partition-1.json"), Paths.get("json", "roundtrip-2", "partition-2.json")};
-            assertThat(SecretMerging.apply(paths_2).password()).isEqualTo(myPassword.toCharArray());
+            assertThat(new ShamirsProtection(paths_2).getPassword()).isEqualTo(myPassword.toCharArray());
             Path[] paths_3 = {Paths.get("json", "roundtrip-2", "partition-1.json")};
-            Throwable catched = catchThrowable(() -> SecretMerging.apply(paths_3).password());
+            Throwable catched = catchThrowable(() -> new ShamirsProtection(paths_3).getPassword());
             assertThat(catched).isInstanceOf(IllegalArgumentException.class);
+            assertThat(catched).hasMessage("requirement failed: Too few sharepoints.");
         } finally {
             tracer.wayout();
         }
@@ -135,9 +136,9 @@ public class ShamirsKeystoreUnit implements Traceable {
             SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
             final int[] SIZES = {4, 2, 2};
             secretSharing.savePartition(SIZES, Paths.get("json", "keystore-1", "partition"));
-            Path[] paths_1 = {Paths.get("json", "keystore-1", "partition-0.json")};
+            Path[] paths = {Paths.get("json", "keystore-1", "partition-0.json")};
             File keyStoreFile = Paths.get("pkcs12", "my-keystore-1.p12").toFile();
-            ShamirsProtection shamirsProtection = new ShamirsProtection(paths_1);
+            ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             keyStore.load(shamirsLoadParameter);
