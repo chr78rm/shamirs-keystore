@@ -10,28 +10,56 @@ import java.security.DrbgParameters;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
 public class PasswordGenerator implements Traceable {
 
+    private static final char[] ALPHANUMERIC = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7',
+            '8', '9', '0'};
+    private static final char[] UMLAUTS = {'Ä', 'Ö', 'Ü', 'ä', 'ö', 'ü'};
+    private static final char[] PUNCTUATION_AND_SYMBOLS = {'!', '#', '$', '%', '&', '(', ')', '*', '+', '-', '<', '=', '>', '?'};
+    private static final char[] ALPHANUMERIC_WITH_UMLAUTS = ArrayUtils.concat(ALPHANUMERIC, UMLAUTS);
+    private static final char[] ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS = ArrayUtils.concat(ALPHANUMERIC, PUNCTUATION_AND_SYMBOLS);
+    private static final char[] ALL = ArrayUtils.concat(ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS, UMLAUTS);
+
+    public static char[] alphanumeric() {
+        return Arrays.copyOf(ALPHANUMERIC, ALPHANUMERIC.length);
+    }
+
+    public static char[] umlauts() {
+        return Arrays.copyOf(UMLAUTS, UMLAUTS.length);
+    }
+
+    public static char[] alphanumericWithUmlauts() {
+        return Arrays.copyOf(ALPHANUMERIC_WITH_UMLAUTS, ALPHANUMERIC_WITH_UMLAUTS.length);
+    }
+
+    public static char[] alphanumericWithPunctuationAndSymbols() {
+        return Arrays.copyOf(ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS, ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS.length);
+    }
+
+    public static char[] all() {
+        return Arrays.copyOf(ALL, ALL.length);
+    }
+
     final SecureRandom secureRandom;
     final int length;
     final char[] symbols;
 
     public PasswordGenerator(int length) throws GeneralSecurityException {
-        this(length, new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-                'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7',
-                '8', '9', '0'});
+        this(length, ALPHANUMERIC);
     }
 
     public PasswordGenerator(int length, char[] symbols) throws GeneralSecurityException {
         this.secureRandom = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(
                 256, PR_AND_RESEED, "christof".getBytes()));
         this.length = length;
-        this.symbols = symbols;
+        this.symbols = Arrays.copyOf(symbols, symbols.length);
     }
 
     Stream<String> generate() {

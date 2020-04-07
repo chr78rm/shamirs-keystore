@@ -3,6 +3,8 @@ package de.christofreichardt.jca.shamirsdemo;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import de.christofreichardt.scala.shamir.SecretMerging;
+import de.christofreichardt.scala.shamir.SecretSharing;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,15 +12,13 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,10 +100,10 @@ public class ShamirsDemoUnit implements Traceable {
     }
 
     @Test
-    @DisplayName("encoding")
-    void encoding() throws GeneralSecurityException {
+    @DisplayName("encoding-1")
+    void encoding_1() throws GeneralSecurityException {
         AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("void", this, "encoding()");
+        tracer.entry("void", this, "encoding_1()");
 
         try {
             final int LIMIT = 100, LENGTH = 25;
@@ -113,11 +113,54 @@ public class ShamirsDemoUnit implements Traceable {
                     '8', '9', '0', 'Ä', 'Ö', 'Ü', 'ä', 'ö', 'ü', '#', '$', '%', '&', '(', ')', '*', '+', '-', '<', '=', '>',
                     '?', '§', '\u00C2', '\u00D4', '\u00DB'};
             final String[] LATIN1_SUPPLEMENT_SYMBOLS = {"Ä", "Ö", "Ü", "ä", "ö", "ü", "§", "\u00C2", "\u00D4", "\u00DB"};
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, SYMBOLS);
-            passwordGenerator.generate()
+            List<String> passwords = passwordGenerator.generate()
                     .filter(password -> Stream.of(LATIN1_SUPPLEMENT_SYMBOLS).anyMatch(seq -> password.contains(seq)))
                     .limit(LIMIT)
-                    .forEach(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))));
+                    .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
+                    .collect(Collectors.toList());
+            List<String> recoveredPasswords = passwords.stream()
+                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
+                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                    .map(password -> new String(password))
+                    .collect(Collectors.toList());
+            assertThat(passwords).isEqualTo(recoveredPasswords);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("encoding-2")
+    void encoding_2() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "encoding_2()");
+
+        try {
+            final int LIMIT = 100, LENGTH = 25;
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
+            List<String> passwords = passwordGenerator.generate()
+                    .filter(password -> {
+                        boolean matched = false;
+                        char[] umlauts = PasswordGenerator.umlauts();
+                        for (int i=0; i<umlauts.length && !matched; i++) {
+                            matched = password.indexOf(Character.codePointAt(umlauts, i)) != -1 ? true : false;
+                        }
+                        return matched;
+                    })
+                    .limit(LIMIT)
+                    .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
+                    .collect(Collectors.toList());
+            List<String> recoveredPasswords = passwords.stream()
+                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
+                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                    .map(password -> new String(password))
+                    .collect(Collectors.toList());
+            assertThat(passwords).isEqualTo(recoveredPasswords);
         } finally {
             tracer.wayout();
         }
@@ -125,8 +168,8 @@ public class ShamirsDemoUnit implements Traceable {
 
     private String formatBytes(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i=0; i<bytes.length; i++) {
-            stringBuilder.append(String.format("0x%02X", bytes[i]));
+        for (int i = 0; i < bytes.length; i++) {
+            stringBuilder.append(String.format("0x%02x", bytes[i]));
             if (i < bytes.length - 1) {
                 stringBuilder.append(",");
             }
