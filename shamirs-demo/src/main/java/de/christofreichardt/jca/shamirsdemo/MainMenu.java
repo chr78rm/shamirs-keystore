@@ -240,7 +240,7 @@ public class MainMenu  extends AbstractMenu {
             File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
 
             String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
-            String slices = this.console.readString(regex, "Slićes");
+            String slices = this.console.readString(regex, "Slices");
             String[] files = slices.split(",");
             Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
                     .peek(path -> tracer.out().printfIndentln("path = %s", path))
@@ -265,7 +265,7 @@ public class MainMenu  extends AbstractMenu {
             File keyStoreFile = this.app.getCurrentWorkspace().resolve(keystoreName + ".p12").toFile();
 
             String regex = "(" + PARTITION_PATTERN.pattern() + "-[0-9]+" + "\\.json(,( )*)?)+" + "(" + PARTITION_PATTERN.pattern() + "-[0-9]+\\.json)?";
-            String slices = this.console.readString(regex, "Slićes");
+            String slices = this.console.readString(regex, "Slices");
             String[] files = slices.split(",");
             Set<Path> paths = Stream.of(files).map(file -> this.app.getCurrentWorkspace().resolve(file.trim()))
                     .peek(path -> tracer.out().printfIndentln("path = %s", path))
