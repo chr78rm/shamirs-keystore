@@ -167,10 +167,11 @@ public class ShamirsKeystoreUnit implements Traceable {
                 KeyStore.Entry entry = keyStore.getEntry(alias, shamirsProtection);
                 tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
             }
-
-            KeyStore.Entry keyStoreEntry = keyStore.getEntry("my-test-keypair", shamirsProtection);
+            final String ALIAS = "my-test-keypair";
+            KeyStore.Entry keyStoreEntry = keyStore.getEntry(ALIAS, shamirsProtection);
             assertThat(keyStoreEntry).isNotNull();
             assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+            assertThat(keyStore.entryInstanceOf(ALIAS, KeyStore.PrivateKeyEntry.class)).isTrue();
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
             X509Certificate x509Certificate = (X509Certificate) privateKeyEntry.getCertificate();
             String distinguishedName = "CN=Christof,L=Rodgau,ST=Hessen,C=DE";

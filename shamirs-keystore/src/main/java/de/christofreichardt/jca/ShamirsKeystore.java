@@ -92,14 +92,20 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 
     @Override
     public KeyStore.Entry engineGetEntry(String alias, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
-        if (!(protectionParameter instanceof ShamirsProtection)) {
-            throw new IllegalArgumentException("ShamirsProtection required.");
+        KeyStore.Entry entry;
+        if (!this.keyStore.isCertificateEntry(alias)) {
+            if (!(protectionParameter instanceof ShamirsProtection)) {
+                throw new IllegalArgumentException("ShamirsProtection required.");
+            }
+
+            ShamirsProtection shamirsProtection = (ShamirsProtection) protectionParameter;
+            KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
+            entry = this.keyStore.getEntry(alias, passwordProtection);
+        } else {
+            entry = this.keyStore.getEntry(alias, null);
         }
 
-        ShamirsProtection shamirsProtection = (ShamirsProtection) protectionParameter;
-        KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(shamirsProtection.getPassword());
-
-        return this.keyStore.getEntry(alias, passwordProtection);
+        return entry;
     }
 
     @Override
@@ -221,6 +227,15 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
             }
         } finally {
             tracer.wayout();
+        }
+    }
+
+    @Override
+    public boolean engineEntryInstanceOf(String alias, Class<? extends KeyStore.Entry> entryClass) {
+        try {
+            return this.keyStore.entryInstanceOf(alias, entryClass);
+        } catch (KeyStoreException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
