@@ -24,19 +24,14 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import scala.jdk.CollectionConverters;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
@@ -88,8 +83,8 @@ public class ShamirsKeystoreUnit implements Traceable {
 
         try {
             List<Path> paths = new ArrayList<>();
-            paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-1.json"));
-            paths.add(Paths.get("..", "shamirs-secret-sharing", "json", "partition-3-2.json"));
+            paths.add(Path.of("..", "shamirs-secret-sharing", "json", "partition-3-1.json"));
+            paths.add(Path.of("..", "shamirs-secret-sharing", "json", "partition-3-2.json"));
             SecretMerging secretMerging = SecretMerging.apply(CollectionConverters.ListHasAsScala(paths).asScala());
 
             tracer.out().printfIndentln("secretMerging.secretBytes() = (%s)", secretMerging.secretBytes().mkString(","));
@@ -128,12 +123,12 @@ public class ShamirsKeystoreUnit implements Traceable {
             final int THRESHOLD = 4;
             SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
             final int[] SIZES = {4, 2, 2};
-            secretSharing.savePartition(SIZES, Paths.get("json", "roundtrip-2", "partition"));
-            Path[] paths_1 = {Paths.get("json", "roundtrip-2", "partition-0.json")};
+            secretSharing.savePartition(SIZES, Path.of("json", "roundtrip-2", "partition"));
+            Path[] paths_1 = {Path.of("json", "roundtrip-2", "partition-0.json")};
             assertThat(new ShamirsProtection(paths_1).getPassword()).isEqualTo(myPassword.toCharArray());
-            Path[] paths_2 = {Paths.get("json", "roundtrip-2", "partition-1.json"), Paths.get("json", "roundtrip-2", "partition-2.json")};
+            Path[] paths_2 = {Path.of("json", "roundtrip-2", "partition-1.json"), Path.of("json", "roundtrip-2", "partition-2.json")};
             assertThat(new ShamirsProtection(paths_2).getPassword()).isEqualTo(myPassword.toCharArray());
-            Path[] paths_3 = {Paths.get("json", "roundtrip-2", "partition-1.json")};
+            Path[] paths_3 = {Path.of("json", "roundtrip-2", "partition-1.json")};
             Throwable catched = catchThrowable(() -> new ShamirsProtection(paths_3).getPassword());
             assertThat(catched).isInstanceOf(IllegalArgumentException.class);
             assertThat(catched).hasMessage("requirement failed: Too few sharepoints.");
@@ -142,43 +137,103 @@ public class ShamirsKeystoreUnit implements Traceable {
         }
     }
 
-    @Test
-    @DisplayName("KeyStore-1")
-    void keyStore_1() throws GeneralSecurityException, IOException {
-        AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("void", this, "keyStore_1()");
+    @Nested
+    @DisplayName("Prepared-Keystore")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class PreparedKeystore {
 
-        try {
-            String myPassword = "Super-sicheres-Passwort";
-            final int SHARES = 8;
-            final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
-            final int[] SIZES = {4, 2, 2};
-            secretSharing.savePartition(SIZES, Paths.get("json", "keystore-1", "partition"));
-            Path[] paths = {Paths.get("json", "keystore-1", "partition-0.json")};
-            File keyStoreFile = Paths.get("pkcs12", "my-keystore-1.p12").toFile();
-            ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
-            ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
-            KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
-            keyStore.load(shamirsLoadParameter);
-            Enumeration<String> aliases = keyStore.aliases();
-            while (aliases.hasMoreElements()) {
-                String alias = aliases.nextElement();
-                KeyStore.Entry entry = keyStore.getEntry(alias, shamirsProtection);
-                tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
+        KeyStore keyStore;
+        ShamirsProtection shamirsProtection;
+        ShamirsLoadParameter shamirsLoadParameter;
+
+        @BeforeAll
+        void loadKeystore() throws GeneralSecurityException, IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "loadKeystore()");
+
+            try {
+                final String MY_PASSWORD = "Super-sicheres-Passwort";
+                final int SHARES = 8;
+                final int THRESHOLD = 4;
+                SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, MY_PASSWORD);
+                final int[] SIZES = {4, 2, 2};
+                secretSharing.savePartition(SIZES, Path.of("json", "keystore-1", "partition"));
+                Path[] paths = {Path.of("json", "keystore-1", "partition-0.json")};
+                File keyStoreFile = Path.of("pkcs12", "my-keystore-1.p12").toFile();
+                this.shamirsProtection = new ShamirsProtection(paths);
+                this.shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, this.shamirsProtection);
+                this.keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
+                keyStore.load(this.shamirsLoadParameter);
+            } finally {
+                tracer.wayout();
             }
-            final String ALIAS = "my-test-keypair";
-            KeyStore.Entry keyStoreEntry = keyStore.getEntry(ALIAS, shamirsProtection);
-            assertThat(keyStoreEntry).isNotNull();
-            assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
-            assertThat(keyStore.entryInstanceOf(ALIAS, KeyStore.PrivateKeyEntry.class)).isTrue();
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
-            X509Certificate x509Certificate = (X509Certificate) privateKeyEntry.getCertificate();
-            String distinguishedName = "CN=Christof,L=Rodgau,ST=Hessen,C=DE";
-            assertThat(x509Certificate.getIssuerX500Principal().getName()).isEqualTo(distinguishedName);
-            assertThat(x509Certificate.getSubjectX500Principal().getName()).isEqualTo(distinguishedName);
-        } finally {
-            tracer.wayout();
+        }
+
+        @Test
+        @DisplayName("Enumeration")
+        void enumerateEntries() throws GeneralSecurityException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "enumerateEntries()");
+
+            try {
+                Enumeration<String> aliases = keyStore.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    KeyStore.Entry entry = keyStore.getEntry(alias, this.shamirsProtection);
+                    tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
+                }
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Test
+        @DisplayName("Private-Key-Entry")
+        void privateKeyEntry() throws GeneralSecurityException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "privateKeyEntry()");
+
+            try {
+                final String PRIVATE_KEY_ALIAS = "my-test-keypair";
+                KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(PRIVATE_KEY_ALIAS, this.shamirsProtection);
+                assertThat(keyStoreEntry).isNotNull();
+                assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+                assertThat(this.keyStore.entryInstanceOf(PRIVATE_KEY_ALIAS, KeyStore.PrivateKeyEntry.class)).isTrue();
+                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
+                X509Certificate x509Certificate = (X509Certificate) privateKeyEntry.getCertificate();
+                final String DISTINGUISHED_NAME = "CN=Christof,L=Rodgau,ST=Hessen,C=DE";
+                assertThat(x509Certificate.getIssuerX500Principal().getName()).isEqualTo(DISTINGUISHED_NAME);
+                assertThat(x509Certificate.getSubjectX500Principal().getName()).isEqualTo(DISTINGUISHED_NAME);
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Test
+        @DisplayName("Trusted-Certificate-Entry")
+        void trustedCertificateEntry() throws GeneralSecurityException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "trustedCertificateEntry()");
+
+            try {
+                final String CERTIFICATE_ALIAS = "digicert";
+                KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(CERTIFICATE_ALIAS, this.shamirsProtection);
+                assertThat(keyStoreEntry).isNotNull();
+                assertThat(keyStoreEntry).isInstanceOf(KeyStore.TrustedCertificateEntry.class);
+                assertThat(this.keyStore.entryInstanceOf(CERTIFICATE_ALIAS, KeyStore.TrustedCertificateEntry.class)).isTrue();
+                keyStoreEntry = this.keyStore.getEntry(CERTIFICATE_ALIAS, null);
+                assertThat(keyStoreEntry).isNotNull();
+                assertThat(keyStoreEntry).isInstanceOf(KeyStore.TrustedCertificateEntry.class);
+                assertThat(this.keyStore.entryInstanceOf(CERTIFICATE_ALIAS, KeyStore.TrustedCertificateEntry.class)).isTrue();
+                X509Certificate x509Certificate = (X509Certificate) this.keyStore.getCertificate(CERTIFICATE_ALIAS);
+                assertThat(x509Certificate).isNotNull();
+                final String ISSUER = "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US";
+                final String SUBJECT = "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US";
+                assertThat(x509Certificate.getIssuerX500Principal().getName()).isEqualTo(ISSUER);
+                assertThat(x509Certificate.getSubjectX500Principal().getName()).isEqualTo(SUBJECT);
+            } finally {
+                tracer.wayout();
+            }
         }
     }
 
@@ -190,11 +245,11 @@ public class ShamirsKeystoreUnit implements Traceable {
 
         try {
             String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
-            Set<Path> paths = Stream.of(slices).map(slice -> Paths.get("json", "keystore-2").resolve(slice))
+            Set<Path> paths = Stream.of(slices).map(slice -> Path.of("json", "keystore-2").resolve(slice))
                     .collect(Collectors.toSet());
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
-            File keyStoreFile = Paths.get("pkcs12", "my-keystore-2.p12").toFile();
+            File keyStoreFile = Path.of("pkcs12", "my-keystore-2.p12").toFile();
             ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);
             keyStore.load(null, null);
             final String ALGORITHM = "AES";
