@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -176,12 +177,24 @@ public class ShamirsKeystoreUnit implements Traceable {
             tracer.entry("void", this, "enumerateEntries()");
 
             try {
-                Enumeration<String> aliases = keyStore.aliases();
+                tracer.out().printfIndentln("this.keyStore.size() = %d", this.keyStore.size());
+
+                Enumeration<String> aliases = this.keyStore.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
-                    KeyStore.Entry entry = keyStore.getEntry(alias, this.shamirsProtection);
-                    tracer.out().printfIndentln("entry.getClass().getName() = %s", entry.getClass().getName());
-                }
+                    KeyStore.Entry entry = this.keyStore.getEntry(alias, this.shamirsProtection);
+
+                    tracer.out().printfIndentln(
+                            "creationDate(%1$s) = %2$s, isCertificateEntry(%1$s) = %3$b, isKeyEntry(%1$s) = %4$b, " +
+                                    "entryInstanceOf(%1$s, KeyStore.TrustedCertificateEntry.class) = %5$b, " +
+                                    "entryInstanceOf(%1$s, KeyStore.PrivateKeyEntry.class) = %6$b, " +
+                                    "entryInstanceOf(%1$s, KeyStore.SecretKeyEntry.class) = %7$b",
+                            alias, this.keyStore.getCreationDate(alias), this.keyStore.isCertificateEntry(alias), this.keyStore.isKeyEntry(alias),
+                            this.keyStore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class),
+                            this.keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class),
+                            this.keyStore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)
+                    );
+                 }
             } finally {
                 tracer.wayout();
             }
@@ -231,6 +244,29 @@ public class ShamirsKeystoreUnit implements Traceable {
                 final String SUBJECT = "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US";
                 assertThat(x509Certificate.getIssuerX500Principal().getName()).isEqualTo(ISSUER);
                 assertThat(x509Certificate.getSubjectX500Principal().getName()).isEqualTo(SUBJECT);
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Test
+        @DisplayName("Secret-Key-Entry")
+        void secretKeyEntry() throws GeneralSecurityException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "secretKeyEntry()");
+
+            try {
+                final String SECRET_KEY_ALIAS = "my-aes-key", KEYGENERATOR_ALG = "AES", KEY_FORMAT = "RAW";
+                final int KEY_SIZE = 256;
+                KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(SECRET_KEY_ALIAS, this.shamirsProtection);
+                assertThat(keyStoreEntry).isNotNull();
+                assertThat(keyStoreEntry).isInstanceOf(KeyStore.SecretKeyEntry.class);
+                assertThat(this.keyStore.entryInstanceOf(SECRET_KEY_ALIAS, KeyStore.SecretKeyEntry.class)).isTrue();
+                KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStoreEntry;
+                SecretKey secretKey = secretKeyEntry.getSecretKey();
+                assertThat(secretKey.getAlgorithm()).isEqualTo(KEYGENERATOR_ALG);
+                assertThat(secretKey.getFormat()).isEqualTo(KEY_FORMAT);
+                assertThat(secretKey.getEncoded().length).isEqualTo(KEY_SIZE / 8);
             } finally {
                 tracer.wayout();
             }
