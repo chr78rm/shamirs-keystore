@@ -1,0 +1,13 @@
+
+-> Summary
+==========
+JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
+containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
+ShamirsDemoUnit[container=true, test=false, start=2020-04-21T18:44:54.094819, end=2020-04-21T18:45:00.225702, duration=PT6.130883S, status=SUCCESSFUL]
+
+ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
+containers = 0, tests = 3, successful = 3, failed = 0, aborted = 0
+encoding-1[container=false, test=true, start=2020-04-21T18:44:54.538356, end=2020-04-21T18:44:58.326459, duration=PT3.788103S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-04-21T18:44:54.173484, end=2020-04-21T18:44:54.532802, duration=PT0.359318S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-04-21T18:44:58.33012, end=2020-04-21T18:45:00.219999, duration=PT1.889879S, status=SUCCESSFUL]
+

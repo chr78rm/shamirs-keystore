@@ -23,11 +23,16 @@ import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.LogLevel;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestExecutionListener;
@@ -40,49 +45,115 @@ import org.junit.platform.launcher.TestPlan;
  */
 public class MyTestExecutionListener implements TestExecutionListener, Traceable {
 
+	class Test {
+		final TestIdentifier testIdentifier;
+		final LocalDateTime startTime;
+		LocalDateTime endTime;
+		TestExecutionResult.Status status;
+
+		public Test(TestIdentifier testIdentifier, LocalDateTime startTime) {
+			this.testIdentifier = testIdentifier;
+			this.startTime = startTime;
+		}
+
+		public LocalDateTime getEndTime() {
+			return endTime;
+		}
+
+		public void setEndTime(LocalDateTime endTime) {
+			this.endTime = endTime;
+		}
+
+		public Optional<Duration> getDuration() {
+			return this.endTime != null ? Optional.of(Duration.between(this.startTime, this.endTime)) : Optional.empty();
+		}
+
+		public TestIdentifier getTestIdentifier() {
+			return testIdentifier;
+		}
+
+		public Optional<TestExecutionResult.Status> getStatus() {
+			return this.status != null ? Optional.of(this.status) : Optional.empty();
+		}
+
+		public void setStatus(TestExecutionResult.Status status) {
+			this.status = status;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s[container=%b, test=%b, start=%s, end=%s, duration=%s, status=%s]",
+					this.testIdentifier.getDisplayName(),
+					this.testIdentifier.isContainer(),
+					this.testIdentifier.isTest(),
+					DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(this.startTime),
+					this.endTime != null ? DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(this.endTime) : "-",
+					getDuration().isPresent() ? getDuration().get() : "-",
+					getStatus().isPresent() ? getStatus().get() : "-");
+		}
+	}
+
 	class Summary {
 		final String id;
 
-		int containers;
-		int tests;
-		int successful;
-		int failed;
-		int aborted;
+		final Map<String, Test> tests = new HashMap<>();
 
 		public Summary(String id) {
 			this.id = id;
 		}
 
-		void incrementContainers() {
-			this.containers++;
+		void addTest(Test test) {
+			this.tests.put(test.getTestIdentifier().getUniqueId(), test);
 		}
 
-		void incrementTests() {
-			this.tests++;
+		void setStatus(String id, TestExecutionResult.Status status) {
+			Test test = this.tests.get(id);
+			test.setStatus(status);
+			test.setEndTime(LocalDateTime.now());
 		}
 
-		void incrementsSuccessful() {
-			this.successful++;
+		long getContainerCount() {
+			return this.tests.values().stream()
+					.filter(test -> test.getTestIdentifier().isContainer())
+					.count();
 		}
 
-		void incrementFailed() {
-			this.failed++;
+		long getTestCount() {
+			return this.tests.values().stream()
+					.filter(test -> test.getTestIdentifier().isTest())
+					.count();
 		}
 
-		void incrementAborted() {
-			this.aborted++;
+		long getSuccessful() {
+			return this.tests.values().stream()
+					.filter(test -> test.getStatus().isPresent() && test.getStatus().get() == TestExecutionResult.Status.SUCCESSFUL)
+					.count();
+		}
+
+		long getFailed() {
+			return this.tests.values().stream()
+					.filter(test -> test.getStatus().isPresent() && test.getStatus().get() == TestExecutionResult.Status.FAILED)
+					.count();
+		}
+
+		long getAborted() {
+			return this.tests.values().stream()
+					.filter(test -> test.getStatus().isPresent() && test.getStatus().get() == TestExecutionResult.Status.ABORTED)
+					.count();
 		}
 
 		@Override
 		public String toString() {
 			return String.format("id = %s, containers = %d, tests = %d, successful = %d, failed = %d, aborted = %d",
-					this.id, this.containers, this.tests, this.successful, this.failed, this.aborted);
+					this.id, getContainerCount(), getTestCount(), getSuccessful(), getFailed(), getAborted());
 		}
 
 		void printSummary(PrintStream out) {
 			out.printf("%s, (uniqueId = %s)\n", MyTestExecutionListener.this.id2DisplayName.get(this.id), this.id);
-			out.printf("containers = %d, tests = %d, successful = %d, failed = %d, aborted = %d\n\n",
-					this.containers, this.tests, this.successful, this.failed, this.aborted);
+			out.printf("containers = %d, tests = %d, successful = %d, failed = %d, aborted = %d\n",
+					getContainerCount(), getTestCount(), getSuccessful(), getFailed(), getAborted());
+			this.tests.values().forEach(test -> out.printf("%s\n", test));
+			out.println();
 		}
 	}
 
@@ -112,6 +183,7 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 
 		traceTestPlan(testPlan);
 	}
+
 	void traceTestPlan(TestPlan testPlan) {
 		AbstractTracer tracer = getCurrentTracer();
 		tracer.entry("void", this, "traceTestPlan(TestPlan testPlan)");
@@ -141,12 +213,29 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 	public void testPlanExecutionFinished(TestPlan testPlan) {
 		System.out.printf("Testplan execution has been finished ...\n");
 
+		boolean shouldClose = false;
 		AbstractTracer tracer = getCurrentTracer();
-		tracer.out().println();
-		tracer.out().printfIndentln("-> Summary");
-		tracer.out().printfIndentln("==========");
-		this.summaries.entrySet()
-				.forEach(entry -> entry.getValue().printSummary(tracer.out()));
+		PrintStream out = tracer.out();
+		try {
+			if (System.getProperties().containsKey("de.christofreichardt.junit5.summary")) {
+				try {
+					out = new PrintStream(Files.newOutputStream(Paths.get(System.getProperty("de.christofreichardt.junit5.summary"))));
+					shouldClose = true;
+				} catch (IOException ex) {
+					out = tracer.out();
+				}
+			}
+			out.println();
+			out.printf("-> Summary\n");
+			out.printf("==========\n");
+			for (Map.Entry<String, Summary> entry : this.summaries.entrySet()) {
+				entry.getValue().printSummary(out);
+			}
+		} finally {
+			if (shouldClose) {
+				out.close();
+			}
+		}
 
 		TracerFactory.getInstance().closePoolTracer();
 	}
@@ -166,12 +255,7 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 			if (testIdentifier.getParentId().isPresent()) {
 				String parentId = testIdentifier.getParentId().get();
 				Summary summary = this.summaries.getOrDefault(parentId, new Summary(parentId));
-				if (testIdentifier.isContainer()) {
-					summary.incrementContainers();
-				}
-				if (testIdentifier.isTest()) {
-					summary.incrementTests();
-				}
+				summary.addTest(new Test(testIdentifier, LocalDateTime.now()));
 				this.summaries.putIfAbsent(parentId, summary);
 			}
 		} finally {
@@ -210,19 +294,7 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
 
 			if (testIdentifier.getParentId().isPresent()) {
 				Summary summary = this.summaries.get(testIdentifier.getParentId().get());
-				switch (testExecutionResult.getStatus()) {
-					case SUCCESSFUL:
-						summary.incrementsSuccessful();
-						break;
-					case FAILED:
-						summary.incrementFailed();
-						break;
-					case ABORTED:
-						summary.incrementAborted();
-						break;
-					default:
-						break;
-				}
+				summary.setStatus(testIdentifier.getUniqueId(), testExecutionResult.getStatus());
 			}
 		} finally {
 			tracer.wayout();

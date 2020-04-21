@@ -65,6 +65,7 @@
                     <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
                     <systemPropertyVariables>
                         <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/shamirsdemo/trace-config.xml</de.christofreichardt.junit5.traceConfig>
+                        <de.christofreichardt.junit5.summary>../reports/shamirs-demo-summary.txt</de.christofreichardt.junit5.summary>
                         <java.security.egd>file:/dev/urandom</java.security.egd>
                     </systemPropertyVariables>
                 </configuration>
@@ -87,19 +88,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.0</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.6.0</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
