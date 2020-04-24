@@ -19,23 +19,28 @@
 
 package de.christofreichardt.scalatest
 
-import java.io.File
+import java.io.{File, PrintStream}
+import java.nio.file.{Files, Paths}
+import java.time.format.DateTimeFormatter
+import java.time.{Duration, Instant, LocalDateTime, ZoneId}
 
-import org.scalatest._
-import de.christofreichardt.diagnosis.AbstractTracer
-import de.christofreichardt.diagnosis.TracerFactory
+import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
+import org.scalatest._
+import org.scalatest.events.{TestCanceled, TestFailed, TestIgnored, TestStarting, TestSucceeded}
 
 class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with BeforeAndAfterAll with SequentialNestedSuiteExecution {
 
   override def run(testName: Option[String], args: Args): Status = {
-    printf("%s.run%n", this.getClass().getSimpleName())
+    printf("%s.run%n", this.getClass.getSimpleName)
     TracerFactory.getInstance().readConfiguration(new File("." + File.separator + "config" + File.separator + "tracerfactory-config.xml"))
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     tracer.open()
     tracer.initCurrentTracingContext(5, true)
     try {
       withTracer("Status", this, "run(testName: Option[String], args: Args)") {
+        traceSuites(this)
+
         val myReporter = new MyReporter(args.reporter)
         val myArgs = new Args(myReporter, args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
           args.distributedTestSorter, args.distributedSuiteSorter)
@@ -43,11 +48,76 @@ class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with Befo
         tracer.out().printfIndentln("myArgs = %s", myArgs)
         val status = super.run(testName, myArgs)
         tracer.out().printfIndentln("myReporter.succeeded = %d", myReporter.succeeded: java.lang.Integer)
+        tracer.out().printfIndentln("de.christofreichardt.scala.scalatest.summary = %s", System.getProperty("de.christofreichardt.scala.scalatest.summary"))
+        val print =
+          if (System.getProperties.containsKey("de.christofreichardt.scala.scalatest.summary")) {
+            val out = new PrintStream(Files.newOutputStream(Paths.get(System.getProperty("de.christofreichardt.scala.scalatest.summary"))))
+            (out, true)
+          } else {
+            (tracer.out(), false)
+          }
+        try {
+          printSummary(myReporter, print._1)
+        } finally {
+          if (print._2) print._1.close()
+        }
+
         status
       }
     } finally {
       tracer.close()
     }
+  }
+
+  def traceSuites(suite: Suite): Unit = {
+    val tracer = getCurrentTracer()
+    withTracer("Unit", this, "traceSuites(suite: Suite)") {
+      tracer.out().printfIndentln("%s[id=%s]", suite.suiteName, suite.suiteId)
+      suite.nestedSuites.foreach(suite => traceSuites(suite))
+    }
+  }
+
+  def printSummary(myReporter: MyReporter, out: PrintStream): Unit = {
+    def traverseSuites(current: Suite): Unit = {
+
+      def findStartTime(testName: String): Option[String] = {
+        myReporter.events
+          .find(starting => {
+            starting match {
+              case starting: TestStarting => starting.suiteId == current.suiteId && testName == starting.testName
+              case _ => false
+            }
+          })
+          .map(starting => LocalDateTime.ofInstant(Instant.ofEpochMilli(starting.timeStamp), ZoneId.systemDefault()))
+          .map(startTime => startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+      }
+
+      out.printf("\n%s\n", current.suiteName)
+      out.printf("=====================================\n")
+      myReporter.events
+        .filter(event => {
+          event match {
+            case event: TestSucceeded => event.suiteId == current.suiteId
+            case event: TestFailed => event.suiteId == current.suiteId
+            case event: TestIgnored => event.suiteId == current.suiteId
+            case event: TestCanceled => event.suiteId == current.suiteId
+            case _ => false
+          }
+        })
+        .map(event => new TestInfo(event))
+        .foreach(testInfo => {
+          val startTime = testInfo.testName.flatMap(name => findStartTime(name))
+          val endTime = testInfo.timeStamp.map(timeStamp => LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), ZoneId.systemDefault()))
+          val duration = testInfo.duration.map(millis => Duration.ofMillis(millis).toString)
+          out.printf("%s[startTime=%s, endtime=%s, duration=%sms, status=%s]\n",
+            testInfo.testName.getOrElse(""), startTime.getOrElse(""), endTime.getOrElse(""), duration.getOrElse(""),
+            testInfo.status.getOrElse(""))
+        })
+      out.println()
+      current.nestedSuites.foreach(nestedSuite => traverseSuites(nestedSuite))
+    }
+
+    traverseSuites(this)
   }
 
   override def beforeAll: Unit = {

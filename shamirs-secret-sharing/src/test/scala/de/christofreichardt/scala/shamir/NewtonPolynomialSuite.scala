@@ -54,4 +54,12 @@ class NewtonPolynomialSuite extends MyFunSuite {
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
     assert(caught.getMessage.endsWith("Basis values must be pairwise different."))
   }
+
+//  ignore(this, "Always-Fail") {
+//    fail("This is a test.")
+//  }
+//
+//  testWithTracing(this, "Always-Cancel") {
+//    cancel("This is a test.")
+//  }
 }

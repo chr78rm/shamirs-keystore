@@ -19,25 +19,33 @@
 
 package de.christofreichardt.scalatest
 
+import java.io.PrintStream
+
 import org.scalatest.Reporter
 import org.scalatest.events.{Event, TestSucceeded}
 import de.christofreichardt.diagnosis.AbstractTracer
 import de.christofreichardt.diagnosis.TracerFactory
 import de.christofreichardt.scala.diagnosis.Tracing
 
+import scala.collection.mutable.ArrayBuffer
+
 class MyReporter(reporter: Reporter) extends Reporter with Tracing {
-  var succeeded: Int = 0;
-  
-  override  def apply(event: Event): Unit = {
+  val events: ArrayBuffer[Event] = new ArrayBuffer
+
+  override def apply(event: Event): Unit = {
     reporter.apply(event)
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     tracer.out().printfIndentln("event = %s", event)
-    event match {
-      case event: TestSucceeded => succeeded = succeeded + 1
-      case _ =>
-    }
+    this.events.addOne(event)
   }
-  
+
+  def succeeded: Int = {
+    this.events.count(event => event match {
+      case event: TestSucceeded => true
+      case _ => false
+    })
+  }
+
   override def getCurrentTracer(): AbstractTracer = {
     try {
       TracerFactory.getInstance().getTracer("TestTracer")
