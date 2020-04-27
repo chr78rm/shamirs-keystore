@@ -22,7 +22,7 @@ package de.christofreichardt.scalatest
 import java.io.PrintStream
 
 import org.scalatest.Reporter
-import org.scalatest.events.{Event, TestSucceeded}
+import org.scalatest.events.{Event, TestCanceled, TestFailed, TestIgnored, TestSucceeded}
 import de.christofreichardt.diagnosis.AbstractTracer
 import de.christofreichardt.diagnosis.TracerFactory
 import de.christofreichardt.scala.diagnosis.Tracing
@@ -42,6 +42,27 @@ class MyReporter(reporter: Reporter) extends Reporter with Tracing {
   def succeeded: Int = {
     this.events.count(event => event match {
       case event: TestSucceeded => true
+      case _ => false
+    })
+  }
+
+  def failed: Int = {
+    this.events.count(event => event match {
+      case event: TestFailed => true
+      case _ => false
+    })
+  }
+
+  def canceled: Int = {
+    this.events.count(event => event match {
+      case event: TestCanceled => true
+      case _ => false
+    })
+  }
+
+  def ignored: Int = {
+    this.events.count(event => event match {
+      case event: TestIgnored => true
       case _ => false
     })
   }

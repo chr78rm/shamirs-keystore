@@ -94,6 +94,9 @@ class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with Befo
 
       out.printf("\n%s\n", current.suiteName)
       out.printf("=====================================\n")
+      if (current.nestedSuites.length != 0) {
+        out.printf("Nested suites: %s\n", current.nestedSuites.mkString(", "))
+      }
       myReporter.events
         .filter(event => {
           event match {
@@ -118,6 +121,15 @@ class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with Befo
     }
 
     traverseSuites(this)
+
+    out.println()
+    out.println("=====================================")
+    out.printf("Succeeded: %d\n", myReporter.succeeded)
+    out.printf("   Failed: %d\n", myReporter.failed)
+    out.printf(" Canceled: %d\n", myReporter.canceled)
+    out.printf("  Ignored: %d\n", myReporter.ignored)
+    out.println("=====================================")
+    out.println()
   }
 
   override def beforeAll: Unit = {
