@@ -1,13 +1,25 @@
 
 -> Summary
-==========
+=====================================
+
+-------------------------------------
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
-ShamirsDemoUnit[container=true, test=false, start=2020-04-24T18:00:40.193516, end=2020-04-24T18:00:46.207568, duration=PT6.014052S, status=SUCCESSFUL]
+-------------------------------------
+ShamirsDemoUnit[container=true, test=false, start=2020-04-27T16:59:58.65371, end=2020-04-27T17:00:05.590725, duration=PT6.937015S, status=SUCCESSFUL]
 
+-------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
 containers = 0, tests = 3, successful = 3, failed = 0, aborted = 0
-encoding-1[container=false, test=true, start=2020-04-24T18:00:40.65841, end=2020-04-24T18:00:44.249697, duration=PT3.591287S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2020-04-24T18:00:40.271251, end=2020-04-24T18:00:40.653293, duration=PT0.382042S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2020-04-24T18:00:44.253797, end=2020-04-24T18:00:46.20199, duration=PT1.948193S, status=SUCCESSFUL]
+-------------------------------------
+encoding-1[container=false, test=true, start=2020-04-27T16:59:59.221029, end=2020-04-27T17:00:03.257415, duration=PT4.036386S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-04-27T16:59:58.754666, end=2020-04-27T16:59:59.21315, duration=PT0.458484S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-04-27T17:00:03.262136, end=2020-04-27T17:00:05.584913, duration=PT2.322777S, status=SUCCESSFUL]
+
+
+=====================================
+succeeded: 3
+   failed: 0
+  aborted: 0
+=====================================
 
