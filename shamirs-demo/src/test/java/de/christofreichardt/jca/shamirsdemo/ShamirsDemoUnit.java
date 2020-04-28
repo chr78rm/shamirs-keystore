@@ -30,7 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
+import java.security.*;
+import java.security.spec.ECGenParameterSpec;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -195,6 +196,47 @@ public class ShamirsDemoUnit implements Traceable {
         }
 
         return stringBuilder.toString();
+    }
+
+    @Test
+    @DisplayName("ec-keypair")
+    void ecKeyPair() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "ecKeyPair()");
+
+        try {
+            final String ALGO = "EC";
+            final String KEYPAIR_GEN_TYPE = "KeyPairGenerator", KEYPAIR_GEN_EC_FILTER = KEYPAIR_GEN_TYPE + "." + ALGO;
+            Provider[] providers = Security.getProviders(KEYPAIR_GEN_EC_FILTER);
+            Stream.of(providers).forEach(
+                    provider -> {
+                        tracer.out().printfIndentln("%s-Provider = %s", KEYPAIR_GEN_EC_FILTER, provider.getName());
+                        String[] lines = provider.getService(KEYPAIR_GEN_TYPE, ALGO).toString().split("\n");
+                        for (String line : lines) {
+                            tracer.out().printfIndentln("%s", line);
+                        }
+                    }
+            );
+
+            final String ALGO_PARAM_TYPE = "AlgorithmParameters", ALGO_PARAM_EC_FILTER = ALGO_PARAM_TYPE + "." + ALGO;
+            providers = Security.getProviders(ALGO_PARAM_EC_FILTER);
+            Stream.of(providers).forEach(
+                    provider -> {
+                        tracer.out().printfIndentln("%s-Provider = %s", ALGO_PARAM_EC_FILTER, provider.getName());
+                        String[] lines = provider.getService(ALGO_PARAM_TYPE, ALGO).toString().split("\n");
+                        for (String line : lines) {
+                            tracer.out().printfIndentln("%s", line);
+                        }
+                    }
+            );
+
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp521r1");
+            keyPairGenerator.initialize(ecGenParameterSpec);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        } finally {
+            tracer.wayout();
+        }
     }
 
     @Override

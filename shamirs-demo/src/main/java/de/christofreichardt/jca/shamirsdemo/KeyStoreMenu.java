@@ -21,20 +21,31 @@ package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.jca.ShamirsLoadParameter;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class KeyStoreMenu extends AbstractMenu {
@@ -141,6 +152,9 @@ public class KeyStoreMenu extends AbstractMenu {
                 case LIST_ENTRIES:
                     listEntries();
                     break;
+                case PRIVATE_KEY:
+                    addPrivateKey();
+                    break;
             }
         } finally {
             tracer.wayout();
@@ -178,16 +192,69 @@ public class KeyStoreMenu extends AbstractMenu {
                 if (keyStoreEntry instanceof KeyStore.SecretKeyEntry) {
                     KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStoreEntry;
                     algorithm = secretKeyEntry.getSecretKey().getAlgorithm();
+                } else if (this.keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
+                    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
+                    algorithm = privateKeyEntry.getPrivateKey().getAlgorithm();
                 }
                 Set<KeyStore.Entry.Attribute> entryAttributes = keyStoreEntry.getAttributes();
                 Map<String, KeyStore.Entry.Attribute> entryAttrMap = entryAttributes.stream()
+                        .peek(entryAttribut -> tracer.out().printfIndentln("attr: %s = %s", entryAttribut.getName(), entryAttribut.getValue()))
                         .collect(Collectors.toMap(entryAttribut -> entryAttribut.getName(), Function.identity()));
-                final String FRIENDLY_NAME_OOID = "1.2.840.113549.1.9.20", LOCAL_ID_OOID = "1.2.840.113549.1.9.21";
+                final String FRIENDLY_NAME_OOID = "1.2.840.113549.1.9.20", LOCAL_ID_OOID = "1.2.840.113549.1.9.21",
+                        TRUSTED_KEY_USAGE_OID = "2.16.840.1.113894.746875.1.1";
                 String friendlyName = entryAttrMap.containsKey(FRIENDLY_NAME_OOID) ? entryAttrMap.get(FRIENDLY_NAME_OOID).getValue() : "null";
                 String localId = entryAttrMap.containsKey(LOCAL_ID_OOID) ? entryAttrMap.get(LOCAL_ID_OOID).getValue() : "null";
-                tracer.out().printfIndentln("friendlyName(%1$s) = %2$s, localId(%1$s) = %3$s, algorithm(%1$s) = %4$s", alias, friendlyName, localId, algorithm);
+                String trustedKeyUsage = entryAttrMap.containsKey(TRUSTED_KEY_USAGE_OID) ? entryAttrMap.get(TRUSTED_KEY_USAGE_OID).getValue() : "null";
+                tracer.out().printfIndentln("friendlyName(%1$s) = %2$s, localId(%1$s) = %3$s, algorithm(%1$s) = %4$s, trustedKeyUsage(%1$s) = %5$s",
+                        alias, friendlyName, localId, algorithm, trustedKeyUsage);
                 System.console().printf("%s-> %s: friendlyName=%s, localId=%s, algorithm=%s\n",
                         this.app.getCurrentWorkspace().getFileName(), alias, friendlyName, localId, algorithm);
+            }
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void addPrivateKey() throws GeneralSecurityException, IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "addPrivateKey()");
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(4096);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+            tracer.out().printfIndentln("keyPair.getPrivate().getAlgorithm() = %s, keyPair.getPrivate().getEncoded().length = %d",
+                    keyPair.getPrivate().getAlgorithm(), keyPair.getPrivate().getEncoded().length);
+
+            final int DAYS = 365;
+            final String SIGNATURE_ALGO = "SHA256withRSA", DISTINGUISHED_NAME = "CN=Christof Reichardt, L=Rodgau, ST=Hessen, C=Deutschland";
+            Instant now = Instant.now();
+            Date notBefore = Date.from(now);
+            Date notAfter = Date.from(now.plus(Duration.ofDays(DAYS)));
+            try {
+                ContentSigner contentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGO).build(keyPair.getPrivate());
+                X500Name x500Name = new X500Name(DISTINGUISHED_NAME);
+                JcaX509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
+                        x500Name,
+                        BigInteger.valueOf(now.toEpochMilli()),
+                        notBefore,
+                        notAfter,
+                        x500Name,
+                        keyPair.getPublic()
+                );
+                X509CertificateHolder x509CertificateHolder = certificateBuilder.build(contentSigner);
+                JcaX509CertificateConverter x509CertificateConverter = new JcaX509CertificateConverter();
+                x509CertificateConverter.setProvider(new BouncyCastleProvider());
+                X509Certificate x509Certificate = x509CertificateConverter.getCertificate(x509CertificateHolder);
+//                this.keyStore.setCertificateEntry("myTestCertificate", x509Certificate);
+                this.keyStore.setEntry(
+                        "myPrivateTestKey",
+                        new KeyStore.PrivateKeyEntry(keyPair.getPrivate(),
+                                new Certificate[]{x509Certificate}),
+                        this.shamirsLoadParameter.getProtectionParameter()
+                );
+            } catch (OperatorCreationException ex) {
+                throw new GeneralSecurityException(ex);
             }
         } finally {
             tracer.wayout();
