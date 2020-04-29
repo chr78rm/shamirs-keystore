@@ -24,6 +24,14 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.jupiter.api.*;
 import scala.jdk.CollectionConverters;
 
@@ -31,12 +39,14 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.Security;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -194,7 +204,7 @@ public class ShamirsKeystoreUnit implements Traceable {
                             this.keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class),
                             this.keyStore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)
                     );
-                 }
+                }
             } finally {
                 tracer.wayout();
             }
@@ -273,7 +283,7 @@ public class ShamirsKeystoreUnit implements Traceable {
         }
     }
 
-    @Test
+    @Disabled
     @DisplayName("KeyStore-2")
     void keyStore_2() throws GeneralSecurityException, IOException {
         AbstractTracer tracer = getCurrentTracer();
@@ -306,6 +316,148 @@ public class ShamirsKeystoreUnit implements Traceable {
             assertThat(secretKeyEntry.getSecretKey().getEncoded().length).isEqualTo(KEY_SIZE / 8);
         } finally {
             tracer.wayout();
+        }
+    }
+
+    @Nested
+    @DisplayName("Programmatic-Keystore")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ProgrammaticKeystore {
+
+        KeyStore keyStore;
+        ShamirsProtection shamirsProtection;
+        ShamirsLoadParameter shamirsLoadParameter;
+        Path keystorePath;
+
+        @BeforeEach
+        void init() throws GeneralSecurityException, IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "init()");
+
+            try {
+                String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
+                Set<Path> paths = Stream.of(slices).map(slice -> Path.of("json", "keystore-2").resolve(slice))
+                        .collect(Collectors.toSet());
+                this.keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
+                this.shamirsProtection = new ShamirsProtection(paths);
+                this.keystorePath = Path.of("pkcs12", "my-keystore-2.p12");
+                assertThat(Files.notExists(this.keystorePath)).isTrue();
+                this.shamirsLoadParameter = new ShamirsLoadParameter(this.keystorePath.toFile(), shamirsProtection);
+                keyStore.load(null, null);
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Test
+        @DisplayName("Secret-Key-Entry")
+        void secretKeyEntry() throws GeneralSecurityException, IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "secretKeyEntry()");
+
+            try {
+                final String ALGORITHM = "AES";
+                final int KEY_SIZE = 256;
+                KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
+                keyGenerator.init(KEY_SIZE);
+                SecretKey secretKey = keyGenerator.generateKey();
+                KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
+                final String ALIAS = "my-secret-aes-key";
+                this.keyStore.setEntry(ALIAS, secretKeyEntry, this.shamirsProtection);
+                this.keyStore.store(this.shamirsLoadParameter);
+                this.keyStore.load(this.shamirsLoadParameter);
+                KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(ALIAS, this.shamirsProtection);
+                assertThat(keyStoreEntry).isNotNull();
+                assertThat(keyStoreEntry).isInstanceOf(KeyStore.SecretKeyEntry.class);
+                assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.SecretKeyEntry.class)).isTrue();
+                assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.PrivateKeyEntry.class)).isFalse();
+                assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.TrustedCertificateEntry.class)).isFalse();
+                secretKeyEntry = (KeyStore.SecretKeyEntry) keyStoreEntry;
+                assertThat(secretKeyEntry.getSecretKey().getAlgorithm()).isEqualTo(ALGORITHM);
+                assertThat(secretKeyEntry.getSecretKey().getEncoded().length).isEqualTo(KEY_SIZE / 8);
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Test
+        @DisplayName("Private-Key-Entry")
+        void privateKeyEntry() throws GeneralSecurityException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "privateKeyEntry()");
+
+            try {
+                final String ALGORITHM = "RSA";
+                KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+                keyPairGenerator.initialize(4096);
+                KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+                tracer.out().printfIndentln("keyPair.getPrivate().getAlgorithm() = %s, keyPair.getPrivate().getEncoded().length = %d",
+                        keyPair.getPrivate().getAlgorithm(), keyPair.getPrivate().getEncoded().length);
+
+                final int DAYS = 365;
+                final String COMMON_NAME = "CN=Christof Reichardt", LOCALITY = "L=Rodgau", STATE = "ST=Hessen", COUNTRY = "C=Deutschland";
+                final String SIGNATURE_ALGO = "SHA256withRSA", DISTINGUISHED_NAME = COMMON_NAME + ", " + LOCALITY + ", " + STATE + ", " + COUNTRY;
+                Instant now = Instant.now();
+                Date notBefore = Date.from(now);
+                Date notAfter = Date.from(now.plus(Duration.ofDays(DAYS)));
+                try {
+                    ContentSigner contentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGO).build(keyPair.getPrivate());
+                    X500Name x500Name = new X500Name(DISTINGUISHED_NAME);
+                    JcaX509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
+                            x500Name,
+                            BigInteger.valueOf(now.toEpochMilli()),
+                            notBefore,
+                            notAfter,
+                            x500Name,
+                            keyPair.getPublic()
+                    );
+                    X509CertificateHolder x509CertificateHolder = certificateBuilder.build(contentSigner);
+                    JcaX509CertificateConverter x509CertificateConverter = new JcaX509CertificateConverter();
+                    x509CertificateConverter.setProvider(new BouncyCastleProvider());
+                    X509Certificate x509Certificate = x509CertificateConverter.getCertificate(x509CertificateHolder);
+                    final String ALIAS = "my-private-rsa-key";
+                    this.keyStore.setEntry(
+                            ALIAS,
+                            new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), new Certificate[]{x509Certificate}),
+                            this.shamirsLoadParameter.getProtectionParameter()
+                    );
+                    this.keyStore.store(this.shamirsLoadParameter);
+                    this.keyStore.load(this.shamirsLoadParameter);
+                    KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(ALIAS, this.shamirsProtection);
+                    assertThat(keyStoreEntry).isNotNull();
+                    assertThat(keyStoreEntry).isInstanceOf(KeyStore.PrivateKeyEntry.class);
+                    assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.SecretKeyEntry.class)).isFalse();
+                    assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.PrivateKeyEntry.class)).isTrue();
+                    assertThat(this.keyStore.entryInstanceOf(ALIAS, KeyStore.TrustedCertificateEntry.class)).isFalse();
+                    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
+                    assertThat(privateKeyEntry.getPrivateKey().getAlgorithm()).isEqualTo(ALGORITHM);
+                    x509Certificate = (X509Certificate) privateKeyEntry.getCertificate();
+                    tracer.out().printfIndentln("x509Certificate.getSubjectX500Principal().getName() = %s",
+                            x509Certificate.getSubjectX500Principal().getName());
+                    assertThat(x509Certificate.getSubjectX500Principal().getName())
+                            .contains(COMMON_NAME)
+                            .contains(LOCALITY)
+                            .contains(STATE)
+                            .contains(COUNTRY);
+                } catch (OperatorCreationException | IOException ex) {
+                    throw new GeneralSecurityException(ex);
+                }
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @AfterEach
+        void exit() throws IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "exit()");
+
+            try {
+                assertThat(Files.deleteIfExists(this.keystorePath)).isTrue();
+            } finally {
+                tracer.wayout();
+            }
         }
     }
 
