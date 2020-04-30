@@ -107,6 +107,21 @@ public class App implements Traceable {
                     }
                 } catch (IOException | IllegalArgumentException | NoSuchElementException | GeneralSecurityException ex) {
                     ex.printStackTrace();
+                    Throwable throwable = ex;
+                    do {
+                        StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+                        for (StackTraceElement stackTraceElement : stackTraceElements) {
+                            tracer.out().printfIndentln("  at %s.%s(%s:%d)", stackTraceElement.getClassName(),
+                                    stackTraceElement.getMethodName(), stackTraceElement.getFileName(),
+                                    stackTraceElement.getLineNumber());
+                        }
+                        throwable = throwable.getCause();
+                        if (throwable != null) {
+                            tracer.out().printfIndentln("caused by = %s: %s", throwable.getClass().getName(),
+                                    throwable.getMessage());
+                        }
+                    } while (throwable != null);
+
                 }
             } while(!this.menu.isExit());
         } finally {

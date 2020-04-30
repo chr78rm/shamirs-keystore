@@ -34,12 +34,10 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -188,13 +186,15 @@ public class KeyStoreMenu extends AbstractMenu {
             while (iter.hasNext()) {
                 String alias = iter.next();
                 KeyStore.Entry keyStoreEntry = this.keyStore.getEntry(alias, this.shamirsLoadParameter.getProtectionParameter());
-                String algorithm = null;
+                String algorithm = null, keyEntryType = null;
                 if (keyStoreEntry instanceof KeyStore.SecretKeyEntry) {
                     KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStoreEntry;
                     algorithm = secretKeyEntry.getSecretKey().getAlgorithm();
+                    keyEntryType = "Secret Key";
                 } else if (this.keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
                     KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
                     algorithm = privateKeyEntry.getPrivateKey().getAlgorithm();
+                    keyEntryType = "Private Key";
                 }
                 Set<KeyStore.Entry.Attribute> entryAttributes = keyStoreEntry.getAttributes();
                 Map<String, KeyStore.Entry.Attribute> entryAttrMap = entryAttributes.stream()
@@ -207,8 +207,8 @@ public class KeyStoreMenu extends AbstractMenu {
                 String trustedKeyUsage = entryAttrMap.containsKey(TRUSTED_KEY_USAGE_OID) ? entryAttrMap.get(TRUSTED_KEY_USAGE_OID).getValue() : "null";
                 tracer.out().printfIndentln("friendlyName(%1$s) = %2$s, localId(%1$s) = %3$s, algorithm(%1$s) = %4$s, trustedKeyUsage(%1$s) = %5$s",
                         alias, friendlyName, localId, algorithm, trustedKeyUsage);
-                System.console().printf("%s-> %s: friendlyName=%s, localId=%s, algorithm=%s\n",
-                        this.app.getCurrentWorkspace().getFileName(), alias, friendlyName, localId, algorithm);
+                System.console().printf("%s-> %s: friendlyName=%s, localId=%s, algorithm=%s, keytype=%s\n",
+                        this.app.getCurrentWorkspace().getFileName(), alias, friendlyName, localId, algorithm, keyEntryType);
             }
         } finally {
             tracer.wayout();
@@ -219,21 +219,45 @@ public class KeyStoreMenu extends AbstractMenu {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "addPrivateKey()");
         try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(4096);
+            String algorithm = this.console.readString("DSA|RSA|EC", "Keygenerator algorithm");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+            String signatureAlgo;
+            switch (algorithm) {
+                case "DSA":
+                    keyPairGenerator.initialize(2048);
+                    signatureAlgo = "SHA256withDSA";
+                    break;
+                case "RSA":
+                    keyPairGenerator.initialize(4096);
+                    signatureAlgo = "SHA256withRSA";
+                    break;
+                case "EC":
+                    ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp521r1");
+                    keyPairGenerator.initialize(ecGenParameterSpec);
+                    signatureAlgo = "SHA256withECDSA";
+                    break;
+                default:
+                    throw new NoSuchAlgorithmException(String.format("%s is not supported.", algorithm));
+            }
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
             tracer.out().printfIndentln("keyPair.getPrivate().getAlgorithm() = %s, keyPair.getPrivate().getEncoded().length = %d",
                     keyPair.getPrivate().getAlgorithm(), keyPair.getPrivate().getEncoded().length);
 
-            final int DAYS = 365;
-            final String SIGNATURE_ALGO = "SHA256withRSA", DISTINGUISHED_NAME = "CN=Christof Reichardt, L=Rodgau, ST=Hessen, C=Deutschland";
+            int validity = this.console.readInt("[0-9]+", "Validity");
+            String commonName = this.console.readString("[A-Za-z- ]{5,30}", "Common Name");
+            String locality = this.console.readString("[A-Za-z- ]{5,30}", "Locality");
+            String state = this.console.readString("[A-Za-z- ]{5,30}", "State");
+            String country = this.console.readString("[A-Za-z- ]{5,30}", "Country");
+            String distinguishedName = String.format("CN=%s, L=%s, ST=%s, C=%s", commonName, locality, state, country);
+            String alias = this.console.readString("[a-z0-9-]{5,25}", "Alias");
+
             Instant now = Instant.now();
             Date notBefore = Date.from(now);
-            Date notAfter = Date.from(now.plus(Duration.ofDays(DAYS)));
+            Date notAfter = Date.from(now.plus(Duration.ofDays(validity)));
             try {
-                ContentSigner contentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGO).build(keyPair.getPrivate());
-                X500Name x500Name = new X500Name(DISTINGUISHED_NAME);
+                ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgo).build(keyPair.getPrivate());
+                X500Name x500Name = new X500Name(distinguishedName);
                 JcaX509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
                         x500Name,
                         BigInteger.valueOf(now.toEpochMilli()),
@@ -246,9 +270,8 @@ public class KeyStoreMenu extends AbstractMenu {
                 JcaX509CertificateConverter x509CertificateConverter = new JcaX509CertificateConverter();
                 x509CertificateConverter.setProvider(new BouncyCastleProvider());
                 X509Certificate x509Certificate = x509CertificateConverter.getCertificate(x509CertificateHolder);
-//                this.keyStore.setCertificateEntry("myTestCertificate", x509Certificate);
                 this.keyStore.setEntry(
-                        "myPrivateTestKey",
+                        alias,
                         new KeyStore.PrivateKeyEntry(keyPair.getPrivate(),
                                 new Certificate[]{x509Certificate}),
                         this.shamirsLoadParameter.getProtectionParameter()
