@@ -20,6 +20,7 @@
 package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
+import de.christofreichardt.diagnosis.LogLevel;
 import de.christofreichardt.jca.ShamirsLoadParameter;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -32,8 +33,14 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -50,7 +57,7 @@ public class KeyStoreMenu extends AbstractMenu {
 
     public enum KeystoreCommand implements Command {
         LIST_ENTRIES("l", "list entries"), SECRET_KEY("s", "secret key"),
-        PRIVATE_KEY("p", "private key"), CERTIFICATE("t", "certificate"),
+        PRIVATE_KEY("p", "private key"), CERTIFICATE("c", "certificate"),
         MAIN_MENU("m", "main menu");
 
         String shortCut;
@@ -153,6 +160,9 @@ public class KeyStoreMenu extends AbstractMenu {
                 case PRIVATE_KEY:
                     addPrivateKey();
                     break;
+                case CERTIFICATE:
+                    addCertificate();
+                    break;
             }
         } finally {
             tracer.wayout();
@@ -195,6 +205,10 @@ public class KeyStoreMenu extends AbstractMenu {
                     KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStoreEntry;
                     algorithm = privateKeyEntry.getPrivateKey().getAlgorithm();
                     keyEntryType = "Private Key";
+                } else if (this.keyStore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class)) {
+                    KeyStore.TrustedCertificateEntry trustedCertificateEntry = (KeyStore.TrustedCertificateEntry) keyStoreEntry;
+                    algorithm = trustedCertificateEntry.getTrustedCertificate().getPublicKey().getAlgorithm();
+                    keyEntryType = "Trusted Certificate";
                 }
                 Set<KeyStore.Entry.Attribute> entryAttributes = keyStoreEntry.getAttributes();
                 Map<String, KeyStore.Entry.Attribute> entryAttrMap = entryAttributes.stream()
@@ -278,6 +292,51 @@ public class KeyStoreMenu extends AbstractMenu {
                 );
             } catch (OperatorCreationException ex) {
                 throw new GeneralSecurityException(ex);
+            }
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    void addCertificate() throws IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "addCertificate()");
+        try {
+            String url = this.console.readString("https://[A-Za-z-\\./]{5,30}", "URL");
+            String alias = this.console.readString("[A-Za-z0-9-]{5,25}", "Alias");
+
+            final int TIME_OUT = 30;
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .version(HttpClient.Version.HTTP_2)
+                    .followRedirects(HttpClient.Redirect.NEVER)
+                    .connectTimeout(Duration.ofSeconds(TIME_OUT))
+                    .build();
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            try {
+                HttpResponse<Void> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+                Optional<SSLSession> sslSession = httpResponse.sslSession();
+                sslSession.ifPresentOrElse(
+                        session -> {
+                            try {
+                                Certificate[] certificates = session.getPeerCertificates();
+                                tracer.out().printfIndentln("certificates.length = %d", certificates.length);
+                                for (int i=0; i<certificates.length; i++) {
+                                    this.keyStore.setCertificateEntry(alias + i, certificates[i]);
+                                }
+                            } catch (SSLPeerUnverifiedException | KeyStoreException ex) {
+                                tracer.logException(LogLevel.ERROR, ex, getClass(), "addCertificate()");
+                            }
+                        },
+                        () -> tracer.logMessage(
+                                LogLevel.WARNING, "No ssl session available.", getClass(), "addCertificate()"
+                        )
+                );
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
         } finally {
             tracer.wayout();
