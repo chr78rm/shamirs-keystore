@@ -30,8 +30,8 @@ class Polynomial(
 
   require(prime.isProbablePrime(CERTAINTY))
 
-  val a = coefficients.dropWhile(c => c == BigInt(0))
-  val degree = a.length - 1
+  val a: Seq[BigInt] = coefficients.dropWhile(c => c == BigInt(0))
+  val degree: Int = a.length - 1
   val isZero: Boolean = degree == -1
 
   def evaluateAt(x: BigInt): BigInt = {

@@ -29,6 +29,8 @@ import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import javax.json.{Json, JsonObject}
 
+import scala.annotation.tailrec
+
 class SecretSharing(
                      val shares: Int,
                      val threshold: Int,
@@ -49,7 +51,7 @@ class SecretSharing(
   val s: BigInt = bytes2BigInt(secretBytes)
   val randomGenerator: RandomGenerator = new RandomGenerator(random)
   val prime: BigInt = choosePrime
-  val polynomial: Polynomial = new Polynomial(chooseCanonicalCoefficients :+ s, prime)
+  val polynomial: Polynomial = choosePolynomial(k - 1)
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
   val id: String = UUID.randomUUID().toString()
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
@@ -57,6 +59,7 @@ class SecretSharing(
 
   require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
   require(k <= n, "The threshold must be less than or equal to the number of shares.")
+  require(polynomial.degree == k - 1)
 
   def choosePrime: BigInt = {
     val BIT_OFFSET = 1
@@ -67,6 +70,13 @@ class SecretSharing(
   def chooseCanonicalCoefficients: IndexedSeq[BigInt] = {
     val bits = s.bitLength * 2
     randomGenerator.bigIntStream(bits, prime).take(k - 1).toIndexedSeq
+  }
+
+  @tailrec
+  final def choosePolynomial(degree: Int): Polynomial = {
+    val candidate: Polynomial = new Polynomial(chooseCanonicalCoefficients :+ s, prime)
+    if (candidate.degree == degree) candidate
+    else choosePolynomial(degree)
   }
 
   def computeShares: IndexedSeq[(BigInt, BigInt)] = {

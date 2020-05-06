@@ -21,14 +21,11 @@ package de.christofreichardt.scala
 package shamir
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
-import java.time.LocalDateTime
 
 import de.christofreichardt.scala.utils.RandomGenerator
 import de.christofreichardt.scalatest.MyFunSuite
-import java.time.Instant
 
 class SecretSharingSuite extends MyFunSuite {
   val randomGenerator = new RandomGenerator(new SecureRandom)
@@ -92,7 +89,35 @@ class SecretSharingSuite extends MyFunSuite {
     }
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
-  
+
+  testWithTracing(this, "Preconditions-4") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 15 // Bytes
+    val trials = 100
+    val test = LazyList.from(1)
+      .map(_ => (this.randomGenerator.intStream(12).head, this.randomGenerator.intStream(12).head))
+      .filter(tuple => {
+        val n = tuple._1
+        val k = tuple._2
+        n >= 2 && k >= 2 && k <= n
+      })
+      .take(trials)
+      .map(tuple => {
+        val n = tuple._1
+        val k = tuple._2
+        val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+        val secretSharing = new SecretSharing(n, k, secret)
+        tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+        (k, secretSharing)
+      })
+      .forall(tuple => {
+        val k = tuple._1
+        val secretSharing = tuple._2
+        secretSharing.polynomial.degree == k - 1
+      })
+    assert(test)
+  }
+
   testWithTracing(this, "Sharing-1") {
     val tracer = getCurrentTracer()
     val secret: IndexedSeq[Byte] = IndexedSeq(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
