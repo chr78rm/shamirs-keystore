@@ -20,9 +20,9 @@
 package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
-import de.christofreichardt.jca.ShamirsLoadParameter;
-import de.christofreichardt.jca.ShamirsProtection;
-import de.christofreichardt.jca.ShamirsProvider;
+import de.christofreichardt.jca.shamir.ShamirsLoadParameter;
+import de.christofreichardt.jca.shamir.ShamirsProtection;
+import de.christofreichardt.jca.shamir.ShamirsProvider;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 
