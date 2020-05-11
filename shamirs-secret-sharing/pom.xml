@@ -8,8 +8,7 @@
 		<groupId>de.christofreichardt</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	
-	<groupId>de.christofreichardt</groupId>
+
 	<artifactId>shamirs-secret-sharing</artifactId>
 	<name>${project.artifactId}</name>
 	<description>Implementation of Shamir's secret sharing scheme</description>
@@ -22,7 +21,16 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
+	<developers>
+		<developer>
+			<name>Christof Reichardt</name>
+			<email>projektstudien@christofreichardt.de</email>
+			<organizationUrl>http://www.christofreichardt.de/index.html</organizationUrl>
+		</developer>
+	</developers>
+	<scm>
+		<url>https://github.com/chr78rm/shamirs-keystore</url>
+	</scm>
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -78,6 +86,7 @@
 						<goals>
 							<goal>compile</goal>
 							<goal>testCompile</goal>
+							<goal>add-source</goal>
 						</goals>
 						<configuration>
 							<scalaVersion>${scala.version}</scalaVersion>
@@ -120,4 +129,75 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<!-- see http://davidb.github.com/scala-maven-plugin -->
+						<groupId>net.alchim31.maven</groupId>
+						<artifactId>scala-maven-plugin</artifactId>
+						<version>${scala-maven-plugin.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>compile</goal>
+									<goal>testCompile</goal>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<scalaVersion>${scala.version}</scalaVersion>
+									<args>
+										<arg>-deprecation</arg>
+									</args>
+								</configuration>
+							</execution>
+							<execution>
+								<id>Scaladoc</id>
+								<goals>
+									<goal>doc</goal>
+								</goals>
+								<phase>prepare-package</phase>
+								<configuration>
+									<jvmArgs>
+										<jvmArg>-Xms64m</jvmArg>
+										<jvmArg>-Xmx1024m</jvmArg>
+									</jvmArgs>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
