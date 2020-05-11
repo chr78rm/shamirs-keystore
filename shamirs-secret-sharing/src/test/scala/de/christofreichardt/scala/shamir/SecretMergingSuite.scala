@@ -27,6 +27,8 @@ import de.christofreichardt.scala.utils.RandomGenerator
 import java.security.SecureRandom
 import java.nio.file.Paths
 
+import de.christofreichardt.scala.combinations.BinomialCombinator
+
 class SecretMergingSuite extends MyFunSuite {
   val randomGenerator = new RandomGenerator(new SecureRandom)
 
@@ -107,7 +109,7 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
     assert(secret == secretMerging.secretBytes)
   }
-  
+
   /*
    * Any (k - 1) random shares aren't sufficent to recalculate the secret
    */
@@ -130,7 +132,7 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
     assert(secret != secretMerging.secretBytes)
   }
-  
+
   /*
    * The computed shares are saved into a JSON file and will be recalculated by parsing
    * and evaluating this file.
@@ -144,14 +146,14 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val partitions = secretSharing.sharePointPartition(Seq(4,2,2,1,1,1,1))
+    val partitions = secretSharing.sharePointPartition(Seq(4, 2, 2, 1, 1, 1, 1))
     tracer.out().printfIndentln("partitions = (%s)", partitions.mkString(","))
-    secretSharing.savePartition(Seq(4,2,2,1,1,1,1), Paths.get("json", "partition-2"))
+    secretSharing.savePartition(Seq(4, 2, 2, 1, 1, 1, 1), Paths.get("json", "partition-2"))
     val secretMerging = SecretMerging(Paths.get("json", "partition-2.json"))
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
     assert(secret == secretMerging.secretBytes)
   }
-  
+
   /*
    * The computed shares are splitted into several JSON files and will be recalculated by 
    * parsing and evaluating a subset from these files.
@@ -165,9 +167,9 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val partitions = secretSharing.sharePointPartition(Seq(4,2,2,1,1,1,1).reverse)
+    val partitions = secretSharing.sharePointPartition(Seq(4, 2, 2, 1, 1, 1, 1).reverse)
     tracer.out().printfIndentln("partitions = (%s)", partitions.mkString(","))
-    secretSharing.savePartition(Seq(4,2,2,1,1,1,1).reverse, Paths.get("json", "partition-3"))
+    secretSharing.savePartition(Seq(4, 2, 2, 1, 1, 1, 1).reverse, Paths.get("json", "partition-3"))
     val secretMerging = SecretMerging(IndexedSeq(Paths.get("json", "partition-3-1.json"), Paths.get("json", "partition-3-2.json")))
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
     assert(secret == secretMerging.secretBytes)
@@ -199,45 +201,75 @@ class SecretMergingSuite extends MyFunSuite {
     assert(secretSharing.verified)
   }
 
-//
-// Takes several minutes to complete.
-//
-//  testWithTracing(this, "Exhaustive-Verification-3") {
-//    val tracer = getCurrentTracer()
-//    val SECRET_SIZE = 16 // Bytes
-//    val SHARES = 16
-//    val THRESHOLD = 8
-//    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
-//    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
-//    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
-//    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-//    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
-//    assert(secretSharing.verified)
-//  }
+  //
+  // Takes several minutes to complete.
+  //
+  //  testWithTracing(this, "Exhaustive-Verification-3") {
+  //    val tracer = getCurrentTracer()
+  //    val SECRET_SIZE = 16 // Bytes
+  //    val SHARES = 16
+  //    val THRESHOLD = 8
+  //    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+  //    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+  //    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+  //    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+  //    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
+  //    assert(secretSharing.verified)
+  //  }
 
-    /*
-     * A password containing several characters from the range 0080–00FF (Latin-1 Supplement), in particular
-     * some german umlauts. The sharing and merging algorithms are defaulting to UTF-8 when encoding respective
-     * decoding the characters.
-     */
-    testWithTracing(this, "Password-1") {
-      val tracer = getCurrentTracer()
-      val SHARES = 12
-      val THRESHOLD = 4
-      val password = "secret-\u00E4\u00F6\u00FC-with-umlauts"
-      tracer.out().printfIndentln("password = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
-      val secretSharing = new SecretSharing(SHARES, THRESHOLD, password)
-      assert(secretSharing.n == SHARES && secretSharing.k == THRESHOLD)
-      tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-      val chosenSharePoints = randomGenerator.intStream(SHARES)
-        .distinct
-        .take(THRESHOLD)
-        .map(i => secretSharing.sharePoints(i))
-        .toIndexedSeq
-      val secretMerging = SecretMerging(chosenSharePoints, secretSharing.prime)
-      tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
-      val recoveredPassword = new String(secretMerging.password)
-      tracer.out().printfIndentln("recoveredPassword = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", recoveredPassword, formatBytes(recoveredPassword.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
-      assert(password == recoveredPassword)
-    }
+  /*
+   * Merging with one sharepoint less than the required threshold must not produce the
+   * original secret at least not with overwhelming probability
+   */
+  testWithTracing(this, "Exhaustive-Falsification") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 8
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, SHARES), THRESHOLD - 1)
+    tracer.out().printfIndentln("size = %d", combinator.solutions.size)
+    val falsified = combinator.solutions
+      .map(combination => {
+        val indices = combination
+        val selectedPoints = indices.map(index => secretSharing.sharePoints(index))
+        val merger = SecretMerging(selectedPoints, secretSharing.prime)
+        merger.secretBytes
+      })
+      .forall(mergedBytes => {
+        tracer.out().printfIndentln("mergedBytes = (%s)", formatBytes(mergedBytes))
+        mergedBytes != secret
+      })
+    assert(falsified)
   }
+
+
+  /*
+   * A password containing several characters from the range 0080–00FF (Latin-1 Supplement), in particular
+   * some german umlauts. The sharing and merging algorithms are defaulting to UTF-8 when encoding respective
+   * decoding the characters.
+   */
+  testWithTracing(this, "Password-1") {
+    val tracer = getCurrentTracer()
+    val SHARES = 12
+    val THRESHOLD = 4
+    val password = "secret-\u00E4\u00F6\u00FC-with-umlauts"
+    tracer.out().printfIndentln("password = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, password)
+    assert(secretSharing.n == SHARES && secretSharing.k == THRESHOLD)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val chosenSharePoints = randomGenerator.intStream(SHARES)
+      .distinct
+      .take(THRESHOLD)
+      .map(i => secretSharing.sharePoints(i))
+      .toIndexedSeq
+    val secretMerging = SecretMerging(chosenSharePoints, secretSharing.prime)
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
+    val recoveredPassword = new String(secretMerging.password)
+    tracer.out().printfIndentln("recoveredPassword = %1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", recoveredPassword, formatBytes(recoveredPassword.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16)))
+    assert(password == recoveredPassword)
+  }
+}
