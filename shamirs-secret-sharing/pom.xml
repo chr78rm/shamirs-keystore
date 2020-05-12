@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>shamirs-lib</artifactId>
 		<groupId>de.christofreichardt</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.0-beta</version>
 	</parent>
 
 	<artifactId>shamirs-secret-sharing</artifactId>

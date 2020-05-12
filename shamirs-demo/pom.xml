@@ -7,10 +7,9 @@
     <parent>
         <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0-beta</version>
     </parent>
 
-    <groupId>de.christofreichardt</groupId>
     <artifactId>shamirs-demo</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
@@ -19,6 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <app.main.class>de.christofreichardt.jca.shamirsdemo.App</app.main.class>
     </properties>
 
     <build>
@@ -73,6 +73,49 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>fat-jar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.3</version>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>${app.main.class}</Main-Class>
+                                    </manifestEntries>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>de.christofreichardt</groupId>
@@ -82,7 +125,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>shamirs-keystore</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -118,7 +161,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>junit5-ext</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -6,7 +6,7 @@
 
   <groupId>de.christofreichardt</groupId>
   <artifactId>shamirs-lib</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-beta</version>
   <packaging>pom</packaging>
   <name>shamirs-lib</name>
 

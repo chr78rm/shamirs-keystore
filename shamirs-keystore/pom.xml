@@ -7,10 +7,9 @@
     <parent>
         <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0-beta</version>
     </parent>
 
-    <groupId>de.christofreichardt</groupId>
     <artifactId>shamirs-keystore</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
@@ -90,7 +89,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>shamirs-secret-sharing</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -120,7 +119,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>junit5-ext</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
