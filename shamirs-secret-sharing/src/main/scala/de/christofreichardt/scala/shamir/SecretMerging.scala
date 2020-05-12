@@ -37,7 +37,7 @@ class SecretMerging(
   val newtonPolynomial: NewtonPolynomial = new NewtonPolynomial(degree, sharePoints.take(sharePoints.length - 1).map(p => p._1), coefficients, prime)
   val s: BigInt = newtonPolynomial.evaluateAt(BigInt(0))
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
-  val password: Array[Char] = new String(secretBytes.toArray, StandardCharsets.UTF_8).toCharArray
+  lazy val password: Array[Char] = new String(secretBytes.toArray, StandardCharsets.UTF_8).toCharArray
 }
 
 object SecretMerging {
