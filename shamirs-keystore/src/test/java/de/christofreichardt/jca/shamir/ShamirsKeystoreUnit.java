@@ -148,6 +148,31 @@ public class ShamirsKeystoreUnit implements Traceable {
         }
     }
 
+    @Test
+    @DisplayName("Sun-Provider")
+    void sunProvider() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "sunProvider()");
+
+        try {
+            final String ALGO = "pkcs12";
+            final String KEYSTORE_TYPE = "KeyStore", KEYSTORE_FILTER = KEYSTORE_TYPE + "." + ALGO;
+            Provider[] providers = Security.getProviders(KEYSTORE_FILTER);
+            Stream.of(providers).forEach(
+                    provider -> {
+                        tracer.out().printfIndentln("%s-Provider = %s", KEYSTORE_FILTER, provider.getName());
+                        String[] lines = provider.getService(KEYSTORE_TYPE, ALGO).toString().split("\n");
+                        for (String line : lines) {
+                            tracer.out().printfIndentln("%s", line);
+                        }
+                    }
+            );
+
+        } finally {
+            tracer.wayout();
+        }
+    }
+
     @Nested
     @DisplayName("Prepared-Keystore")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
