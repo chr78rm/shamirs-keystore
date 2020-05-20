@@ -104,5 +104,5 @@ abstract class JsonWebSignature(val kid: String) extends Tracing {
     }
   }
 
-  override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getTracer("TestTracer")
+//  override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getTracer("TestTracer")
 }

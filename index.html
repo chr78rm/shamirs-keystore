@@ -50,7 +50,7 @@
         color: rgb(77,77,77); font-size: 0.9rem; line-height: 100%; font-family: 'Montserrat', sans-serif;
       }
       th.cell {
-        border-bottom-style: none; border-width: 1px; width: 25%; border-top-style: none; background-color: rgb(253,219,199)
+        border-bottom-style: none; border-width: 1px; width: 25%; border-top-style: none; background-color: rgb(244,165,130)
       }
       td.cell {
         border-bottom-style: none; border-width: 1px; width: 25%; border-top-style: none; background-color: rgb(146,197,222)
@@ -60,7 +60,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-05-18</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-05-20</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -110,6 +110,12 @@
       </div>
       <p class="section">
         Above command will compile the sources, run the tests and install the provider into the local Maven repo.
+      </p>
+      <p class="section">
+        Note that the included demo app makes use of the pkix sub-module from the <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a> crypto library for 
+        programmatically generating self-signed X.509 certificates which is something that cannot be easily done with the JDK alone. Aside from this two other
+        dependencies must be mentioned: JSON processing by <a href="https://resteasy.github.io/">RESTEasy</a> and of course the 
+        <a href="https://www.scala-lang.org/">Scala</a> library since the core module containing the actual algorithm is written in Scala.
       </p>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -252,6 +258,10 @@
       </p>
       <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 50%">Artifact</th>
+            <th class="cell" style="width: 50%">Report</th>
+          </tr>
           <tr style="">
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">shamirs-keystore</td>
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)"><a href="./reports/shamirs-keystore-summary.txt">summary.txt</a></td>
@@ -270,6 +280,10 @@
       </p>
       <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 50%">Artifact</th>
+            <th class="cell" style="width: 50%">Report</th>
+          </tr>
           <tr style="">
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">shamirs-secret-sharing</td>
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)"><a href="./reports/shamirs-secret-sharing-summary.txt">summary.txt</a></td>
@@ -300,15 +314,19 @@
           <tr style="">
             <td class="cell" style="width: 15%">shamirs-demo</td>
             <td class="cell">
-              <a href="https://www.dropbox.com/s/7a42vcx9xmx1cbm/shamirs-demo-1.0.0-beta.zip?dl=1">shamirs-demo-1.0.0-beta.zip</a>
+              <a href="https://www.dropbox.com/s/rhs76o31qppix9m/shamirs-demo-1.0.0-beta.zip?dl=1">shamirs-demo-1.0.0-beta.zip</a>
             </td>
-            <td class="cell">2020-05-18 20:51:52.379 +0200</td>
+            <td class="cell">2020-05-20 13:50:27.364 +0200</td>
             <td class="cell">
               <a href="./shamirs-demo-1.0.0-beta.zip.sha512.txt">shamirs-demo-1.0.0-beta.zip.sha512</a>
             </td>
           </tr>
         </tbody>
       </table>
+      <p class="section">
+        Note that the demo app includes binaries from external open source projects, namely the scala-library-2.13.2, resteasy-json-p-provider-4.5.3
+        and bcpkix-jdk15on-1.65.
+      </p>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>

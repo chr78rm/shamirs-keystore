@@ -11,3 +11,4 @@ dependency-reduced-pom.xml
 shamirs-demo/workspace/**/*.json
 shamirs-demo/workspace/**/*.p12
 shamirs-keystore/pkcs12/my-keystore-2.p12
+temp/

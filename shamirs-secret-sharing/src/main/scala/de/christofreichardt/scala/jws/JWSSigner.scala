@@ -98,6 +98,6 @@ package jws {
       }
     }
 
-    override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getTracer("TestTracer")
+//    override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getTracer("TestTracer")
   }
 }
