@@ -12,16 +12,17 @@
       }
       p.headline-0 {
         background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; 
-        padding-left: 1rem; padding-right: 0.75rem
+        padding-left: 1rem; padding-right: 0.75rem; font-weight: bold;
       }
       p.headline-1 {
-        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; padding-left: 1rem
+        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; 
+        padding-left: 1rem; font-weight: bold;
       }
       p.section {
         color: rgb(26,26,26); font-family: 'Crimson Text', serif; text-align: justify
       }
       div.code {
-        border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); width: 60%; margin-left: auto; 
+        border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); width: 80%; margin-left: auto; 
         margin-right: auto; overflow-x: auto; white-space: nowrap
       }
       p.code {
@@ -55,12 +56,23 @@
       td.cell {
         border-bottom-style: none; border-width: 1px; width: 25%; border-top-style: none; background-color: rgb(146,197,222)
       }
+      div.console {
+        border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(209,229,240); width: 60%; margin-left: auto; 
+        margin-right: auto; overflow-x: auto; white-space: nowrap
+      }
+      p.console {
+        font-family: 'Fira Code', monospace; font-size: 12px; text-align: left; padding-left: 1rem
+      }
+      span.code {
+        border-style: solid; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); border-radius: 3px;
+        font-family: 'Fira Code', monospace; font-size: 11px;
+      }
     </style>
   </head>
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-05-20</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-05-22</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -96,8 +108,8 @@
       </p>
       <div class="code">
         <p class="code">
-          git clone https://github.com/chr78rm/shamirs-keystore.git<br/>
-          cd shamirs-keystore
+          $ git clone https://github.com/chr78rm/shamirs-keystore.git<br/>
+          $ cd shamirs-keystore
         </p>
       </div>
       <p class="section">
@@ -105,7 +117,7 @@
       </p>
       <div class="code">
         <p class="code">
-          mvn clean install
+          $ mvn clean install
         </p>
       </div>
       <p class="section">
@@ -115,7 +127,7 @@
         Note that the included demo app makes use of the pkix sub-module from the <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a> crypto library for 
         programmatically generating self-signed X.509 certificates which is something that cannot be easily done with the JDK alone. Aside from this two other
         dependencies must be mentioned: JSON processing by <a href="https://resteasy.github.io/">RESTEasy</a> and of course the 
-        <a href="https://www.scala-lang.org/">Scala</a> library since the core module containing the actual algorithm is written in Scala.
+        <a href="https://www.scala-lang.org/">Scala</a>-Library since the core module containing the actual algorithm is written in Scala.
       </p>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -324,16 +336,113 @@
         </tbody>
       </table>
       <p class="section">
-        Note that the demo app includes binaries from external open source projects, namely the scala-library-2.13.2, resteasy-json-p-provider-4.5.3
-        and bcpkix-jdk15on-1.65.
+        Note that the demo app includes binaries from external open source projects, namely the <a href="https://www.scala-lang.org/">Scala</a>-Library, 
+        the JSON-Processing provider from <a href="https://resteasy.github.io/">RESTEasy</a> and
+        the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>.
       </p>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
       <p id="9" class="headline-1">7. Usage</p>
       <p class="section">
-        Coming soon ...
+        Download the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
+        commands into their MS-DOS (or Powershell) equivalents if you are working on Windows. Note that I haven't been able to test the demo on Windows but it should 
+        work in principle. Following commands show the relevant content of the distribution:
       </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">$ cd shamirs-demo/
+$ ls
+LICENCE.txt  log  NOTICE.txt  run-shamirs-demo.sh  src  target  workspace
+$ ls target/
+shamirs-demo-1.0.0-beta.jar
+ls --recursive workspace/
+workspace/:
+my-workspace-0
+
+workspace/my-workspace-0:
+my-keys.p12  test-0.json  test-1.json  test-2.json  test-3.json  test-4.json  test-5.json  test-6.json  test.json</p>
+      </div>
+      <p class="section">
+        The demo can be started with <span class="code">./run-shamirs-demo.sh</span> or alternatively:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.0.0-beta.jar
+...
++---------------+
+| Shamir's Demo |
++---------------+
+
+Current time: 2020-05-22T14:26:10.667463
+   Workspace: 2020-05-22
+
+2020-05-22-> Main menu
+
+       (s)plit password       (m)erge password       (o)pen workspace
+      (c)reate keystore        (lo)ad keystore       (li)st workspace
+                 (e)xit
+
+2020-05-22-></p>
+      </div>
+      <p class="section">
+        The explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
+        when generating random passwords. See <a href="https://www.2uo.de/myths-about-urandom/">Myths about /dev/urandom</a> for a discussion about the confusion
+        regarding the special device files which serve as (pseudo) random generators on Linux systems.
+        The string <span class="code">2020-05-22</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
+        the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
+        a password:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">2020-05-22-> s
+2020-05-22-> split password
+2020-05-22-> Password ([A-Za-z0-9-]{8,45}): mdCArzFxaOrYtco5XNfLne39R 
+2020-05-22-> Number of shares ([0-9]+): 12
+2020-05-22-> Threshold ([0-9]+): 4
+2020-05-22-> Name of partition ([A-Za-z]{1,10}): demo
+2020-05-22-> Number of slices ([0-9]+): 7
+2020-05-22-> Size[i=0, sum=0] ([0-9]+): 4
+2020-05-22-> Size[i=1, sum=4] ([0-9]+): 2
+2020-05-22-> Size[i=2, sum=6] ([0-9]+): 2
+2020-05-22-> Size[i=3, sum=8] ([0-9]+): 1
+2020-05-22-> Size[i=4, sum=9] ([0-9]+): 1
+2020-05-22-> Size[i=5, sum=10] ([0-9]+): 1
+2020-05-22-> Size[i=6, sum=11] ([0-9]+): 1</p>
+      </div>
+      <p class="section">
+        The app will made a password proposal. Every user provided input will be matched against the regular expression 
+        given in the brackets. In our example we instructed to generate 12 shares whereas 4 of them are needed to recover the original password. The shares
+        are grouped within a partition named <span class="code">demo</span>. The 12 shares were divided into 7 slices. The first slice had been given 4
+        shares. The next two slices have both received 2 shares and the remaining slices had been in each case given 1 share. Open another console
+        and review the content of the your workspace directory (workspace/yyyy-MM-dd):
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">$ ls workspace/2020-05-22
+demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  demo.json</p>
+      </div>
+      <p class="section">
+        The file <span class="code">demo.json</span> contains all of the generated shares, <span class="code">demo-0.json</span> four of them, 
+        <span class="code">demo-1.json</span> two and so on. 
+        The idea is that we have seven participants in our example. Each of them will be given one slice. This means the participant owning the slice 
+        <span class="code">demo-0.json</span> is able to recover the password himself whereas the owner of <span class="code">demo-1.json</span> must team up with 
+        the owner of <span class="code">demo-2.json</span> or with two of the owners of the remaining slices. Now switch back to the demo app and invoke
+        <span class="code">(li)st workspace</span>:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">2020-05-22-> li
+2020-05-22-> list workspace
+2020-05-22-> Partitions: [demo]
+2020-05-22-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2020-05-22-> Keystores: []</p>
+      </div>
+      <p class="section">
+        We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
+        <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">2020-05-22-> m
+2020-05-22-> merge password
+2020-05-22-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json,demo-3.json,demo-6.json
+2020-05-22-> password = mdCArzFxaOrYtco5XNfLne39R</p>
+      </div>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
