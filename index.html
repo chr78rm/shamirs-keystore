@@ -72,7 +72,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-05-23</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-08-12</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -106,7 +106,15 @@
       </p>
       <p id="3" class="headline-1">1. Build</p>
       <p class="section">
-        First clone the project:
+        On Windows, you have to disable the automatic conversion of Unix style end-of-line marker, otherwise one of the test cases might fail:
+      </p>
+      <div class="code">
+        <p class="code">
+          $ git config --global core.autocrlf false
+        </p>
+      </div>
+      <p class="section">
+        Now clone the project:
       </p>
       <div class="code">
         <p class="code">

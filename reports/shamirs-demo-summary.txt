@@ -6,16 +6,16 @@
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
 -------------------------------------
-ShamirsDemoUnit[container=true, test=false, start=2020-05-23T14:06:02.291477, end=2020-05-23T14:06:08.741295, duration=PT6.449818S, status=SUCCESSFUL]
+ShamirsDemoUnit[container=true, test=false, start=2020-08-12T18:28:53.415895, end=2020-08-12T18:29:00.446024, duration=PT7.030129S, status=SUCCESSFUL]
 
 -------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
 containers = 0, tests = 4, successful = 4, failed = 0, aborted = 0
 -------------------------------------
-encoding-1[container=false, test=true, start=2020-05-23T14:06:02.982136, end=2020-05-23T14:06:06.806405, duration=PT3.824269S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2020-05-23T14:06:02.602547, end=2020-05-23T14:06:02.978338, duration=PT0.375791S, status=SUCCESSFUL]
-ec-keypair[container=false, test=true, start=2020-05-23T14:06:02.393175, end=2020-05-23T14:06:02.596522, duration=PT0.203347S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2020-05-23T14:06:06.813457, end=2020-05-23T14:06:08.734568, duration=PT1.921111S, status=SUCCESSFUL]
+encoding-1[container=false, test=true, start=2020-08-12T18:28:54.16278, end=2020-08-12T18:28:58.531844, duration=PT4.369064S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-08-12T18:28:53.781427, end=2020-08-12T18:28:54.158998, duration=PT0.377571S, status=SUCCESSFUL]
+ec-keypair[container=false, test=true, start=2020-08-12T18:28:53.492873, end=2020-08-12T18:28:53.76377, duration=PT0.270897S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-08-12T18:28:58.536039, end=2020-08-12T18:29:00.439713, duration=PT1.903674S, status=SUCCESSFUL]
 
 
 =====================================
