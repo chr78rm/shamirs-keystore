@@ -72,7 +72,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-08-12</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-09-08</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -106,7 +106,8 @@
       </p>
       <p id="3" class="headline-1">1. Build</p>
       <p class="section">
-        On Windows, you have to disable the automatic conversion of Unix style end-of-line marker, otherwise one of the test cases might fail:
+          On Windows I recommend to use the <a href="https://git-scm.com/download/win">Git Bash</a>. Then you would have to disable the automatic conversion of Unix style end-of-line marker, 
+          otherwise one of the test cases might fail. But please also note the instructions when executing the <a href="#9">demo app</a> within the Git Bash.
       </p>
       <div class="code">
         <p class="code">
@@ -355,9 +356,9 @@
       </p>
       <p id="9" class="headline-1">7. Usage</p>
       <p class="section">
-        Download the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
-        commands into their MS-DOS (or Powershell) equivalents if you are working on Windows. Note that I haven't been able to test the demo on Windows but it should 
-        work in principle. Following commands show the relevant content of the distribution:
+          <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
+        commands into their <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> equivalents if you are working on Windows and aren't using 
+        the <a href="https://git-scm.com/download/win">Git Bash</a>. I discourage the usage of the Windows PowerShell. Following commands show the relevant content of the distribution:
       </p>
       <div class="code">
         <p class="code" style="white-space: pre">$ cd shamirs-demo/
@@ -365,7 +366,7 @@ $ ls
 LICENCE.txt  log  NOTICE.txt  run-shamirs-demo.sh  src  target  workspace
 $ ls target/
 shamirs-demo-1.0.0-beta.jar
-ls --recursive workspace/
+$ ls --recursive workspace/
 workspace/:
 my-workspace-0
 
@@ -373,7 +374,12 @@ workspace/my-workspace-0:
 my-keys.p12  test-0.json  test-1.json  test-2.json  test-3.json  test-4.json  test-5.json  test-6.json  test.json</p>
       </div>
       <p class="section">
-        The demo can be started with <span class="code">./run-shamirs-demo.sh</span> or alternatively:
+        On Linux the demo can be started with <span class="code">./run-shamirs-demo.sh</span>. On Windows and using the Git Bash you will instead need <span class="code">winpty sh -i -c ./run-shamirs-demo.sh</span>
+        or simply <span class="code">winpty java -jar target/shamirs-demo-1.0.0-beta.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
+        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Console.html">Console</a> and 
+        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#console()">System.console()</a> would return null. Using the command interpreter
+        <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> of Windows you can simply type 
+        <span class="code">java -jar target/shamirs-demo-1.0.0-beta.jar</span> to invoke the demo.
       </p>
       <div class="code">
         <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.0.0-beta.jar
@@ -394,7 +400,7 @@ Current time: 2020-05-22T14:26:10.667463
 2020-05-22-></p>
       </div>
       <p class="section">
-        The explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
+        On Linux the explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
         when generating random passwords. See <a href="https://www.2uo.de/myths-about-urandom/">Myths about /dev/urandom</a> for a discussion about the confusion
         regarding the special device files which serve as (pseudo) random generators on Linux systems.
         The string <span class="code">2020-05-22</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
