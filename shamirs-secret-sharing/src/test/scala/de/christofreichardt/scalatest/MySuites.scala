@@ -132,13 +132,13 @@ class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with Befo
     out.println()
   }
 
-  override def beforeAll: Unit = {
+  override def beforeAll(): Unit = {
     withTracer("Unit", this, "beforeAll") {
       TracerFactory.getInstance().getTracer("TestTracer").open()
     }
   }
 
-  override def afterAll: Unit = {
+  override def afterAll(): Unit = {
     printf("%s.afterAll%n", this.getClass().getSimpleName())
     withTracer("Unit", this, "afterAll") {
       TracerFactory.getInstance().getTracer("TestTracer").close()

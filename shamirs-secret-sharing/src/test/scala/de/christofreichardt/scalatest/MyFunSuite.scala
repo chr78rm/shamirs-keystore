@@ -32,7 +32,7 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
 
   override def run(testName: Option[String], args: Args): Status = {
     printf("%s.run%n", this.getClass().getSimpleName())
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     tracer.initCurrentTracingContext(15, true)
     withTracer("Status", this, "run(testName: Option[String], args: Args)") {
       tracer.out().printfIndentln("testName = %s", testName)
@@ -43,14 +43,14 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
   }
 
   override def beforeAll(): Unit = {
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     withTracer("Unit", this, "beforeAll()") {
       tracer.logMessage(LogLevel.INFO, String.format("%s started.", this.suiteName), getClass, "beforeAll()")
     }
   }
 
   override def runTest(testName: String, args: Args): Status = {
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     withTracer("Status", this, "runTest(testName: String, args: Args)") {
       tracer.logMessage(LogLevel.INFO, testName + " started ...", getClass(), "runTest(testName: String, args: Args)")
       tracer.out().printfIndentln("testName = %s", testName)
@@ -62,7 +62,7 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
   }
   
   override def afterAll(): Unit = {
-    val tracer = getCurrentTracer
+    val tracer = getCurrentTracer()
     withTracer("Unit", this, "afterAll()") {
     }
   }
@@ -85,7 +85,7 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
   }
   
   def ignore[T](callee : Any, testName : String)(block : => T) : Unit = {
-     val tracer = getCurrentTracer
+     val tracer = getCurrentTracer()
     ignore(testName) {
        block
      }
