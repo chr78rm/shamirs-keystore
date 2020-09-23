@@ -31,13 +31,20 @@
 	<scm>
 		<url>https://github.com/chr78rm/shamirs-keystore</url>
 	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<encoding>UTF-8</encoding>
-		<scala.version>2.13.2</scala.version>
-		<scalatest.version>3.1.1</scalatest.version>
-		<scala-maven-plugin.version>4.3.1</scala-maven-plugin.version>
+		<scala.version>2.13.3</scala.version>
+		<scalatest.version>3.2.0</scalatest.version>
+		<scala-maven-plugin.version>4.4.0</scala-maven-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.0.0</scalatest-maven-plugin.version>
 		<javax.json.version>1.1.4</javax.json.version>
@@ -165,9 +172,9 @@
 							<execution>
 								<id>Scaladoc</id>
 								<goals>
-									<goal>doc</goal>
+									<goal>doc-jar</goal>
 								</goals>
-								<phase>prepare-package</phase>
+								<phase>package</phase>
 								<configuration>
 									<jvmArgs>
 										<jvmArg>-Xms64m</jvmArg>
@@ -190,6 +197,17 @@
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>false</autoReleaseAfterClose>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
