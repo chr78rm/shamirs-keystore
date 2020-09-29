@@ -9,6 +9,32 @@
   <version>1.0.0-beta</version>
   <packaging>pom</packaging>
   <name>shamirs-lib</name>
+  <description>Shamirs Secret Sharing with child modules</description>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License 3</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Christof Reichardt</name>
+      <email>projektstudien@christofreichardt.de</email>
+      <organizationUrl>http://www.christofreichardt.de/index.html</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <url>https://github.com/chr78rm/shamirs-keystore</url>
+  </scm>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <url>https://chr78rm.github.io/shamirs-keystore/</url>
 
   <modules>
     <module>shamirs-secret-sharing</module>
@@ -16,5 +42,40 @@
     <module>junit5-ext</module>
     <module>shamirs-demo</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

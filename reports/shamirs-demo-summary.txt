@@ -6,16 +6,16 @@
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
 -------------------------------------
-ShamirsDemoUnit[container=true, test=false, start=2020-09-23T16:21:14.756014179, end=2020-09-23T16:21:21.104474622, duration=PT6.348460443S, status=SUCCESSFUL]
+ShamirsDemoUnit[container=true, test=false, start=2020-09-29T14:18:16.660231399, end=2020-09-29T14:18:23.796846618, duration=PT7.136615219S, status=SUCCESSFUL]
 
 -------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
 containers = 0, tests = 4, successful = 4, failed = 0, aborted = 0
 -------------------------------------
-encoding-1[container=false, test=true, start=2020-09-23T16:21:15.575724902, end=2020-09-23T16:21:19.137546995, duration=PT3.561822093S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2020-09-23T16:21:15.152547598, end=2020-09-23T16:21:15.570717211, duration=PT0.418169613S, status=SUCCESSFUL]
-ec-keypair[container=false, test=true, start=2020-09-23T16:21:14.856748827, end=2020-09-23T16:21:15.145751397, duration=PT0.28900257S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2020-09-23T16:21:19.141933669, end=2020-09-23T16:21:21.098155416, duration=PT1.956221747S, status=SUCCESSFUL]
+encoding-1[container=false, test=true, start=2020-09-29T14:18:17.724310879, end=2020-09-29T14:18:21.919774699, duration=PT4.19546382S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-09-29T14:18:17.259553798, end=2020-09-29T14:18:17.718929174, duration=PT0.459375376S, status=SUCCESSFUL]
+ec-keypair[container=false, test=true, start=2020-09-29T14:18:16.821607084, end=2020-09-29T14:18:17.243701576, duration=PT0.422094492S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-09-29T14:18:21.923042914, end=2020-09-29T14:18:23.790593769, duration=PT1.867550855S, status=SUCCESSFUL]
 
 
 =====================================
