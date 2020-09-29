@@ -72,7 +72,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-09-08</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-09-29</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -85,7 +85,11 @@
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#11">4.2 Class Diagram</a><br/>
           <a class="menu" href="#7">5. Reports</a><br/>
           <a class="menu" href="#8">6. Download</a><br/>
-          <a class="menu" href="#9">7. Usage</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#12">6.1 Demo App</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#13">6.2 Maven Coordinates</a><br/>
+          <a class="menu" href="#9">7. User Manual</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#14">7.1 Demo App</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#15">7.2 Keystore Engine</a><br/>
           <a class="menu" href="#imprint">Imprint</a>
         </div>
       </div>
@@ -107,7 +111,7 @@
       <p id="3" class="headline-1">1. Build</p>
       <p class="section">
           On Windows I recommend to use the <a href="https://git-scm.com/download/win">Git Bash</a>. Then you would have to disable the automatic conversion of Unix style end-of-line marker, 
-          otherwise one of the test cases might fail. But please also note the instructions when executing the <a href="#9">demo app</a> within the Git Bash.
+          otherwise one of the test cases might fail. But please also note the instructions when executing the <a href="#14">7.1 Demo App</a> within the Git Bash.
       </p>
       <div class="code">
         <p class="code">
@@ -259,12 +263,12 @@
         <a href="#1">[ToC]</a>
       </p>
       <p id="6" class="headline-1">4. UML Diagrams</p>
-      <p id="10" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem">4.1 Component Diagrams</p>
+      <p id="10" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">4.1 Component Diagrams</p>
       <div style="text-align: center">
         <img style="width: 80%; height: auto" src="uml/component-diagram-1.png" alt="component-diagram-1"/>
         <img style="width: 80%; height: auto; margin-top: 1em" src="uml/component-diagram-2.png" alt="component-diagram-2"/>
       </div>
-      <p id="11" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem">4.2 Class Diagram</p>
+      <p id="11" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">4.2 Class Diagram</p>
       <div style="text-align: center">
         <img style="width: 80%" src="uml/class-diagram.png" alt="class-diagram"/>
       </div>
@@ -317,6 +321,7 @@
         <a href="#1">[ToC]</a>
       </p>
       <p id="8" class="headline-1">6. Download</p>
+      <p id="12" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">6.1 Demo App</p>
       <p class="section">
         By the time I initially experimented with this Maven multi module project I had run into difficulties regarding the automatic execution of unit tests
         when applying the principles of the new Java module system (Jigsaw). I decided to waste no further time in finding workable solutions and leave this for
@@ -351,10 +356,26 @@
         the JSON-Processing provider from <a href="https://resteasy.github.io/">RESTEasy</a> and
         the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>.
       </p>
+      <p id="13" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">6.1 Maven Coordinates</p>
+      <p class="section">
+        The KeyStore engine together with the relevant artifacts had been deployed to Maven Central and can be used within your applications by referencing the subsequent Maven coordinates:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">&lt;dependency&gt;
+    &lt;groupId&gt;de.christofreichardt&lt;/groupId&gt;
+    &lt;artifactId&gt;shamirs-keystore&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-beta&lt;/version&gt;
+    &lt;type&gt;jar&lt;/type&gt;
+&lt;/dependency&gt;</p>
+      </div>
+      <p class="section">
+        See section <a href="#15">7.2 Keystore Engine</a> how to use the provider within your applications.
+      </p>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
       <p id="9" class="headline-1">7. Usage</p>
+      <p id="14" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
       <p class="section">
           <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
         commands into their <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> equivalents if you are working on Windows and aren't using 
@@ -620,6 +641,183 @@ Version: 3
 2020-05-22-> e
 2020-05-22-> exit</p>
       </div>
+      <p class="section">
+        <a href="#1">[ToC]</a>
+      </p>
+      <p id="15" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">7.2 Keystore Engine</p>
+      <p class="section">
+        See section <a href="#13">6.2 Maven Coordinates</a> for the version of the present distribution. Subsequently, I give a simple example how to use the keystore engine within your 
+        application. First, you need to install the provider:
+      </p>
+      <div class="code">
+        <table style="border-collapse: separate; padding: 0.25em">
+          <tr>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(01)</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(02)</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(03)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsProvider myProvider = new ShamirsProvider();</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Security.addProvider(myProvider);</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Stream.of(Security.getProviders()).forEach(provider -> System.out.printf("provider[%s] = %s\n", provider.getName(), provider.getInfo()));</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p class="section">
+        On my system I'm getting the following output:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">provider[SUN] = SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; PKCS12, JKS & DKS keystores; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
+provider[SunRsaSign] = Sun RSA signature provider
+provider[SunEC] = Sun Elliptic Curve provider (EC, ECDSA, ECDH)
+provider[SunJSSE] = Sun JSSE provider(PKCS12, SunX509/PKIX key/trust factories, SSLv3/TLSv1/TLSv1.1/TLSv1.2/TLSv1.3/DTLSv1.0/DTLSv1.2)
+provider[SunJCE] = SunJCE Provider (implements RSA, DES, Triple DES, AES, Blowfish, ARCFOUR, RC2, PBE, Diffie-Hellman, HMAC, ChaCha20)
+provider[SunJGSS] = Sun (Kerberos v5, SPNEGO)
+provider[SunSASL] = Sun SASL provider(implements client mechanisms for: DIGEST-MD5, EXTERNAL, PLAIN, CRAM-MD5, NTLM; server mechanisms for: DIGEST-MD5, CRAM-MD5, NTLM)
+provider[XMLDSig] = XMLDSig (DOM XMLSignatureFactory; DOM KeyInfoFactory; C14N 1.0, C14N 1.1, Exclusive C14N, Base64, Enveloped, XPath, XPath2, XSLT TransformServices)
+provider[SunPCSC] = Sun PC/SC provider
+provider[JdkLDAP] = JdkLDAP Provider (implements LDAP CertStore)
+provider[JdkSASL] = JDK SASL provider(implements client and server mechanisms for GSSAPI)
+provider[SunMSCAPI] = Sun's Microsoft Crypto API provider
+provider[SunPKCS11] = Unconfigured and unusable PKCS11 provider
+provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports shared passwords.</p>
+      </div>
+      <p class="section">
+        As can be seen the recently installed provider is the least significant one. The next statement requests the desired keystore engine: 
+      </p>
+      <div class="code">
+        <table style="border-collapse: separate; padding: 0.25em">
+          <tr>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(04)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", myProvider);</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p class="section">
+        In order to make it simple I'm building upon from the previous section <a href="#14">7.1 Demo App</a> by assuming the over there generated shares and keystore within a subdirectory
+        <span class="code">test-workspace</span>.
+      </p>
+      <div class="code">
+        <table style="border-collapse: separate; padding: 0.25em">
+          <tr>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(05)</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(06)
+
+
+  </td>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(07)</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(08)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Path dir = Path.of(".", "test-workspace");</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Set<Path> paths = Set.of(Path.of("demo-1.json"), Path.of("demo-3.json"), Path.of("demo-4.json"))
+    .stream()
+    .map(path -> dir.resolve(path))
+    .collect(Collectors.toSet());</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsProtection shamirsProtection = new ShamirsProtection(paths);</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">File keyStoreFile = dir.resolve("my-keys.p12").toFile();</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p class="section">
+        Now we have everything together to load the keystore:
+      </p>
+      <div class="code">
+        <table style="border-collapse: separate; padding: 0.25em">
+          <tr>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(09)</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(10)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);</td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">keyStore.load(shamirsLoadParameter);</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p class="section">
+        For further examples I am referring to the source code of the demo app.
+      </p>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
