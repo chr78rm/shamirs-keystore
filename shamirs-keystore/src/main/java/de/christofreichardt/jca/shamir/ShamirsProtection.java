@@ -21,29 +21,61 @@ package de.christofreichardt.jca.shamir;
 
 import de.christofreichardt.scala.shamir.SecretMerging;
 
+import javax.json.JsonArray;
+import javax.security.auth.DestroyFailedException;
+import javax.security.auth.Destroyable;
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.Collection;
 
-public class ShamirsProtection implements KeyStore.ProtectionParameter {
-    final Path[] paths;
-    final char[] password;
+public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroyable {
+    private final char[] password;
+    private boolean destroyed = false;
 
+    /**
+     * Creates a Shamir protection parameter by providing the paths to the different slices containing the shares.
+     *
+     * @param paths path array to the JSON files (slices) containing the shares
+     */
     public ShamirsProtection(Path[] paths) {
-        this.paths = paths;
-        this.password = mergePassword();
+        this.password = mergePassword(paths);
     }
 
     public ShamirsProtection(Collection<Path> paths) {
-        this.paths = paths.toArray(new Path[0]);
-        this.password = mergePassword();
+        this(paths.toArray(new Path[0]));
     }
 
-    private char[] mergePassword() {
-        return SecretMerging.apply(this.paths).password();
+    // @TODO test it
+    public ShamirsProtection(JsonArray slices) {
+        this.password = mergePassword(slices);
+    }
+
+    private char[] mergePassword(Path[] paths) {
+        return SecretMerging.apply(paths).password();
+    }
+
+    private char[] mergePassword(JsonArray slices) {
+        return SecretMerging.apply(slices).password();
     }
 
     public char[] getPassword() {
-        return password;
+        if (destroyed) {
+            throw new IllegalStateException("Password has been cleared.");
+        }
+        return this.password;
+    }
+
+    @Override
+    public void destroy() throws DestroyFailedException {
+        this.destroyed = true;
+        if (this.password != null) {
+            Arrays.fill(this.password, ' ');
+        }
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return this.destroyed;
     }
 }

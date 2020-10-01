@@ -37,6 +37,7 @@ import scala.jdk.CollectionConverters;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -316,7 +317,9 @@ public class ShamirsKeystoreUnit implements Traceable {
 
         try {
             String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
-            Set<Path> paths = Stream.of(slices).map(slice -> Path.of("json", "keystore-2").resolve(slice))
+            Path dir = Path.of("json", "keystore-2");
+            Set<Path> paths = Stream.of(slices)
+                    .map(slice -> dir.resolve(slice))
                     .collect(Collectors.toSet());
             KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
             ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
@@ -342,6 +345,31 @@ public class ShamirsKeystoreUnit implements Traceable {
         } finally {
             tracer.wayout();
         }
+    }
+
+    @Test
+    @DisplayName("Destroyable-Protection-Parameter")
+    void destroyableProtectionParameter() throws DestroyFailedException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "destroyableProtectionParameter()");
+
+            try {
+                Path dir = Path.of("json", "keystore-1");
+                String[] slices = {"partition-1.json", "partition-2.json"};
+                Set<Path> paths = Stream.of(slices)
+                        .map(slice -> dir.resolve(slice))
+                        .collect(Collectors.toSet());
+                ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
+                assertThat(shamirsProtection.isDestroyed()).isFalse();
+                tracer.out().printfIndentln("shamirsProtection.getPassword() = %s", new String(shamirsProtection.getPassword()));
+                shamirsProtection.destroy();
+                assertThat(shamirsProtection.isDestroyed());
+                Throwable thrown = catchThrowable(() -> shamirsProtection.getPassword());
+                assertThat(thrown).isInstanceOf(IllegalStateException.class);
+                assertThat(thrown.getMessage()).isEqualTo("Password has been cleared.");
+            } finally {
+                tracer.wayout();
+            }
     }
 
     @Nested

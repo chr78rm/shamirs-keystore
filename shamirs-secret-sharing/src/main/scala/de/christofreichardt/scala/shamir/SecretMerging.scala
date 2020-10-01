@@ -23,7 +23,7 @@ import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
-import javax.json.{Json, JsonValue}
+import javax.json.{Json, JsonArray, JsonObject, JsonValue}
 
 import scala.jdk.CollectionConverters
 
@@ -45,9 +45,14 @@ object SecretMerging {
   def apply(sharePoints: IndexedSeq[(BigInt, BigInt)], prime: BigInt): SecretMerging = new SecretMerging(sharePoints, prime)
 
   def apply(path: Path): SecretMerging = {
-    val in = new FileInputStream(path.toFile)
-    val reader = Json.createReader(in)
-    val jsonObject = reader.readObject()
+    val jsonObject = {
+      val fileIn = new FileInputStream(path.toFile)
+      try {
+        Json.createReader(fileIn).readObject()
+      } finally {
+        fileIn.close()
+      }
+    }
     val prime = jsonObject.getJsonNumber("Prime").bigIntegerValue()
     val threshold = jsonObject.getInt("Threshold")
     val sharePointsAsJson = jsonObject.getJsonArray("SharePoints")
@@ -60,7 +65,20 @@ object SecretMerging {
   }
 
   def apply(paths: Iterable[Path]): SecretMerging = {
-    val jsonObjects = paths.map(path => Json.createReader(new FileInputStream(path.toFile)).readObject())
+    val jsonObjects = paths.map(
+      path => {
+        val fileIn = new FileInputStream(path.toFile)
+        try {
+          Json.createReader(new FileInputStream(path.toFile)).readObject()
+        } finally {
+          fileIn.close()
+        }
+      }
+    ).toIndexedSeq
+    processSlices(jsonObjects)
+  }
+
+  private def processSlices(jsonObjects: Seq[JsonObject]): SecretMerging = {
     val ids = jsonObjects.map(jsonObject => jsonObject.getString("Id"))
     require(ids.forall(id => id == ids.head), "Inconsistent Ids.")
     val (prime, threshold) = jsonObjects.view.map(jsonObject => (BigInt(jsonObject.getJsonNumber("Prime").bigIntegerValue()), jsonObject.getInt("Threshold"))).head
@@ -76,4 +94,10 @@ object SecretMerging {
   }
 
   def apply(paths: Array[Path]): SecretMerging = apply(paths.toIterable)
+
+  def apply(slices: JsonArray): SecretMerging = {
+    val iter = CollectionConverters.IteratorHasAsScala(slices.iterator()).asScala
+    val jsonObjects = iter.map(jsonValue => jsonValue.asJsonObject()).toIndexedSeq
+    processSlices(jsonObjects)
+  }
 }
