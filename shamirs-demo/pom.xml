@@ -7,7 +7,7 @@
     <parent>
         <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
-        <version>1.0.0-beta</version>
+        <version>1.0.0-rc1</version>
     </parent>
 
     <artifactId>shamirs-demo</artifactId>
@@ -181,25 +181,25 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.2</version>
+            <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.6.2</version>
+            <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>1.6.2</version>
+            <version>1.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.15.0</version>
+            <version>3.17.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
