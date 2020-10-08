@@ -307,6 +307,31 @@ public class ShamirsKeystoreUnit implements Traceable {
                 tracer.wayout();
             }
         }
+
+        @Test
+        @DisplayName("Destroyable-Protection-Parameter")
+        void destroyableProtectionParameter() throws DestroyFailedException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "destroyableProtectionParameter()");
+
+            try {
+                Path dir = Path.of("json", "keystore-1");
+                String[] slices = {"partition-1.json", "partition-2.json"};
+                Set<Path> paths = Stream.of(slices)
+                        .map(slice -> dir.resolve(slice))
+                        .collect(Collectors.toSet());
+                ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
+                assertThat(shamirsProtection.isDestroyed()).isFalse();
+                tracer.out().printfIndentln("shamirsProtection.getPassword() = %s", new String(shamirsProtection.getPassword()));
+                shamirsProtection.destroy();
+                assertThat(shamirsProtection.isDestroyed());
+                Throwable thrown = catchThrowable(() -> shamirsProtection.getPassword());
+                assertThat(thrown).isInstanceOf(IllegalStateException.class);
+                assertThat(thrown.getMessage()).isEqualTo("Password has been cleared.");
+            } finally {
+                tracer.wayout();
+            }
+        }
     }
 
     @Disabled
@@ -345,31 +370,6 @@ public class ShamirsKeystoreUnit implements Traceable {
         } finally {
             tracer.wayout();
         }
-    }
-
-    @Test
-    @DisplayName("Destroyable-Protection-Parameter")
-    void destroyableProtectionParameter() throws DestroyFailedException {
-            AbstractTracer tracer = getCurrentTracer();
-            tracer.entry("void", this, "destroyableProtectionParameter()");
-
-            try {
-                Path dir = Path.of("json", "keystore-1");
-                String[] slices = {"partition-1.json", "partition-2.json"};
-                Set<Path> paths = Stream.of(slices)
-                        .map(slice -> dir.resolve(slice))
-                        .collect(Collectors.toSet());
-                ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
-                assertThat(shamirsProtection.isDestroyed()).isFalse();
-                tracer.out().printfIndentln("shamirsProtection.getPassword() = %s", new String(shamirsProtection.getPassword()));
-                shamirsProtection.destroy();
-                assertThat(shamirsProtection.isDestroyed());
-                Throwable thrown = catchThrowable(() -> shamirsProtection.getPassword());
-                assertThat(thrown).isInstanceOf(IllegalStateException.class);
-                assertThat(thrown.getMessage()).isEqualTo("Password has been cleared.");
-            } finally {
-                tracer.wayout();
-            }
     }
 
     @Nested
