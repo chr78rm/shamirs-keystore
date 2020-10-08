@@ -20,16 +20,18 @@
 package de.christofreichardt.scala.shamir
 
 import java.io.FileInputStream
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
-import javax.json.{Json, JsonArray, JsonObject, JsonValue}
+import de.christofreichardt.scala.diagnosis.Tracing
+import javax.json.{Json, JsonArray, JsonObject}
 
 import scala.jdk.CollectionConverters
 
 class SecretMerging(
   val sharePoints: IndexedSeq[(BigInt, BigInt)],
-  val prime:       BigInt) {
+  val prime:       BigInt) extends Tracing {
 
   val interpolation: NewtonInterpolation = new NewtonInterpolation(sharePoints, prime)
   val coefficients: IndexedSeq[BigInt] = interpolation.computeCoefficients()
@@ -37,7 +39,11 @@ class SecretMerging(
   val newtonPolynomial: NewtonPolynomial = new NewtonPolynomial(degree, sharePoints.take(sharePoints.length - 1).map(p => p._1), coefficients, prime)
   val s: BigInt = newtonPolynomial.evaluateAt(BigInt(0))
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
-  lazy val password: Array[Char] = new String(secretBytes.toArray, StandardCharsets.UTF_8).toCharArray
+  def password: Array[Char] = {
+    val byteBuffer = ByteBuffer.wrap(this.secretBytes.toArray)
+    val charBuffer = StandardCharsets.UTF_8.newDecoder().decode(byteBuffer)
+    java.util.Arrays.copyOf(charBuffer.array(), charBuffer.limit())
+  }
 }
 
 object SecretMerging {
