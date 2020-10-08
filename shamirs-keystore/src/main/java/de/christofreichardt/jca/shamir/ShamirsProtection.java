@@ -46,7 +46,6 @@ public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroya
         this(paths.toArray(new Path[0]));
     }
 
-    // @TODO test it
     public ShamirsProtection(JsonArray slices) {
         this.password = mergePassword(slices);
     }

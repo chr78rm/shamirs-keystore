@@ -37,9 +37,9 @@ import scala.jdk.CollectionConverters;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.json.*;
 import javax.security.auth.DestroyFailedException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +49,11 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -372,6 +377,68 @@ public class ShamirsKeystoreUnit implements Traceable {
         }
     }
 
+    static class JsonValueCollector implements Collector<JsonValue, JsonArrayBuilder, JsonArray> {
+
+        @Override
+        public Supplier<JsonArrayBuilder> supplier() {
+            return () -> Json.createArrayBuilder();
+        }
+
+        @Override
+        public BiConsumer<JsonArrayBuilder, JsonValue> accumulator() {
+            return (JsonArrayBuilder jsonArrayBuilder, JsonValue jsonValue) -> jsonArrayBuilder.add(jsonValue);
+        }
+
+        @Override
+        public BinaryOperator<JsonArrayBuilder> combiner() {
+            return null;
+        }
+
+        @Override
+        public Function<JsonArrayBuilder, JsonArray> finisher() {
+            return (JsonArrayBuilder jsonArrayBuilder) -> jsonArrayBuilder.build();
+        }
+
+        @Override
+        public Set<Collector.Characteristics> characteristics() {
+            return Collections.emptySet();
+        }
+    }
+
+    @Test
+    @DisplayName("Json-Array-Constructor")
+    void jsonArrayConstructor() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "jsonArrayConstructor()");
+
+        try {
+            final String MY_SUPER_SECRET_PASSWORD = "my-super-secret-password";
+
+            String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
+            Path slicesDir = Path.of("json", "keystore-2");
+            JsonArray sharePoints = Stream.of(slices)
+                    .map(slice -> slicesDir.resolve(slice))
+                    .map(slice -> {
+                        try {
+                            return new FileInputStream(slice.toFile());
+                        } catch (FileNotFoundException ex) {
+                            throw new UncheckedIOException(ex);
+                        }
+                    })
+                    .map(fileIn -> {
+                        try (JsonReader jsonReader = Json.createReader(fileIn)) {
+                            return jsonReader.read();
+                        }
+                    })
+                    .collect(new JsonValueCollector());
+            ShamirsProtection shamirsProtection = new ShamirsProtection(sharePoints);
+
+            assertThat(new String(shamirsProtection.getPassword())).isEqualTo(MY_SUPER_SECRET_PASSWORD);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
     @Nested
     @DisplayName("Programmatic-Keystore")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -389,13 +456,15 @@ public class ShamirsKeystoreUnit implements Traceable {
 
             try {
                 String[] slices = {"test-3.json", "test-4.json", "test-5.json", "test-6.json"};
-                Set<Path> paths = Stream.of(slices).map(slice -> Path.of("json", "keystore-2").resolve(slice))
+                Path slicesDir = Path.of("json", "keystore-2");
+                Set<Path> paths = Stream.of(slices)
+                        .map(slice -> slicesDir.resolve(slice))
                         .collect(Collectors.toSet());
                 this.keyStore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
                 this.shamirsProtection = new ShamirsProtection(paths);
                 this.keystorePath = Path.of("pkcs12", "my-keystore-2.p12");
                 assertThat(Files.notExists(this.keystorePath)).isTrue();
-                this.shamirsLoadParameter = new ShamirsLoadParameter(this.keystorePath.toFile(), shamirsProtection);
+                this.shamirsLoadParameter = new ShamirsLoadParameter(this.keystorePath.toFile(), this.shamirsProtection);
                 keyStore.load(null, null);
             } finally {
                 tracer.wayout();
