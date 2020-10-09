@@ -102,7 +102,7 @@ public class KeyStoreMenu extends AbstractMenu {
             System.console().printf("Current time: %s\n", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             System.console().printf("   Workspace: %s\n", this.app.getCurrentWorkspace().getFileName());
             System.console().printf("\n");
-            String keyStoreFilename = this.shamirsLoadParameter.getFile().getName();
+            String keyStoreFilename = this.shamirsLoadParameter.getName();
             System.console().printf("%s-> KeyStore menu [%s]\n", this.app.getCurrentWorkspace().getFileName(),
                     keyStoreFilename.substring(0, keyStoreFilename.length() - ".p12".length()));
             System.console().printf("\n");

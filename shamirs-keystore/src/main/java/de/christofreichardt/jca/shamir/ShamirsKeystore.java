@@ -200,8 +200,13 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 
         ShamirsLoadParameter shamirsLoadParameter = (ShamirsLoadParameter) loadStoreParameter;
         ShamirsProtection shamirsProtection = (ShamirsProtection) shamirsLoadParameter.getProtectionParameter();
-        try (FileOutputStream fileOutputStream = new FileOutputStream(shamirsLoadParameter.getFile())) {
-            engineStore(fileOutputStream, shamirsProtection.getPassword());
+        if (shamirsLoadParameter.getFile().isPresent()) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(shamirsLoadParameter.getFile().get())) {
+                engineStore(fileOutputStream, shamirsProtection.getPassword());
+            }
+        } else {
+            OutputStream outputStream = shamirsLoadParameter.getOutputStream().orElseThrow(() -> new IOException("Missing OutputStream."));
+            engineStore(outputStream, shamirsProtection.getPassword());
         }
     }
 
@@ -222,8 +227,13 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 
             ShamirsLoadParameter shamirsLoadParameter = (ShamirsLoadParameter) loadStoreParameter;
             ShamirsProtection shamirsProtection = (ShamirsProtection) shamirsLoadParameter.getProtectionParameter();
-            try (FileInputStream fileInputStream = new FileInputStream(shamirsLoadParameter.getFile())) {
-                this.keyStore.load(fileInputStream, shamirsProtection.getPassword());
+            if (shamirsLoadParameter.getFile().isPresent()) {
+                try (FileInputStream fileInputStream = new FileInputStream(shamirsLoadParameter.getFile().get())) {
+                    engineLoad(fileInputStream, shamirsProtection.getPassword());
+                }
+            } else {
+                InputStream inputStream = shamirsLoadParameter.getInputStream().orElseThrow(() -> new IOException("Missing InputStream."));
+                engineLoad(inputStream, shamirsProtection.getPassword());
             }
         } finally {
             tracer.wayout();
