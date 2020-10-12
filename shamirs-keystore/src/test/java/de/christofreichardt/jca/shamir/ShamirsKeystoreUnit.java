@@ -439,6 +439,44 @@ public class ShamirsKeystoreUnit implements Traceable {
         }
     }
 
+    @Test
+    @DisplayName("Alternative-LoadParam-Constructors")
+    void alternativeLoadParamConstructors() throws IOException, GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "alternativeLoadParamConstructors()");
+
+        try {
+            String[] slices = {"test-2.json", "test-5.json", "test-6.json"};
+            Path slicesDir = Path.of("json", "keystore-2");
+            Set<Path> paths = Stream.of(slices)
+                    .map(slice -> slicesDir.resolve(slice))
+                    .collect(Collectors.toSet());
+            KeyStore keystore = KeyStore.getInstance("ShamirsKeystore", Security.getProvider(ShamirsProvider.NAME));
+            Throwable throwable = catchThrowable(() -> keystore.aliases());
+            assertThat(throwable).isInstanceOf(KeyStoreException.class);
+            ShamirsProtection shamirsProtection = new ShamirsProtection(paths);
+            Path keystorePath = Path.of("pkcs12", "my-alternative-keystore.p12");
+            try {
+                assertThat(Files.notExists(keystorePath)).isTrue();
+                try (FileOutputStream out = new FileOutputStream(keystorePath.toFile())) {
+                    ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(out, shamirsProtection);
+                    keystore.load(null, null);
+                    keystore.aliases();
+                    keystore.store(shamirsLoadParameter);
+                }
+                try (FileInputStream in = new FileInputStream(keystorePath.toFile())) {
+                    ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(in, shamirsProtection);
+                    keystore.load(shamirsLoadParameter);
+                    keystore.aliases();
+                }
+            } finally {
+                assertThat(Files.deleteIfExists(keystorePath)).isTrue();
+            }
+        } finally {
+            tracer.wayout();
+        }
+    }
+
     @Nested
     @DisplayName("Programmatic-Keystore")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
