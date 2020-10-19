@@ -6,21 +6,27 @@
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
 -------------------------------------
-ShamirsDemoUnit[container=true, test=false, start=2020-10-12T16:34:04.3929672, end=2020-10-12T16:34:07.8255963, duration=PT3.4326291S, status=SUCCESSFUL]
+ShamirsDemoUnit[container=true, test=false, start=2020-10-19T17:05:47.6442386, end=2020-10-19T17:05:50.9850171, duration=PT3.3407785S, status=SUCCESSFUL]
 
 -------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
 containers = 0, tests = 4, successful = 4, failed = 0, aborted = 0
 -------------------------------------
-encoding-1[container=false, test=true, start=2020-10-12T16:34:05.0799201, end=2020-10-12T16:34:06.6567235, duration=PT1.5768034S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2020-10-12T16:34:04.6641604, end=2020-10-12T16:34:05.0799201, duration=PT0.4157597S, status=SUCCESSFUL]
-ec-keypair[container=false, test=true, start=2020-10-12T16:34:04.4307245, end=2020-10-12T16:34:04.6621064, duration=PT0.2313819S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2020-10-12T16:34:06.6567235, end=2020-10-12T16:34:07.8255963, duration=PT1.1688728S, status=SUCCESSFUL]
+encoding-1[container=false, test=true, start=2020-10-19T17:05:48.2919882, end=2020-10-19T17:05:49.8027131, duration=PT1.5107249S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-10-19T17:05:47.8822819, end=2020-10-19T17:05:48.2909889, duration=PT0.408707S, status=SUCCESSFUL]
+ec-keypair[container=false, test=true, start=2020-10-19T17:05:47.6682386, end=2020-10-19T17:05:47.8802712, duration=PT0.2120326S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-10-19T17:05:49.8027131, end=2020-10-19T17:05:50.9830491, duration=PT1.180336S, status=SUCCESSFUL]
 
 
-=====================================
+Tests--------------------------------
 succeeded: 4
    failed: 0
   aborted: 0
-=====================================
+-------------------------------------
+
+Container----------------------------
+succeeded: 2
+   failed: 0
+  aborted: 0
+-------------------------------------
 

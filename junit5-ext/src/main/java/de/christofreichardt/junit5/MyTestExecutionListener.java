@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.christofreichardt.junit5;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
@@ -47,8 +46,14 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
     int succeeded;
     int failed;
     int aborted;
+    int containerFailed;
+    int containerSucceeded;
+    int containerAborted;
+    
+//    boolean shouldClose = false;
 
     class Test {
+
         final TestIdentifier testIdentifier;
         final LocalDateTime startTime;
         LocalDateTime endTime;
@@ -97,6 +102,7 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
     }
 
     class Summary {
+
         final String id;
 
         final Map<String, Test> tests = new HashMap<>();
@@ -162,26 +168,36 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
         }
     }
 
-    Map<String, Summary> summaries = new LinkedHashMap<>();
-    Map<String, String> id2DisplayName = new HashMap<>();
+    final Map<String, Summary> summaries = new LinkedHashMap<>();
+    final Map<String, String> id2DisplayName = new HashMap<>();
+    
+    static final public String TRACE_CONFIG_PROPERTY = "de.christofreichardt.junit5.traceConfig";
+    final String traceConfig = System.getProperty(TRACE_CONFIG_PROPERTY);
+    static final public String SUMMARY_PROPERTY = "de.christofreichardt.junit5.summary";
+    final String summary = System.getProperty(SUMMARY_PROPERTY);
+
+    public MyTestExecutionListener() {
+        
+    }
 
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
         System.out.printf("%s: Testplan execution has been started ...\n", Thread.currentThread().getName());
-        System.out.printf("Using de.christofreichardt.junit5.traceConfig = %s...\n", System.getProperty("de.christofreichardt.junit5.traceConfig"));
+        System.out.printf("Using %s = %s...\n", TRACE_CONFIG_PROPERTY, this.traceConfig);
+        System.out.printf("Using %s = %s...\n", SUMMARY_PROPERTY, this.summary);
 
         try {
-            TracerFactory.getInstance().reset();
-            if (System.getProperties().containsKey("de.christofreichardt.junit5.traceConfig")) {
+            if (this.traceConfig != null) {
+                TracerFactory.getInstance().reset();
                 InputStream resourceAsStream = MyTestExecutionListener.class.getClassLoader()
-                        .getResourceAsStream(System.getProperty("de.christofreichardt.junit5.traceConfig"));
+                        .getResourceAsStream(this.traceConfig);
                 if (resourceAsStream != null) {
                     TracerFactory.getInstance().readConfiguration(resourceAsStream);
                 }
+                TracerFactory.getInstance().openPoolTracer();
+                AbstractTracer tracer = getCurrentTracer();
+                tracer.initCurrentTracingContext();
             }
-            TracerFactory.getInstance().openPoolTracer();
-            AbstractTracer tracer = getCurrentTracer();
-            tracer.initCurrentTracingContext();
         } catch (TracerFactory.Exception ex) {
             throw new RuntimeException("Tracer configuration failed,", ex);
         }
@@ -199,16 +215,16 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
                 void walk(TestIdentifier parent) {
                     tracer.out().printfIndentln("uniqueId = %s, displayName = %s", parent.getUniqueId(), parent.getDisplayName());
                     MyTestExecutionListener.this.id2DisplayName.put(parent.getUniqueId(), parent.getDisplayName());
-                    for (TestIdentifier testIdentifier : testPlan.getChildren(parent)) {
+                    testPlan.getChildren(parent).forEach(testIdentifier -> {
                         walk(testIdentifier);
-                    }
+                    });
                 }
             }
 
             TestPlanWalker testPlanWalker = new TestPlanWalker();
-            for (TestIdentifier testIdentifier : testPlan.getRoots()) {
+            testPlan.getRoots().forEach(testIdentifier -> {
                 testPlanWalker.walk(testIdentifier);
-            }
+            });
         } finally {
             tracer.wayout();
         }
@@ -222,9 +238,9 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
         AbstractTracer tracer = getCurrentTracer();
         PrintStream out = tracer.out();
         try {
-            if (System.getProperties().containsKey("de.christofreichardt.junit5.summary")) {
+            if (this.summary != null) {
                 try {
-                    out = new PrintStream(Files.newOutputStream(Paths.get(System.getProperty("de.christofreichardt.junit5.summary"))));
+                    out = new PrintStream(Files.newOutputStream(Paths.get(this.summary)));
                     shouldClose = true;
                 } catch (IOException ex) {
                     out = tracer.out();
@@ -238,11 +254,17 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
                 entry.getValue().printSummary(out);
             }
             out.println();
-            out.printf("=====================================\n");
+            out.printf("Tests--------------------------------\n");
             out.printf("succeeded: %d\n", this.succeeded);
             out.printf("   failed: %d\n", this.failed);
             out.printf("  aborted: %d\n", this.aborted);
-            out.printf("=====================================\n");
+            out.printf("-------------------------------------\n");
+            out.println();
+            out.printf("Container----------------------------\n");
+            out.printf("succeeded: %d\n", this.containerSucceeded);
+            out.printf("   failed: %d\n", this.containerFailed);
+            out.printf("  aborted: %d\n", this.containerAborted);
+            out.printf("-------------------------------------\n");
             out.println();
         } finally {
             if (shouldClose) {
@@ -250,7 +272,9 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
             }
         }
 
-        TracerFactory.getInstance().closePoolTracer();
+        if (this.traceConfig != null) {
+            TracerFactory.getInstance().closePoolTracer();
+        }
     }
 
     @Override
@@ -320,6 +344,20 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
                         break;
                     case ABORTED:
                         this.aborted++;
+                        break;
+                    default:
+                        break;
+                }
+            } else if (testIdentifier.isContainer()) {
+                switch (testExecutionResult.getStatus()) {
+                    case SUCCESSFUL:
+                        this.containerSucceeded++;
+                        break;
+                    case FAILED:
+                        this.containerFailed++;
+                        break;
+                    case ABORTED:
+                        this.containerAborted++;
                         break;
                     default:
                         break;
