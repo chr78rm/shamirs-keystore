@@ -27,7 +27,7 @@ import java.util.UUID
 import de.christofreichardt.scala.combinations.BinomialCombinator
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
-import javax.json.{Json, JsonObject}
+import javax.json.{Json, JsonArray, JsonObject}
 
 import scala.annotation.tailrec
 
@@ -53,7 +53,7 @@ class SecretSharing(
   val prime: BigInt = choosePrime
   val polynomial: Polynomial = choosePolynomial(k - 1)
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
-  val id: String = UUID.randomUUID().toString()
+  val id: String = UUID.randomUUID().toString
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
   lazy val verified: Boolean = verifyAll
 
@@ -92,7 +92,7 @@ class SecretSharing(
     val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, n), k)
     combinator.solutions
       .map(combination => {
-        val indices = combination.toIndexedSeq
+        val indices = combination
         val selectedPoints = indices.map(index => sharePoints(index))
         val merger = SecretMerging(selectedPoints, prime)
         merger.secretBytes
@@ -126,6 +126,7 @@ class SecretSharing(
     require(sizes.sum == sharePoints.length, "The sum of the shares of each slice doesn't match the number of overall shares.")
     require(sizes.forall(s => s <= k), "A partition must not exceed the threshold.")
 
+    @tailrec
     def partition(sizes: Iterable[Int], remainingPoints: IndexedSeq[(BigInt, BigInt)], partitions: List[IndexedSeq[(BigInt, BigInt)]]): List[IndexedSeq[(BigInt, BigInt)]] = {
       if (sizes.isEmpty) partitions
       else partition(sizes.tail, remainingPoints.drop(sizes.head), remainingPoints.take(sizes.head) :: partitions)
@@ -134,21 +135,27 @@ class SecretSharing(
     partition(sizes, sharePoints, List())
   }
 
+  def partitionAsJson(sizes: Iterable[Int]): JsonArray = {
+    val partition = sharePointPartition(sizes)
+    val arrayBuilder = Json.createArrayBuilder()
+    partition.map(slice => sharePointsAsJson(slice))
+      .foreach(slice => arrayBuilder.add(slice))
+    arrayBuilder.build()
+  }
+
   def savePartition(sizes: Iterable[Int], path: Path): Unit = {
-    require(path.getParent.toFile().exists() && path.getParent.toFile().isDirectory())
+    require(path.getParent.toFile.exists() && path.getParent.toFile.isDirectory)
     val prettyPrinter = new JsonPrettyPrinter
-    prettyPrinter.print(path.getParent.resolve(path.getFileName.toString() + ".json").toFile(), sharePointsAsJson)
+    prettyPrinter.print(path.getParent.resolve(path.getFileName.toString + ".json").toFile, sharePointsAsJson)
     val partition = sharePointPartition(sizes)
     partition.map(part => sharePointsAsJson(part))
       .zipWithIndex
       .foreach({
-        case (jsonObject, i) => {
-          prettyPrinter.print(path.getParent.resolve(path.getFileName.toString() + "-" + i + ".json").toFile(), jsonObject)
-        }
+        case (jsonObject, i) => prettyPrinter.print(path.getParent.resolve(path.getFileName.toString + "-" + i + ".json").toFile, jsonObject)
       })
   }
 
   def savePartition(sizes: Array[Int], path: Path): Unit = savePartition(sizes.reverse.toIterable, path)
 
-  override def toString = String.format("SecretSharing[shares=%d, threshold=%d, s=%s, polynomial=%s, sharePoints=(%s)]", shares: Integer, threshold: Integer, s, polynomial, sharePoints.mkString(","))
+  override def toString: String = String.format("SecretSharing[shares=%d, threshold=%d, s=%s, polynomial=%s, sharePoints=(%s)]", shares: Integer, threshold: Integer, s, polynomial, sharePoints.mkString(","))
 }

@@ -124,8 +124,8 @@ class SecretSharingSuite extends MyFunSuite {
     val secretSharing = new SecretSharing(secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
     tracer.out().printfIndentln("%d secretSharing.sharePoints = (%s)", secretSharing.sharePoints.length: Integer, secretSharing.sharePoints.mkString(","))
-    tracer.out().printfIndentln("secretSharing.sharePointsAsJson = %s", secretSharing.sharePointsAsJson.toString())
-    Files.write(Paths.get("json", "shares-1.json"), secretSharing.sharePointsAsJson.toString().getBytes(StandardCharsets.UTF_8))
+    tracer.out().printfIndentln("secretSharing.sharePointsAsJson = %s", secretSharing.sharePointsAsJson.toString)
+    Files.write(Paths.get("json", "shares-1.json"), secretSharing.sharePointsAsJson.toString.getBytes(StandardCharsets.UTF_8))
   }
   
   testWithTracing(this, "Sharing-2") {
@@ -135,7 +135,7 @@ class SecretSharingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    Files.write(Paths.get("json", "shares-2.json"), secretSharing.sharePointsAsJson.toString().getBytes(StandardCharsets.UTF_8))
+    Files.write(Paths.get("json", "shares-2.json"), secretSharing.sharePointsAsJson.toString.getBytes(StandardCharsets.UTF_8))
   }
   
   testWithTracing(this, "Partition-1") {
@@ -189,7 +189,7 @@ class SecretSharingSuite extends MyFunSuite {
     }
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
-  
+
   testWithTracing(this, "Save-1") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes

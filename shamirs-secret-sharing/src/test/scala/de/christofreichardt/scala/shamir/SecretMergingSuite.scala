@@ -23,11 +23,14 @@ package shamir
 import java.nio.charset.StandardCharsets
 
 import de.christofreichardt.scalatest.MyFunSuite
-import de.christofreichardt.scala.utils.RandomGenerator
+import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import java.security.SecureRandom
 import java.nio.file.Paths
 
 import de.christofreichardt.scala.combinations.BinomialCombinator
+import javax.json.Json
+
+import scala.jdk.CollectionConverters
 
 class SecretMergingSuite extends MyFunSuite {
   val randomGenerator = new RandomGenerator(new SecureRandom)
@@ -173,6 +176,54 @@ class SecretMergingSuite extends MyFunSuite {
     val secretMerging = SecretMerging(IndexedSeq(Paths.get("json", "partition-3-1.json"), Paths.get("json", "partition-3-2.json")))
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
     assert(secret == secretMerging.secretBytes)
+  }
+
+  testWithTracing(this, "Merging-8") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val partition = Seq(4, 2, 2, 1, 1, 1, 1)
+    val slices = secretSharing.partitionAsJson(partition.reverse)
+    val prettyPrinter = new JsonPrettyPrinter
+    prettyPrinter.trace(tracer, slices)
+    val iter = CollectionConverters.IteratorHasAsScala(slices.iterator()).asScala
+    assert(
+      iter.map(slice => slice.asJsonObject())
+        .map(slice => slice.getJsonArray("SharePoints"))
+        .zip(partition)
+        .forall(zipped => zipped._1.size() == zipped._2)
+    )
+    assert(
+      SecretMerging(Json.createArrayBuilder()
+        .add(slices.get(0))
+        .build()).secretBytes == secret
+    )
+    assert(
+      SecretMerging(Json.createArrayBuilder()
+        .add(slices.get(1))
+        .add(slices.get(2))
+        .build()).secretBytes == secret
+    )
+    assert(
+      SecretMerging(Json.createArrayBuilder()
+        .add(slices.get(1))
+        .add(slices.get(3))
+        .add(slices.get(4))
+        .build()).secretBytes == secret
+    )
+    assert(
+      SecretMerging(Json.createArrayBuilder()
+        .add(slices.get(3))
+        .add(slices.get(4))
+        .add(slices.get(5))
+        .add(slices.get(6))
+        .build()).secretBytes == secret
+    )
   }
 
   testWithTracing(this, "Exhaustive-Verification-1") {
