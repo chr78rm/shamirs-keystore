@@ -135,7 +135,7 @@ class SecretSharing(
     partition(sizes, sharePoints, List())
   }
 
-  def partitionAsJson(sizes: Iterable[Int]): JsonArray = {
+  def partitionAsJson(sizes: Array[Int]): JsonArray = {
     val partition = sharePointPartition(sizes)
     val arrayBuilder = Json.createArrayBuilder()
     partition.map(slice => sharePointsAsJson(slice))

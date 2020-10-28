@@ -188,7 +188,7 @@ class SecretMergingSuite extends MyFunSuite {
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
     val partition = Seq(4, 2, 2, 1, 1, 1, 1)
-    val slices = secretSharing.partitionAsJson(partition.reverse)
+    val slices = secretSharing.partitionAsJson(partition.reverse.toArray)
     val prettyPrinter = new JsonPrettyPrinter
     prettyPrinter.trace(tracer, slices)
     val iter = CollectionConverters.IteratorHasAsScala(slices.iterator()).asScala
