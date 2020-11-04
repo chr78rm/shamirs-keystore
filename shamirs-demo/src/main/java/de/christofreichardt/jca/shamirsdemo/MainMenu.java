@@ -178,7 +178,7 @@ public class MainMenu  extends AbstractMenu {
         try {
             final int LENGTH = 25;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
-            String proposal = passwordGenerator.generate().findFirst().get();
+            String proposal = passwordGenerator.generate().findFirst().get().toString();
 
             String password = this.console.readString("[A-Za-z0-9-]{8,45}", "Password", proposal);
             int shares = this.console.readInt("[0-9]+", "Number of shares");

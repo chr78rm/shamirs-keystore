@@ -107,6 +107,7 @@ public class ShamirsDemoUnit implements Traceable {
             final int LIMIT = 100, LENGTH = 15;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
             boolean exactlyOnce = passwordGenerator.generate()
+                    .map(passwordCharSeq -> passwordCharSeq.toString())
                     .limit(LIMIT)
                     .peek(password -> tracer.out().printfIndentln("%s", password))
                     .collect(new PasswordCollector())
@@ -137,6 +138,7 @@ public class ShamirsDemoUnit implements Traceable {
             final int THRESHOLD = 4;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, SYMBOLS);
             List<String> passwords = passwordGenerator.generate()
+                    .map(passwordCharSeq -> passwordCharSeq.toString())
                     .filter(password -> Stream.of(LATIN1_SUPPLEMENT_SYMBOLS).anyMatch(seq -> password.contains(seq)))
                     .limit(LIMIT)
                     .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
@@ -164,6 +166,7 @@ public class ShamirsDemoUnit implements Traceable {
             final int THRESHOLD = 4;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
             List<String> passwords = passwordGenerator.generate()
+                    .map(passwordCharSeq -> passwordCharSeq.toString())
                     .filter(password -> {
                         boolean matched = false;
                         char[] umlauts = PasswordGenerator.umlauts();

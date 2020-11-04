@@ -19,7 +19,11 @@
 
 package de.christofreichardt.scala
 
+import java.nio.CharBuffer
+import java.nio.charset.StandardCharsets
+
 package object shamir {
+
   import scala.annotation.tailrec
 
   /**
@@ -27,18 +31,18 @@ package object shamir {
    * the underlying algorithm there is one false positive.
    */
   val CERTAINTY = 64
-  
-//  /**
-//   * Formats the given bytes as comma separated hexadecimal values
-//   * 
-//   * @param bytes the to be formtted bytes
-//   * @return the comma separated hexadecimal values
-//   */
-//  def formatBytes(bytes: Iterable[Byte]): String = bytes.map(b => String.format("0x%02X", b: java.lang.Byte)).mkString(",")
-  
+
+  //  /**
+  //   * Formats the given bytes as comma separated hexadecimal values
+  //   *
+  //   * @param bytes the to be formtted bytes
+  //   * @return the comma separated hexadecimal values
+  //   */
+  //  def formatBytes(bytes: Iterable[Byte]): String = bytes.map(b => String.format("0x%02X", b: java.lang.Byte)).mkString(",")
+
   /**
    * Checks if any two items within the Iterable are identical.
-   * 
+   *
    * @param items an Iterable of some items
    * @return true if no pair of identical items has been found 
    */
@@ -52,6 +56,7 @@ package object shamir {
         else check(ps.tail, xs + x)
       }
     }
+
     check(items, Set.empty[T])
   }
 
@@ -63,5 +68,14 @@ package object shamir {
   def bigIntToBytes(s: BigInt): IndexedSeq[Byte] = {
     val paddedBytes = s.toByteArray
     paddedBytes.tail.toIndexedSeq
+  }
+
+  def charSequenceToByteArray(charSequence: CharSequence): Array[Byte] = {
+    val charBuffer = CharBuffer.wrap(charSequence)
+    val encoder = StandardCharsets.UTF_8.newEncoder()
+    val byteBuffer = encoder.encode(charBuffer)
+    val bytes = Array.ofDim[Byte](byteBuffer.remaining())
+    byteBuffer.get(bytes)
+    bytes
   }
 }

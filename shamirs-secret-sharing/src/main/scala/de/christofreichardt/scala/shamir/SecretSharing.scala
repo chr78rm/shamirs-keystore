@@ -46,6 +46,8 @@ class SecretSharing(
 
   def this(shares: Int, threshold: Int, password: String) = this(shares, threshold, password.getBytes(StandardCharsets.UTF_8).toIndexedSeq, new SecureRandom)
 
+  def this(shares: Int, threshold: Int, password: CharSequence) = this(shares, threshold, charSequenceToByteArray(password))
+
   val n: Int = shares
   val k: Int = threshold
   val s: BigInt = bytes2BigInt(secretBytes)

@@ -81,9 +81,9 @@ public class PasswordGenerator implements Traceable {
         this.symbols = Arrays.copyOf(symbols, symbols.length);
     }
 
-    Stream<String> generate() {
+    Stream<CharSequence> generate() {
         AbstractTracer tracer = getCurrentTracer();
-        tracer.entry("Stream<String>", this, "generate()");
+        tracer.entry("Stream<CharSequence>", this, "generate()");
         try {
             return Stream.generate(() -> password());
         } finally {
@@ -91,9 +91,9 @@ public class PasswordGenerator implements Traceable {
         }
     }
 
-    String password() {
+    CharSequence password() {
         AbstractTracer tracer = TracerFactory.getInstance().getDefaultTracer();
-        tracer.entry("String", PasswordGenerator.class, "password()");
+        tracer.entry("CharSequence", PasswordGenerator.class, "password()");
         try {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i=0; i<this.length; i++) {
@@ -101,7 +101,7 @@ public class PasswordGenerator implements Traceable {
                 stringBuilder.append(this.symbols[index]);
             }
 
-            return stringBuilder.toString();
+            return stringBuilder;
         } finally {
             tracer.wayout();
         }
