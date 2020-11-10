@@ -22,14 +22,14 @@ package de.christofreichardt.jca.shamirsdemo;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
-import de.christofreichardt.scala.shamir.SecretMerging;
 
-import java.nio.file.Path;
 import java.security.DrbgParameters;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
@@ -52,6 +52,10 @@ public class PasswordGenerator implements Traceable {
 
     public static char[] umlauts() {
         return Arrays.copyOf(UMLAUTS, UMLAUTS.length);
+    }
+
+    public static char[] punctuationAndSymbols() {
+        return Arrays.copyOf(PUNCTUATION_AND_SYMBOLS, PUNCTUATION_AND_SYMBOLS.length);
     }
 
     public static char[] alphanumericWithUmlauts() {
@@ -86,6 +90,75 @@ public class PasswordGenerator implements Traceable {
         tracer.entry("Stream<CharSequence>", this, "generate()");
         try {
             return Stream.generate(() -> password());
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    Stream<CharSequence> generate(char[] requiredChars) {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
+        try {
+            tracer.out().printfIndentln("requiredChars = %s", Arrays.toString(requiredChars));
+
+            HashSet<char[]> requiredCharacterSet = new HashSet<>();
+            requiredCharacterSet.add(requiredChars);
+
+            return generate(requiredCharacterSet);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    private boolean matchRequiredCharSet(char[] requiredCharSet) {
+        IntStream.Builder builder = IntStream.builder();
+        for (char c : requiredCharSet) {
+            builder.add(c);
+        }
+
+        boolean allFound = builder.build()
+                .allMatch(c -> {
+                    boolean found = false;
+                    for (char symbol : this.symbols) {
+                        found = c == symbol;
+                        if (found) {
+                            break;
+                        }
+                    }
+                    return found;
+                });
+
+        return allFound;
+    }
+
+    private boolean requiredCharacterFound(CharSequence passwordSeq, Set<char[]> requiredCharSets) {
+        return requiredCharSets.stream()
+                .allMatch(requiredCharSet -> {
+                    boolean matched = false;
+                    for (char c : requiredCharSet) {
+                        matched = passwordSeq.chars().anyMatch(passwordChar -> c == passwordChar);
+                        if (matched) {
+                            break;
+                        }
+                    }
+                    return matched;
+                });
+    }
+
+    Stream<CharSequence> generate(Set<char[]> requiredCharSets) {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
+        try {
+            requiredCharSets.forEach(requiredCharSet -> tracer.out().printfIndentln("requiredChars = %s", Arrays.toString(requiredCharSet)));
+
+            boolean allRequiredCharsetsMatched = requiredCharSets.stream()
+                    .allMatch(requiredCharSet -> matchRequiredCharSet(requiredCharSet));
+            if (!allRequiredCharsetsMatched) {
+                throw new IllegalArgumentException("Required character not present within given symbol set.");
+            }
+
+            return Stream.generate(() -> password())
+                    .filter(password -> requiredCharacterFound(password, requiredCharSets));
         } finally {
             tracer.wayout();
         }

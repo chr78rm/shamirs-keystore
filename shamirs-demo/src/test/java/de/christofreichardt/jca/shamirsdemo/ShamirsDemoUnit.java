@@ -39,9 +39,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShamirsDemoUnit implements Traceable {
@@ -184,6 +186,123 @@ public class ShamirsDemoUnit implements Traceable {
                     .map(password -> new String(password))
                     .collect(Collectors.toList());
             assertThat(passwords).isEqualTo(recoveredPasswords);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("encoding-3")
+    void encoding_3() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "encoding_3()");
+
+        try {
+            final int LIMIT = 10, LENGTH = 25;
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
+
+            IntStream.Builder builder = IntStream.builder();
+            for (char c : PasswordGenerator.umlauts()) {
+                builder.add(c);
+            }
+            tracer.out().printfIndentln("PasswordGenerator.umlauts() = %s", Arrays.toString(builder.build().toArray()));
+
+            List<CharSequence> passwords = passwordGenerator.generate(PasswordGenerator.umlauts())
+                    .peek(password -> tracer.out().printfIndentln("password.chars() = %s", Arrays.toString(password.chars().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password.codePoints() = %s", Arrays.toString(password.codePoints().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password = %s", password))
+                    .limit(LIMIT)
+                    .collect(Collectors.toList());
+            List<CharSequence> recoveredPasswords = passwords.stream()
+                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
+                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                    .map(password -> new StringBuilder().append(password))
+                    .peek(password -> tracer.out().printfIndentln("password = %s", password))
+                    .collect(Collectors.toList());
+            boolean allMatched = true;
+            for (int i=0; i<passwords.size(); i++) {
+                allMatched = CharSequence.compare(passwords.get(i), recoveredPasswords.get(i)) == 0;
+                if (!allMatched) {
+                    break;
+                }
+            }
+            assertThat(allMatched).isTrue();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("requiredCharacterSets_1")
+    void requiredCharacterSets_1() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "requiredCharacterSets_1()");
+
+        try {
+            final int LIMIT = 10, LENGTH = 25;
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.all());
+
+            Set<char[]> requiredCharSets = new HashSet<>();
+            requiredCharSets.add(PasswordGenerator.alphanumeric());
+            requiredCharSets.add(PasswordGenerator.umlauts());
+            requiredCharSets.add(PasswordGenerator.punctuationAndSymbols());
+
+            List<CharSequence> passwords = passwordGenerator.generate(requiredCharSets)
+                    .peek(password -> tracer.out().printfIndentln("password.chars() = %s", Arrays.toString(password.chars().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password.codePoints() = %s", Arrays.toString(password.codePoints().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password = %s", password))
+                    .limit(LIMIT)
+                    .collect(Collectors.toList());
+
+            List<CharSequence> recoveredPasswords = passwords.stream()
+                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
+                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                    .map(password -> new StringBuilder().append(password))
+                    .peek(password -> tracer.out().printfIndentln("password = %s", password))
+                    .collect(Collectors.toList());
+
+            boolean allMatched = true;
+            for (int i=0; i<passwords.size(); i++) {
+                allMatched = CharSequence.compare(passwords.get(i), recoveredPasswords.get(i)) == 0;
+                if (!allMatched) {
+                    break;
+                }
+            }
+
+            assertThat(allMatched).isTrue();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("requiredCharacterSets_2")
+    void requiredCharacterSets_2() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "requiredCharacterSets_2()");
+
+        try {
+            final int LIMIT = 10, LENGTH = 25;
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
+
+            Set<char[]> requiredCharSets = new HashSet<>();
+            requiredCharSets.add(PasswordGenerator.punctuationAndSymbols());
+
+            Throwable thrown = catchThrowable(() -> passwordGenerator.generate(requiredCharSets)
+                    .peek(password -> tracer.out().printfIndentln("password.chars() = %s", Arrays.toString(password.chars().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password.codePoints() = %s", Arrays.toString(password.codePoints().toArray())))
+                    .peek(password -> tracer.out().printfIndentln("password = %s", password))
+                    .limit(LIMIT)
+                    .collect(Collectors.toList()));
+
+            assertThat(thrown).isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Required character not present within given symbol set.");
         } finally {
             tracer.wayout();
         }

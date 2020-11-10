@@ -24,6 +24,8 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.CharBuffer;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -41,6 +43,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
 
             return input;
         }
+
         String readString(String regex, String label, String proposal) {
             String input;
             do {
@@ -49,6 +52,33 @@ abstract public class AbstractMenu implements Menu, Traceable {
             } while (!Pattern.matches(regex, input));
 
             return input;
+        }
+
+        CharSequence readCharSequence(String regex, String label, CharSequence proposal) throws IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("CharSequence", this, "readCharSequence(String regex, String label, CharSequence proposal)");
+
+            try {
+                final int MAX_LENGTH = 100;
+                Reader reader = System.console().reader();
+                CharBuffer input;
+                do {
+                    input = CharBuffer.allocate(MAX_LENGTH);
+                    System.console().printf("%s-> %s (%s): %s ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
+                    int actualRead = reader.read(input);
+                    int length = actualRead - System.lineSeparator().length();
+                    if (length > 0) {
+                        input.rewind();
+                        input = CharBuffer.wrap(input.subSequence(0, length));
+                    } else {
+                        input = CharBuffer.wrap(proposal);
+                    }
+                } while (!Pattern.matches(regex, input));
+
+                return input;
+            } finally {
+                tracer.wayout();
+            }
         }
 
         String readString(Pattern pattern, String label) {
@@ -81,7 +111,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
     }
 
     @Override
-    public Command readCommand() throws IOException {
+    public Command readCommand() {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Command", this, "readCommand()");
         try {

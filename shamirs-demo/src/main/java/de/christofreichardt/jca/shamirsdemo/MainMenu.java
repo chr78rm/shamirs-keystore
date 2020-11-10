@@ -29,7 +29,6 @@ import de.christofreichardt.scala.shamir.SecretSharing;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -172,15 +171,15 @@ public class MainMenu  extends AbstractMenu {
         return this.exit;
     }
 
-    void splitPassword() throws GeneralSecurityException {
+    void splitPassword() throws GeneralSecurityException, IOException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "splitPassword()");
         try {
             final int LENGTH = 25;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
-            String proposal = passwordGenerator.generate().findFirst().get().toString();
+            CharSequence proposal = passwordGenerator.generate().findFirst().orElseThrow();
 
-            String password = this.console.readString("[A-Za-z0-9-]{8,45}", "Password", proposal);
+            CharSequence passwordSeq = this.console.readCharSequence("[A-Za-z0-9-]{8,45}", "Password", proposal);
             int shares = this.console.readInt("[0-9]+", "Number of shares");
             int threshold = this.console.readInt("[0-9]+", "Threshold");
             String partition = this.console.readString(PARTITION_PATTERN, "Name of partition");
@@ -200,7 +199,7 @@ public class MainMenu  extends AbstractMenu {
                 sizes[i] = size;
                 sum += size;
             }
-            SecretSharing secretSharing = new SecretSharing(shares, threshold, password);
+            SecretSharing secretSharing = new SecretSharing(shares, threshold, passwordSeq);
 
             tracer.out().printfIndentln("secretSharing = %s", secretSharing);
 

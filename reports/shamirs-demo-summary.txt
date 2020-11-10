@@ -6,20 +6,23 @@
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
 -------------------------------------
-ShamirsDemoUnit[container=true, test=false, start=2020-11-04T15:58:26.8073747, end=2020-11-04T15:58:30.1113701, duration=PT3.3039954S, status=SUCCESSFUL]
+ShamirsDemoUnit[container=true, test=false, start=2020-11-10T15:12:08.1660241, end=2020-11-10T15:12:11.6408774, duration=PT3.4748533S, status=SUCCESSFUL]
 
 -------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
-containers = 0, tests = 4, successful = 4, failed = 0, aborted = 0
+containers = 0, tests = 7, successful = 7, failed = 0, aborted = 0
 -------------------------------------
-encoding-1[container=false, test=true, start=2020-11-04T15:58:27.4518467, end=2020-11-04T15:58:28.9589833, duration=PT1.5071366S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2020-11-04T15:58:27.0417793, end=2020-11-04T15:58:27.4508465, duration=PT0.4090672S, status=SUCCESSFUL]
-ec-keypair[container=false, test=true, start=2020-11-04T15:58:26.8293741, end=2020-11-04T15:58:27.0397794, duration=PT0.2104053S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2020-11-04T15:58:28.9599842, end=2020-11-04T15:58:30.1103694, duration=PT1.1503852S, status=SUCCESSFUL]
+encoding-1[container=false, test=true, start=2020-11-10T15:12:09.1690597, end=2020-11-10T15:12:10.3881076, duration=PT1.2190479S, status=SUCCESSFUL]
+requiredCharacterSets_1[container=false, test=true, start=2020-11-10T15:12:08.1816824, end=2020-11-10T15:12:08.7671367, duration=PT0.5854543S, status=SUCCESSFUL]
+requiredCharacterSets_2[container=false, test=true, start=2020-11-10T15:12:08.7671367, end=2020-11-10T15:12:08.7827236, duration=PT0.0155869S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2020-11-10T15:12:08.8124352, end=2020-11-10T15:12:09.166989, duration=PT0.3545538S, status=SUCCESSFUL]
+encoding-3[container=false, test=true, start=2020-11-10T15:12:11.5285317, end=2020-11-10T15:12:11.6408774, duration=PT0.1123457S, status=SUCCESSFUL]
+ec-keypair[container=false, test=true, start=2020-11-10T15:12:08.7827236, end=2020-11-10T15:12:08.8124352, duration=PT0.0297116S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2020-11-10T15:12:10.3881076, end=2020-11-10T15:12:11.5285317, duration=PT1.1404241S, status=SUCCESSFUL]
 
 
 Tests--------------------------------
-succeeded: 4
+succeeded: 7
    failed: 0
   aborted: 0
 -------------------------------------
