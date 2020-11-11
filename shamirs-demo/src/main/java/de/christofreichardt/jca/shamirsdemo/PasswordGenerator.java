@@ -176,7 +176,7 @@ public class PasswordGenerator implements Traceable {
 
     CharSequence password() {
         AbstractTracer tracer = TracerFactory.getInstance().getDefaultTracer();
-        tracer.entry("CharSequence", PasswordGenerator.class, "password()");
+        tracer.entry("CharSequence", this, "password()");
         try {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i=0; i<this.length; i++) {
