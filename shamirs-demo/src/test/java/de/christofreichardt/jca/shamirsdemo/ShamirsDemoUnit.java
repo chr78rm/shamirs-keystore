@@ -22,6 +22,7 @@ package de.christofreichardt.jca.shamirsdemo;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 import org.junit.jupiter.api.BeforeAll;
@@ -78,7 +79,7 @@ public class ShamirsDemoUnit implements Traceable {
                     map.put(password, 1);
                 } else {
                     int count = map.get(password);
-                    map.put(password, count++);
+                    map.put(password, ++count);
                 }
             };
         }
@@ -173,7 +174,7 @@ public class ShamirsDemoUnit implements Traceable {
                         boolean matched = false;
                         char[] umlauts = PasswordGenerator.umlauts();
                         for (int i=0; i<umlauts.length && !matched; i++) {
-                            matched = password.indexOf(Character.codePointAt(umlauts, i)) != -1 ? true : false;
+                            matched = password.indexOf(Character.codePointAt(umlauts, i)) != -1;
                         }
                         return matched;
                     })
@@ -287,8 +288,6 @@ public class ShamirsDemoUnit implements Traceable {
 
         try {
             final int LIMIT = 10, LENGTH = 25;
-            final int SHARES = 8;
-            final int THRESHOLD = 4;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
 
             Set<char[]> requiredCharSets = new HashSet<>();

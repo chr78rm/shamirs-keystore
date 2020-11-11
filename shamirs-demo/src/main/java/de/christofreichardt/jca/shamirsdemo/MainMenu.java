@@ -20,6 +20,7 @@
 package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
+import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.jca.shamir.ShamirsLoadParameter;
 import de.christofreichardt.jca.shamir.ShamirsProtection;
 import de.christofreichardt.jca.shamir.ShamirsProvider;

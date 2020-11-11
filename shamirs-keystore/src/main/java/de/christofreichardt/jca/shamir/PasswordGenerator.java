@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.christofreichardt.jca.shamirsdemo;
+package de.christofreichardt.jca.shamir;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
@@ -95,7 +95,7 @@ public class PasswordGenerator implements Traceable {
         this.symbols = Arrays.copyOf(symbols, symbols.length);
     }
 
-    Stream<CharSequence> generate() {
+    public Stream<CharSequence> generate() {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate()");
         try {
@@ -105,7 +105,7 @@ public class PasswordGenerator implements Traceable {
         }
     }
 
-    Stream<CharSequence> generate(char[] requiredChars) {
+    public Stream<CharSequence> generate(char[] requiredChars) {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
         try {
@@ -155,7 +155,7 @@ public class PasswordGenerator implements Traceable {
                 });
     }
 
-    Stream<CharSequence> generate(Set<char[]> requiredCharSets) {
+    public Stream<CharSequence> generate(Set<char[]> requiredCharSets) {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
         try {
