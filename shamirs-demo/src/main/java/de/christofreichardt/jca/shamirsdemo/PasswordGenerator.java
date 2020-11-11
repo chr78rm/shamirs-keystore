@@ -36,6 +36,16 @@ import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
 public class PasswordGenerator implements Traceable {
 
+    public static class ArrayUtils {
+        static public char[] concat(char[] a1, char[] a2) {
+            char[] result = new char[a1.length + a2.length];
+            System.arraycopy(a1, 0, result, 0, a1.length);
+            System.arraycopy(a2, 0, result, a1.length, a2.length);
+
+            return result;
+        }
+    }
+
     private static final char[] ALPHANUMERIC = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
             'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7',
