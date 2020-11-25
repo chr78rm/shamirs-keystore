@@ -19,11 +19,8 @@
 
 package de.christofreichardt.scala.shamir
 
+import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
-import de.christofreichardt.diagnosis.AbstractTracer
-import de.christofreichardt.diagnosis.TracerFactory
-import scala.collection.GenTraversable
-import scala.annotation.tailrec
 
 class NewtonPolynomial(
   val degree:       Int,
@@ -32,20 +29,19 @@ class NewtonPolynomial(
   val prime:        BigInt) extends Tracing {
 
   require(prime.isProbablePrime(CERTAINTY))
-  val n = degree
+  val n: Int = degree
   require(basis.length == n)
   require(coefficients.length == n + 1)
-  val c = coefficients.map(b => b.mod(prime))
-  val xx = basis.map(b => b.mod(prime))
+  val c: Seq[BigInt] = coefficients.map(b => b.mod(prime))
+  val xx: Seq[BigInt] = basis.map(b => b.mod(prime))
   require(pairwiseDifferent(xx.toList), "Basis values must be pairwise different.")
 
   def pairwiseDifferent(values: List[BigInt]): Boolean = {
     values match {
-      case List(v) => true
-      case head :: tail => {
-        if (tail.exists(v => v == head)) false
+      case List(_) => true
+      case head :: tail =>
+        if (tail.contains(head)) false
         else pairwiseDifferent(tail)
-      }
     }
   }
 
@@ -64,7 +60,7 @@ class NewtonPolynomial(
     }
   }
 
-  override def toString = String.format("NewtonPolynomial[degree=%d, c=(%s), x=(%s), prime=%s]", n: Integer, c.mkString(","), xx.mkString(","), prime)
+  override def toString: String = String.format("NewtonPolynomial[degree=%d, c=(%s), x=(%s), prime=%s]", n: Integer, c.mkString(","), xx.mkString(","), prime)
 
   override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer
 }
