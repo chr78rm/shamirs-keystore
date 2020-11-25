@@ -85,6 +85,7 @@ object SecretMerging {
   }
 
   private def processSlices(jsonObjects: Seq[JsonObject]): SecretMerging = {
+    require(jsonObjects.nonEmpty, "Empty Sequence.")
     val ids = jsonObjects.map(jsonObject => jsonObject.getString("Id"))
     require(ids.forall(id => id == ids.head), "Inconsistent Ids.")
     val (prime, threshold) = jsonObjects.view.map(jsonObject => (BigInt(jsonObject.getJsonNumber("Prime").bigIntegerValue()), jsonObject.getInt("Threshold"))).head
