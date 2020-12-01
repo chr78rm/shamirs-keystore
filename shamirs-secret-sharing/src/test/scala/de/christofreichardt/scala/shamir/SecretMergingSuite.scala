@@ -226,6 +226,15 @@ class SecretMergingSuite extends MyFunSuite {
     )
   }
 
+  testWithTracing(this, "Inconsistent-Partition-Id") {
+    val tracer = getCurrentTracer()
+    val caught = intercept[IllegalArgumentException] {
+      val secretMerging = SecretMerging(IndexedSeq(Paths.get("json", "partition-4-1.json"), Paths.get("json", "partition-4-2.json")))
+      tracer.out().printfIndentln("secret = (%s)", formatBytes(secretMerging.secretBytes))
+    }
+    tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
+  }
+
   testWithTracing(this, "Exhaustive-Verification-1") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes

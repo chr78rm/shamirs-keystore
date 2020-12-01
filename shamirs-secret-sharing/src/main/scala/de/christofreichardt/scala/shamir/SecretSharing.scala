@@ -109,7 +109,7 @@ class SecretSharing(
           .add("y", ps._2.bigInteger)))
     })
     Json.createObjectBuilder()
-      .add("Id", id)
+      .add("PartitionId", id)
       .add("Prime", prime.bigInteger)
       .add("Threshold", threshold)
       .add("SharePoints", arrayBuilder.build())

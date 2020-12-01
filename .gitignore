@@ -4,6 +4,8 @@ target
 shamirs-keystore/json/keystore-1/*.json
 shamirs-keystore/json/roundtrip-2/*.json
 shamirs-secret-sharing/json/**/*.json
+!shamirs-secret-sharing/json/partition-4-1.json
+!shamirs-secret-sharing/json/partition-4-2.json
 !shamirs-secret-sharing/json/jws/secret-share.json
 shamirs-secret-sharing/json/jws/encoded-secret-share.txt
 dependency-reduced-pom.xml
