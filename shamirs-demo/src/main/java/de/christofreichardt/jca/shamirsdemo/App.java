@@ -154,6 +154,9 @@ public class App implements Traceable {
                         tracer.out().printfIndentln("%s = %s", propertyName, System.getProperties().getProperty(propertyName));
                     });
             try {
+                if (System.console() == null) {
+                    throw new Error("There isn't any system console.");
+                }
                 Security.addProvider(new ShamirsProvider());
                 App app = new App();
                 app.mainLoop();
