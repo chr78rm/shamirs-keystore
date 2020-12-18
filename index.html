@@ -72,7 +72,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2020-09-30</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2020-12-18</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -340,13 +340,23 @@
             <th class="cell">sha512 checksum</th>
           </tr>
           <tr style="">
-            <td class="cell" style="width: 15%">shamirs-demo</td>
+            <td class="cell" style="width: 15%">shamirs-demo-1.0.0-beta</td>
             <td class="cell">
               <a href="https://www.dropbox.com/s/rhs76o31qppix9m/shamirs-demo-1.0.0-beta.zip?dl=1">shamirs-demo-1.0.0-beta.zip</a>
             </td>
             <td class="cell">2020-05-20 13:50:27.364 +0200</td>
             <td class="cell">
               <a href="./shamirs-demo-1.0.0-beta.zip.sha512.txt">shamirs-demo-1.0.0-beta.zip.sha512</a>
+            </td>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">shamirs-demo-1.0.0-rc1</td>
+            <td class="cell">
+              <a href="https://www.dropbox.com/s/8jy5ufo4loiyv84/shamirs-demo-1.0.0-rc1.zip?dl=1">shamirs-demo-1.0.0-rc1.zip</a>
+            </td>
+            <td class="cell">2020-12-18 15:43:09.754 +0100</td>
+            <td class="cell">
+              <a href="./shamirs-demo-1.0.0-rc1.zip.sha512.txt">shamirs-demo-1.0.0-rc1.zip.sha512</a>
             </td>
           </tr>
         </tbody>
@@ -385,64 +395,65 @@
         <p class="code" style="white-space: pre">$ cd shamirs-demo/
 $ ls
 LICENCE.txt  log  NOTICE.txt  run-shamirs-demo.sh  src  target  workspace
-$ ls target/
-shamirs-demo-1.0.0-beta.jar
-$ ls --recursive workspace/
-workspace/:
-my-workspace-0
+$ ls --recursive target workspace
+target:
+shamirs-demo-1.0.0-rc1.jar
+
+workspace:
+my-workspace-0/
 
 workspace/my-workspace-0:
-my-keys.p12  test-0.json  test-1.json  test-2.json  test-3.json  test-4.json  test-5.json  test-6.json  test.json</p>
+my-keys.p12  test.json  test-0.json  test-1.json  test-2.json  test-3.json  test-4.json  test-5.json  test-6.json</p>
       </div>
       <p class="section">
         On Linux the demo can be started with <span class="code">./run-shamirs-demo.sh</span>. On Windows and using the Git Bash you will instead need <span class="code">winpty sh -i -c ./run-shamirs-demo.sh</span>
-        or simply <span class="code">winpty java -jar target/shamirs-demo-1.0.0-beta.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
+        or simply <span class="code">winpty java -jar target/shamirs-demo-1.0.0-rc1.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
         <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Console.html">Console</a> and 
         <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#console()">System.console()</a> would return null. Using the command interpreter
         <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> of Windows you can simply type 
-        <span class="code">java -jar target/shamirs-demo-1.0.0-beta.jar</span> to invoke the demo.
+        <span class="code">java -jar target/shamirs-demo-1.0.0-rc1.jar</span> to invoke the demo.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.0.0-beta.jar
+        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.0.0-rc1.jar
 ...
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2020-05-22T14:26:10.667463
-   Workspace: 2020-05-22
+Current time: 2020-12-18T15:55:13.152862
+   Workspace: 2020-12-18
 
-2020-05-22-> Main menu
+2020-12-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2020-05-22-></p>
+2020-12-18-></p>
       </div>
       <p class="section">
         On Linux the explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
         when generating random passwords. See <a href="https://www.2uo.de/myths-about-urandom/">Myths about /dev/urandom</a> for a discussion about the confusion
         regarding the special device files which serve as (pseudo) random generators on Linux systems.
-        The string <span class="code">2020-05-22</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
+        The string <span class="code">2020-12-18</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
         the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
         a password:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> s
-2020-05-22-> split password
-2020-05-22-> Password ([A-Za-z0-9-]{8,45}): mdCArzFxaOrYtco5XNfLne39R 
-2020-05-22-> Number of shares ([0-9]+): 12
-2020-05-22-> Threshold ([0-9]+): 4
-2020-05-22-> Name of partition ([A-Za-z]{1,10}): demo
-2020-05-22-> Number of slices ([0-9]+): 7
-2020-05-22-> Size[i=0, sum=0] ([0-9]+): 4
-2020-05-22-> Size[i=1, sum=4] ([0-9]+): 2
-2020-05-22-> Size[i=2, sum=6] ([0-9]+): 2
-2020-05-22-> Size[i=3, sum=8] ([0-9]+): 1
-2020-05-22-> Size[i=4, sum=9] ([0-9]+): 1
-2020-05-22-> Size[i=5, sum=10] ([0-9]+): 1
-2020-05-22-> Size[i=6, sum=11] ([0-9]+): 1</p>
+        <p class="code" style="white-space: pre">2020-12-18-> s
+2020-12-18-> split password
+2020-12-18-> Password ([A-Za-z0-9-]{8,45}): ynTnUlkBIdKK42ijzDWNbhYoa
+2020-12-18-> Number of shares ([0-9]+): 12
+2020-12-18-> Threshold ([0-9]+): 4
+2020-12-18-> Name of partition ([A-Za-z]{1,10}): demo
+2020-12-18-> Number of slices ([0-9]+): 7
+2020-12-18-> Size[i=0, sum=0] ([0-9]+): 4
+2020-12-18-> Size[i=1, sum=4] ([0-9]+): 2
+2020-12-18-> Size[i=2, sum=6] ([0-9]+): 2
+2020-12-18-> Size[i=3, sum=8] ([0-9]+): 1
+2020-12-18-> Size[i=4, sum=9] ([0-9]+): 1
+2020-12-18-> Size[i=5, sum=10] ([0-9]+): 1
+2020-12-18-> Size[i=6, sum=11] ([0-9]+): 1</p>
       </div>
       <p class="section">
         The app will make a password proposal. Every user provided input will be matched against the regular expression 
@@ -452,8 +463,8 @@ Current time: 2020-05-22T14:26:10.667463
         and review the content of the your workspace directory (workspace/yyyy-MM-dd):
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ ls workspace/2020-05-22
-demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  demo.json</p>
+        <p class="code" style="white-space: pre">$ ls workspace/2020-12-18/
+demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json</p>
       </div>
       <p class="section">
         The file <span class="code">demo.json</span> contains all of the generated shares, <span class="code">demo-0.json</span> four of them, 
@@ -464,57 +475,57 @@ demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  de
         <span class="code">(li)st workspace</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> li
-2020-05-22-> list workspace
-2020-05-22-> Partitions: [demo]
-2020-05-22-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2020-05-22-> Keystores: []</p>
+        <p class="code" style="white-space: pre">2020-12-18-> li
+2020-12-18-> list workspace
+2020-12-18-> Partitions: [demo]
+2020-12-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2020-12-18-> Keystores: []</p>
       </div>
       <p class="section">
         We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
         <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> m
-2020-05-22-> merge password
-2020-05-22-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json,demo-3.json,demo-6.json
-2020-05-22-> password = mdCArzFxaOrYtco5XNfLne39R</p>
+        <p class="code" style="white-space: pre">2020-12-18-> m
+2020-12-18-> merge password
+2020-12-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json,demo-3.json,demo-6.json
+2020-12-18-> password = ynTnUlkBIdKK42ijzDWNbhYoa</p>
       </div>
       <p class="section">
-        As expected. Merging works by providing a list of <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
+        As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
         to the different slices and then applying Newtons Interpolation. That means the slices
         need not necessarily be located together in one directory as in our demo. In fact they could be distributed over the whole filesystem and could be
         located even on remote devices. Think of plugged-in USB memory sticks or network filesystems. Future versions might interpret the Paths as 
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/net/URI.html">URI</a>s and could fetch the slices over the network if required. <br/>
+        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/net/URI.html">URI</a>s and could fetch the slices via the internet if required. <br/>
       </p>
       <p class="section">
         Now, let's create a keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> Main menu
+        <p class="code" style="white-space: pre">2020-12-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2020-05-22-> c
-2020-05-22-> create keystore
-2020-05-22-> Keystore name ([A-Za-z-]{1,20}): my-keys
-2020-05-22-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
+2020-12-18-> c
+2020-12-18-> create keystore
+2020-12-18-> Keystore name ([A-Za-z-]{1,20}): my-keys
+2020-12-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2020-05-23T14:54:04.018555
-   Workspace: 2020-05-22
+Current time: 2020-12-18T16:09:24.5564466
+   Workspace: 2020-12-18
 
-2020-05-22-> KeyStore menu [my-keys]
+2020-12-18-> KeyStore menu [my-keys]
 
          (l)ist entries          (p)rivate key           (s)ecret key
           (c)ertificate            (m)ain menu
 
-2020-05-22-></p>
+2020-12-18-></p>
       </div>
       <p class="section">
         We used four of the slices containing a single share to produce the credentials for the keystore. The demo app switched to a submenu regarding
@@ -527,15 +538,15 @@ Current time: 2020-05-23T14:54:04.018555
         be the result from a PKCS10 certificate request too.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> p
-2020-05-22-> private key
-2020-05-22-> Keygenerator algorithm (DSA|RSA|EC): EC
-2020-05-22-> Validity ([0-9]+): 100
-2020-05-22-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
-2020-05-22-> Locality ([A-Za-z- ]{5,30}): Entenhausen
-2020-05-22-> State ([A-Za-z- ]{5,30}): Bayern
-2020-05-22-> Country ([A-Za-z- ]{5,30}): Deutschland
-2020-05-22-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
+        <p class="code" style="white-space: pre">2020-12-18-> p
+2020-12-18-> private key
+2020-12-18-> Keygenerator algorithm (DSA|RSA|EC): EC
+2020-12-18-> Validity ([0-9]+): 100
+2020-12-18-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
+2020-12-18-> Locality ([A-Za-z- ]{5,30}): Entenhausen
+2020-12-18-> State ([A-Za-z- ]{5,30}): Bayern
+2020-12-18-> Country ([A-Za-z- ]{5,30}): Deutschland
+2020-12-18-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
       </div>
       <p class="section">
         We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
@@ -546,50 +557,50 @@ Current time: 2020-05-23T14:54:04.018555
         Now, list the entries so far:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> l
-2020-05-22-> list entries
-2020-05-22-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:35:39:30:32:33:39:36:30:30:39:30:32, algorithm=EC, keytype=Private Key</p>
+        <p class="code" style="white-space: pre">2020-12-18-> l
+2020-12-18-> list entries
+2020-12-18-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:36:30:38:33:30:34:32:38:36:33:38:37, algorithm=EC, keytype=Private Key</p>
       </div>
       <p class="section">
         Go back to main menu:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> m
-2020-05-22-> main menu
+        <p class="code" style="white-space: pre">2020-12-18-> m
+2020-12-18-> main menu
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2020-05-23T15:42:23.311563
-   Workspace: 2020-05-22
+Current time: 2020-12-18T16:12:37.6149541
+   Workspace: 2020-12-18
 
-2020-05-22-> Main menu
+2020-12-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2020-05-22-></p>
+2020-12-18-></p>
       </div>
       <p class="section">
         Now, list the workspace again:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> li
-2020-05-22-> list workspace
-2020-05-22-> Partitions: [demo]
-2020-05-22-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2020-05-22-> Keystores: [my-keys]</p>
+        <p class="code" style="white-space: pre">2020-12-18-> li
+2020-12-18-> list workspace
+2020-12-18-> Partitions: [demo]
+2020-12-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2020-12-18-> Keystores: [my-keys]</p>
       </div>
       <p class="section">
         Again, merge some of the slices to recover the password of the keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> m
-2020-05-22-> merge password
-2020-05-22-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
-2020-05-22-> password = mdCArzFxaOrYtco5XNfLne39R</p>
+        <p class="code" style="white-space: pre">2020-12-18-> m
+2020-12-18-> merge password
+2020-12-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
+2020-12-18-> password = ynTnUlkBIdKK42ijzDWNbhYoa</p>
       </div>
       <p class="section">
         Switch to a separate console since we want to investigate the keystore with 
@@ -597,27 +608,27 @@ Current time: 2020-05-23T15:42:23.311563
         different.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd workspace/2020-05-22  # workspace/yyyy-MM-dd
+        <p class="code" style="white-space: pre">$ cd workspace/2020-12-18  # workspace/yyyy-MM-dd
 $ ls
-demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  demo.json  my-keys.p12
-$ keytool -list -keystore my-keys.p12 -storepass mdCArzFxaOrYtco5XNfLne39R -storetype pkcs12 -v
+demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  my-keys.p12
+$ keytool -J-Duser.language=en -list -keystore my-keys.p12 -storepass ynTnUlkBIdKK42ijzDWNbhYoa -storetype pkcs12 -v
 Keystore type: PKCS12
 Keystore provider: SUN
 
 Your keystore contains 1 entry
 
 Alias name: donalds-private-ec-key
-Creation date: 23.05.2020
+Creation date: 18 Dec 2020
 Entry type: PrivateKeyEntry
 Certificate chain length: 1
 Certificate[1]:
 Owner: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
 Issuer: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
-Serial number: 17241aa9c70
-Valid from: Sat May 23 15:13:19 CEST 2020 until: Mon Aug 31 15:13:19 CEST 2020
+Serial number: 1767667d9d3
+Valid from: Fri Dec 18 16:11:26 CET 2020 until: Sun Mar 28 17:11:26 CEST 2021
 Certificate fingerprints:
-	 SHA1: FC:E0:1A:AA:E4:91:88:5C:FF:5F:43:66:FE:43:C9:6A:43:60:5C:48
-	 SHA256: C1:6B:87:B6:9C:C9:6D:65:3D:5E:E8:BF:0B:9B:82:41:DF:D8:88:C9:DA:33:1E:62:79:AA:5D:41:A5:41:EE:FD
+         SHA1: 32:23:00:A7:97:55:99:13:35:D3:E8:CB:29:CE:6E:E8:1C:21:AA:48
+         SHA256: CA:01:4E:7F:A5:36:A6:09:7B:E0:50:64:97:54:92:3B:D5:A5:47:32:EB:B1:D8:F0:07:FF:8A:93:3B:40:5A:7B
 Signature algorithm name: SHA256withECDSA
 Subject Public Key Algorithm: 521-bit EC (secp521r1) key
 Version: 3
@@ -632,14 +643,14 @@ Version: 3
         secret keys don't work since the underlying keystore implementation of the JDK doesn't regocnize them.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2020-05-22-> Main menu
+        <p class="code" style="white-space: pre">2020-12-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2020-05-22-> e
-2020-05-22-> exit</p>
+2020-12-18-> e
+2020-12-18-> exit</p>
       </div>
       <p class="section">
         <a href="#1">[ToC]</a>
