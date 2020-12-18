@@ -175,7 +175,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.65</version>
+            <version>1.67</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -199,7 +199,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.17.2</version>
+            <version>3.18.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
