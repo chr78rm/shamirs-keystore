@@ -169,6 +169,9 @@
 									<scalaVersion>${scala.version}</scalaVersion>
 									<args>
 										<arg>-deprecation</arg>
+										<arg>-target:11</arg>
+										<arg>-encoding</arg>
+										<arg>utf-8</arg>
 									</args>
 								</configuration>
 							</execution>

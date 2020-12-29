@@ -36,16 +36,26 @@
   </distributionManagement>
   <url>https://chr78rm.github.io/shamirs-keystore/</url>
 
-  <modules>
-    <module>shamirs-secret-sharing</module>
-    <module>shamirs-keystore</module>
-    <module>junit5-ext</module>
-    <module>shamirs-demo</module>
-  </modules>
-
   <profiles>
     <profile>
+      <id>development</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>shamirs-secret-sharing</module>
+        <module>shamirs-keystore</module>
+        <module>junit5-ext</module>
+        <module>shamirs-demo</module>
+      </modules>
+    </profile>
+    <profile>
       <id>release</id>
+      <modules>
+        <module>shamirs-secret-sharing</module>
+        <module>shamirs-keystore</module>
+        <module>junit5-ext</module>
+      </modules>
       <build>
         <plugins>
           <plugin>
