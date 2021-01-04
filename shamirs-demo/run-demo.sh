@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MAVEN_REPO=$HOME/.m2/repository/
-VERSION=1.0.0-rc1
+VERSION=1.0.0
 echo Using "${MAVEN_REPO}" and "${VERSION}" ...
 
 echo
@@ -21,6 +21,6 @@ ${BIN_JAVA} -Djava.security.egd=file:/dev/urandom -cp target/shamirs-demo-${VERS
 "${MAVEN_REPO}"/org/jboss/resteasy/resteasy-json-p-provider/resteasy-json-p-provider-4.5.3.Final.jar:\
 "${MAVEN_REPO}"/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:\
 "${MAVEN_REPO}"/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar:\
-"${MAVEN_REPO}"/org/bouncycastle/bcpkix-jdk15on/1.65/bcpkix-jdk15on-1.65.jar:\
-"${MAVEN_REPO}"/org/bouncycastle/bcprov-jdk15on/1.65/bcprov-jdk15on-1.65.jar:\
+"${MAVEN_REPO}"/org/bouncycastle/bcpkix-jdk15on/1.67/bcpkix-jdk15on-1.67.jar:\
+"${MAVEN_REPO}"/org/bouncycastle/bcprov-jdk15on/1.67/bcprov-jdk15on-1.67.jar:\
  de.christofreichardt.jca.shamirsdemo.App
