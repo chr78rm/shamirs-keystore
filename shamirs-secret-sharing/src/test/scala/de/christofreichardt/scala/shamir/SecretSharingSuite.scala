@@ -63,7 +63,7 @@ class SecretSharingSuite extends MyFunSuite {
     assert(secret == test)
   }
 
-  testWithTracing(this, "Preconditions-1") {
+  testWithTracing(this, "Preconditions-1 (Minimal Shares)") {
     val tracer = getCurrentTracer()
     val secret: IndexedSeq[Byte] = IndexedSeq(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
     val caught = intercept[IllegalArgumentException] {
@@ -72,7 +72,7 @@ class SecretSharingSuite extends MyFunSuite {
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
 
-  testWithTracing(this, "Preconditions-2") {
+  testWithTracing(this, "Preconditions-2 (Threshold <= Shares)") {
     val tracer = getCurrentTracer()
     val secret: IndexedSeq[Byte] = IndexedSeq(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
     val caught = intercept[IllegalArgumentException] {
@@ -81,7 +81,7 @@ class SecretSharingSuite extends MyFunSuite {
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
 
-  testWithTracing(this, "Preconditions-3") {
+  testWithTracing(this, "Preconditions-3 (Minimal Threshold)") {
     val tracer = getCurrentTracer()
     val secret: IndexedSeq[Byte] = IndexedSeq(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
     val caught = intercept[IllegalArgumentException] {
@@ -90,7 +90,7 @@ class SecretSharingSuite extends MyFunSuite {
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
 
-  testWithTracing(this, "Preconditions-4") {
+  testWithTracing(this, "Preconditions-4 (Degree of Polynomial)") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 15 // Bytes
     val trials = 100
@@ -116,6 +116,31 @@ class SecretSharingSuite extends MyFunSuite {
         secretSharing.polynomial.degree == k - 1
       })
     assert(test)
+  }
+
+  ignore(this, "Preconditions-5 (Distinct SharePoints)") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 2 // Bytes
+    val trials = 100
+    LazyList.from(1)
+      .map(index => {
+        tracer.out().printfIndentln("--> index = %d", index)
+      })
+      .map(_ => (1000, this.randomGenerator.intStream(12).head))
+      .filter(tuple => {
+        val n = tuple._1
+        val k = tuple._2
+        n >= 2 && k >= 2 && k <= n
+      })
+      .take(trials)
+      .map(tuple => {
+        val n = tuple._1
+        val k = tuple._2
+        val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+        tracer.out().printfIndentln("n = %d, k = %d, secret = %s", n, k, formatBytes(secret))
+        new SecretSharing(n, k, secret)
+      })
+      .foreach(secretSharing => tracer.out().printfIndentln("secretSharing = %s", secretSharing))
   }
 
   testWithTracing(this, "Sharing-1") {

@@ -48,18 +48,22 @@ class SecretSharing(
 
   val n: Int = shares
   val k: Int = threshold
+
+  require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
+  require(k <= n, "The threshold must be less than or equal to the number of shares.")
+
   val s: BigInt = bytes2BigInt(secretBytes)
   val randomGenerator: RandomGenerator = new RandomGenerator(random)
   val prime: BigInt = choosePrime
   val polynomial: Polynomial = choosePolynomial(k - 1)
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
+
+  require(polynomial.degree == k - 1)
+  require(this.sharePoints.map(point => point._1).distinct.length == n, String.format("%d distinct sharepoints are needed: %s", n, this.sharePoints))
+
   val id: String = UUID.randomUUID().toString
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
   lazy val verified: Boolean = verifyAll
-
-  require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
-  require(k <= n, "The threshold must be less than or equal to the number of shares.")
-  require(polynomial.degree == k - 1)
 
   def choosePrime: BigInt = {
     val BIT_OFFSET = 1
