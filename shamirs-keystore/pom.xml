@@ -7,7 +7,7 @@
     <parent>
         <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>shamirs-keystore</artifactId>
@@ -154,7 +154,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.17.2</version>
+            <version>3.18.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
