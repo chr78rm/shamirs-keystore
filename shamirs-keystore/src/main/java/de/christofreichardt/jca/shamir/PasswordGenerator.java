@@ -192,6 +192,6 @@ public class PasswordGenerator implements Traceable {
 
     @Override
     public AbstractTracer getCurrentTracer() {
-        return TracerFactory.getInstance().getCurrentPoolTracer();
+        return TracerFactory.getInstance().getDefaultTracer();
     }
 }
