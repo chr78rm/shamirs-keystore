@@ -31,6 +31,16 @@ import javax.json.{Json, JsonArray, JsonObject}
 
 import scala.annotation.tailrec
 
+/**
+ * A secret sharing sheme.
+ *
+ * @constructor Creates a new SecretSharing sheme with shares, threshold, secretBytes and a secure random source.
+ *
+ * @param shares the number of shares
+ * @param threshold the number of shares required for the recovery of the secret bytes
+ * @param secretBytes the actual secret
+ * @param random the secure random source
+ */
 class SecretSharing(
                      val shares: Int,
                      val threshold: Int,
@@ -38,12 +48,38 @@ class SecretSharing(
                      val random: SecureRandom)
   extends Tracing {
 
+  /**
+   * Creates a new SecretSharing sheme with 6 shares, threshold == 3, the given secretBytes and a default secure random source.
+   *
+   * @param secretBytes the actual secret
+   */
   def this(secretBytes: IndexedSeq[Byte]) = this(6, 3, secretBytes, new SecureRandom)
 
+  /**
+   * Creates a new SecretSharing sheme with shares, threshold, secretBytes and a default secure random source.
+   *
+   * @param shares the number of shares
+   * @param threshold the number of shares required for the recovery of the secret bytes
+   * @param secretBytes the actual secret
+   */
   def this(shares: Int, threshold: Int, secretBytes: IndexedSeq[Byte]) = this(shares, threshold, secretBytes, new SecureRandom)
 
+  /**
+   * Creates a new SecretSharing sheme with shares, threshold, secretBytes and a default secure random source. This is convenient when calling from Java.
+   *
+   * @param shares the number of shares
+   * @param threshold the number of shares required for the recovery of the secret bytes
+   * @param secretBytes the actual secret
+   */
   def this(shares: Int, threshold: Int, secretBytes: Array[Byte]) = this(shares, threshold, secretBytes.toIndexedSeq, new SecureRandom)
 
+  /**
+   * Creates a new SecretSharing sheme with shares, threshold, password and a default secure random source.
+   *
+   * @param shares the number of shares
+   * @param threshold the number of shares required for the recovery of the secret bytes
+   * @param password the actual secret, will be encoded with UTF-8
+   */
   def this(shares: Int, threshold: Int, password: CharSequence) = this(shares, threshold, charSequenceToByteArray(password))
 
   val n: Int = shares
@@ -51,10 +87,14 @@ class SecretSharing(
 
   require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
   require(k <= n, "The threshold must be less than or equal to the number of shares.")
+  require(secretBytes.length >= 2, "Too few secret bytes.")
 
   val s: BigInt = bytes2BigInt(secretBytes)
   val randomGenerator: RandomGenerator = new RandomGenerator(random)
   val prime: BigInt = choosePrime
+
+  require((BigInt(n)*BigInt(n)) <= prime, "Too much shares for given secret.")
+
   val polynomial: Polynomial = choosePolynomial(k - 1)
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
 
@@ -87,6 +127,7 @@ class SecretSharing(
     val bits = s.bitLength * 2
     randomGenerator.bigIntStream(bits, prime)
       .filterNot(x => x == BigInt(0))
+      .distinct
       .take(shares)
       .map(x => (x, polynomial.evaluateAt(x)))
       .toIndexedSeq

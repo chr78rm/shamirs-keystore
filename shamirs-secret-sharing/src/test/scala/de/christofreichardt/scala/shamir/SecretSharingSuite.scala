@@ -118,7 +118,7 @@ class SecretSharingSuite extends MyFunSuite {
     assert(test)
   }
 
-  ignore(this, "Preconditions-5 (Distinct SharePoints)") {
+  testWithTracing(this, "Preconditions-5 (Distinct SharePoints)") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 2 // Bytes
     val trials = 100
