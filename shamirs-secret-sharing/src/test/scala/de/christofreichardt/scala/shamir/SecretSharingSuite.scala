@@ -20,10 +20,11 @@
 package de.christofreichardt.scala
 package shamir
 
+import de.christofreichardt.diagnosis.TracerFactory
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
-
 import de.christofreichardt.scala.utils.RandomGenerator
 import de.christofreichardt.scalatest.MyFunSuite
 
@@ -119,7 +120,7 @@ class SecretSharingSuite extends MyFunSuite {
   }
 
   testWithTracing(this, "Preconditions-5 (Distinct SharePoints)") {
-    val tracer = getCurrentTracer()
+    val tracer = TracerFactory.getInstance().getDefaultTracer
     val SECRET_SIZE = 2 // Bytes
     val trials = 100
     LazyList.from(1)

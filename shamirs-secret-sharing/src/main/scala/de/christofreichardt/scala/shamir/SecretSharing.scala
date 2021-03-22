@@ -19,16 +19,14 @@
 
 package de.christofreichardt.scala.shamir
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Path
-import java.security.SecureRandom
-import java.util.UUID
-
 import de.christofreichardt.scala.combinations.BinomialCombinator
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
-import javax.json.{Json, JsonArray, JsonObject}
 
+import java.nio.file.Path
+import java.security.SecureRandom
+import java.util.UUID
+import javax.json.{Json, JsonArray, JsonObject}
 import scala.annotation.tailrec
 
 /**
@@ -82,40 +80,86 @@ class SecretSharing(
    */
   def this(shares: Int, threshold: Int, password: CharSequence) = this(shares, threshold, charSequenceToByteArray(password))
 
+  /**
+   * an alias for shares
+   */
   val n: Int = shares
+  /**
+   * an alias for threshold
+   */
   val k: Int = threshold
 
   require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
   require(k <= n, "The threshold must be less than or equal to the number of shares.")
   require(secretBytes.length >= 2, "Too few secret bytes.")
 
+  /**
+   * the secret encoded as BigInt
+   */
   val s: BigInt = bytes2BigInt(secretBytes)
+  /**
+   * used to compute a LazyList of random BigInt numbers
+   */
   val randomGenerator: RandomGenerator = new RandomGenerator(random)
+  /**
+   * the modulus
+   */
   val prime: BigInt = choosePrime
 
   require((BigInt(n)*BigInt(n)) <= prime, "Too much shares for given secret.")
+  require(s < prime, "The encoded secret must be strictly smaller than the prime modulus.")
 
+  /**
+   * a random polynomial in the canonical form used to compute the shares
+   */
   val polynomial: Polynomial = choosePolynomial(k - 1)
+  /**
+   * the actual shares
+   */
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
 
   require(polynomial.degree == k - 1)
   require(this.sharePoints.map(point => point._1).distinct.length == n, String.format("%d distinct sharepoints are needed: %s", n, this.sharePoints))
 
+  /**
+   * the partition id
+   */
   val id: String = UUID.randomUUID().toString
+  /**
+   * all shares converted into a JSON object
+   */
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
+  /**
+   * indicates if the cross checks with all possible and valid combinations of shares have been successful
+   */
   lazy val verified: Boolean = verifyAll
 
+  /**
+   * Calculates a random prime p with the property s < p.
+   *
+   * @return a random prime
+   */
   def choosePrime: BigInt = {
     val BIT_OFFSET = 1
     val bits = s.bitLength + BIT_OFFSET
     BigInt(bits, CERTAINTY, random)
   }
 
+  /**
+   * Calculates a batch of coefficients needed for the polynomial in the canonical form.
+   * @return the random coefficients
+   */
   def chooseCanonicalCoefficients: IndexedSeq[BigInt] = {
     val bits = s.bitLength * 2
     randomGenerator.bigIntStream(bits, prime).take(k - 1).toIndexedSeq
   }
 
+  /**
+   * Chooses a random polynomial with the given degrre in the canonical form.
+   *
+   * @param degree the degree of the polynomial
+   * @return the random polynomial
+   */
   @tailrec
   final def choosePolynomial(degree: Int): Polynomial = {
     val candidate: Polynomial = new Polynomial(chooseCanonicalCoefficients :+ s, prime)
@@ -123,6 +167,11 @@ class SecretSharing(
     else choosePolynomial(degree)
   }
 
+  /**
+   * Computes the required number of random and distinct shares.
+   *
+   * @return the shares
+   */
   def computeShares: IndexedSeq[(BigInt, BigInt)] = {
     val bits = s.bitLength * 2
     randomGenerator.bigIntStream(bits, prime)
@@ -133,6 +182,11 @@ class SecretSharing(
       .toIndexedSeq
   }
 
+  /**
+   * Verifies that all valid combinations of shares recover the secret bytes.
+   *
+   * @return indicates the outcome of all possible and valid cross checks
+   */
   def verifyAll: Boolean = {
     val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, n), k)
     combinator.solutions
@@ -145,6 +199,12 @@ class SecretSharing(
       .forall(bytes => bytes == secretBytes)
   }
 
+  /**
+   * Translates the given shares into JSON.
+   *
+   * @param ps the shares
+   * @return the JSON containing the shares
+   */
   def sharePointsAsJson(ps: IndexedSeq[(BigInt, BigInt)]): JsonObject = {
     val arrayBuilder = Json.createArrayBuilder()
     ps.foreach(ps => {
@@ -180,6 +240,12 @@ class SecretSharing(
     partition(sizes, sharePoints, List())
   }
 
+  /**
+   * Partitions the shares according to the given sizes and converts the different slices containing the shares into a JSON array containing the slices as JSON objects.
+   *
+   * @param sizes denotes a partition
+   * @return the JSON array of slices containing the shares
+   */
   def partitionAsJson(sizes: Array[Int]): JsonArray = {
     val partition = sharePointPartition(sizes)
     val arrayBuilder = Json.createArrayBuilder()
@@ -188,6 +254,12 @@ class SecretSharing(
     arrayBuilder.build()
   }
 
+  /**
+   * Saves the desired partition. For technical reasons this method delivers the slices in reverse order as given by the sizes.
+   *
+   * @param sizes denotes the partition
+   * @param path the path to the partition file
+   */
   def savePartition(sizes: Iterable[Int], path: Path): Unit = {
     require(path.getParent.toFile.exists() && path.getParent.toFile.isDirectory)
     val prettyPrinter = new JsonPrettyPrinter
@@ -200,7 +272,17 @@ class SecretSharing(
       })
   }
 
+  /**
+   * A convenience method. Saves the partition in the order as given by the sizes.
+   *
+   * @param sizes denotes the partition
+   * @param path the path to the partition file
+   */
   def savePartition(sizes: Array[Int], path: Path): Unit = savePartition(sizes.reverse.toIterable, path)
 
+  /**
+   * Gives a textual representation of this particular secret sharing sheme.
+   * @return the textual representation
+   */
   override def toString: String = String.format("SecretSharing[shares=%d, threshold=%d, s=%s, polynomial=%s, sharePoints=(%s)]", shares: Integer, threshold: Integer, s, polynomial, sharePoints.mkString(","))
 }

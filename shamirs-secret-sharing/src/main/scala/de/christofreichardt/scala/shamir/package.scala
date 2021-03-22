@@ -60,6 +60,12 @@ package object shamir {
     check(items, Set.empty[T])
   }
 
+  /**
+   * Converts the given bytes into a non-negative BigInt number by padding 0x7F as head.
+   *
+   * @param bytes the to be converted bytes
+   * @return the resulting BigInt number
+   */
   def bytes2BigInt(bytes: IndexedSeq[Byte]): BigInt = {
     val paddedBytes = 0x7F.toByte +: bytes
     BigInt(paddedBytes.toArray)
