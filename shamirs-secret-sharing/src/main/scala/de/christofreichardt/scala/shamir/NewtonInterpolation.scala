@@ -24,12 +24,31 @@ import de.christofreichardt.diagnosis.AbstractTracer
 import de.christofreichardt.diagnosis.TracerFactory
 import scala.annotation.tailrec
 
+/**
+ * Implements Newtons interpolation algorithm. All calculations will be carried out by finite field algebra.
+ *
+ * @constructor Creates a new NewtonInterpolation by applying some supporting points and a prime number.
+ *
+ * @param supportingPoints some pairwise different supporting points
+ * @param prime a prime number
+ */
 class NewtonInterpolation(
   val supportingPoints: IndexedSeq[(BigInt, BigInt)],
   val prime:            BigInt) extends Tracing {
 
   require(prime.isProbablePrime(CERTAINTY), String.format("%s isn't prime.", prime))
   require(pairWiseDifferent(supportingPoints), "Supporting points must be pairwise different and unambiguous.")
+
+  /**
+   * n supporting points give a polynom of degree n - 1.
+   */
+  val degree = supportingPoints.length - 1
+
+  /**
+   * Creates lazily the NewtonPolynomial by computing the Newton Coefficients. For the definition of a NewtonPolynomial with degree n we need only n - 1 supporting points whereas
+   * all of them are needed for the computation of the coefficients.
+   */
+  lazy val newtonPolynomial: NewtonPolynomial = new NewtonPolynomial(degree, supportingPoints.take(supportingPoints.length - 1).map(p => p._1), computeCoefficients(), prime)
 
   def pairWiseDifferent(points: IndexedSeq[(BigInt, BigInt)]): Boolean = {
     @tailrec
@@ -130,7 +149,7 @@ class NewtonInterpolation(
     }
   }
   
-  override def toString = String.format("NewtonInterpolation[supportingPoints=(%s), prime=%s]", supportingPoints.mkString(","), prime)
+  override def toString: String = String.format("NewtonInterpolation[supportingPoints=(%s), prime=%s]", supportingPoints.mkString(","), prime)
 
   override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer
 

@@ -34,9 +34,7 @@ class SecretMerging(
   val prime:       BigInt) extends Tracing {
 
   val interpolation: NewtonInterpolation = new NewtonInterpolation(sharePoints, prime)
-  val coefficients: IndexedSeq[BigInt] = interpolation.computeCoefficients()
-  val degree: Int = sharePoints.length - 1
-  val newtonPolynomial: NewtonPolynomial = new NewtonPolynomial(degree, sharePoints.take(sharePoints.length - 1).map(p => p._1), coefficients, prime)
+  val newtonPolynomial: NewtonPolynomial = interpolation.newtonPolynomial
   val s: BigInt = newtonPolynomial.evaluateAt(BigInt(0))
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
   def password: Array[Char] = {

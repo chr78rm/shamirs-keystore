@@ -74,11 +74,11 @@ class NewtonInterpolationSuite extends MyFunSuite {
     val prime = BigInt(41)
     val ps = IndexedSeq((BigInt(5), BigInt(25)), (BigInt(22), BigInt(16)), (BigInt(17), BigInt(28)), (BigInt(31), BigInt(8)))
     val interpolation = new NewtonInterpolation(ps, prime)
-    val coefficients = interpolation.computeCoefficients()
-    tracer.out().printfIndentln("coefficients = (%s)", coefficients.mkString(","))
+    tracer.out().printfIndentln("interpolation = %s", interpolation)
     val DEGREE = 3
-    val newtonPolynomial = new NewtonPolynomial(DEGREE, ps.take(ps.length - 1).map(p => p._1), coefficients, prime) // for the definition of this Newton polynomial we need only three of the four points
+    val newtonPolynomial = interpolation.newtonPolynomial
     tracer.out().printfIndentln("newtonPolynomial = %s", newtonPolynomial)
+    assert(DEGREE == newtonPolynomial.degree)
     assert(ps.forall(p => newtonPolynomial.evaluateAt(p._1) == p._2))
   }
 
@@ -93,11 +93,10 @@ class NewtonInterpolationSuite extends MyFunSuite {
     val prime = BigInt(101)
     val ps = IndexedSeq((BigInt(3), BigInt(78)), (BigInt(22), BigInt(12)), (BigInt(27), BigInt(89)), (BigInt(31), BigInt(8)), (BigInt(72), BigInt(97)))
     val interpolation = new NewtonInterpolation(ps, prime)
-    val coefficients = interpolation.computeCoefficients()
-    tracer.out().printfIndentln("coefficients = (%s)", coefficients.mkString(","))
     val DEGREE = 4
-    val newtonPolynomial = new NewtonPolynomial(DEGREE, ps.take(ps.length - 1).map(p => p._1), coefficients, prime)
+    val newtonPolynomial = interpolation.newtonPolynomial
     tracer.out().printfIndentln("newtonPolynomial = %s", newtonPolynomial)
+    assert(DEGREE == newtonPolynomial.degree)
     assert(ps.forall(p => newtonPolynomial.evaluateAt(p._1) == p._2))
   }
 
@@ -106,7 +105,7 @@ class NewtonInterpolationSuite extends MyFunSuite {
    *
    * First, this test samples some random points by using the canonical form. Next
    * we feed this points into the interpolation algorithm to compute the
-   * Newton coefficients. Finally we compare the whole co-domain (inclusive the
+   * Newton Polynomial. Finally we compare the whole co-domain (inclusive the
    * original points) calculated by the Horner scheme against the results from
    * the canonical form.
    */
@@ -129,8 +128,7 @@ class NewtonInterpolationSuite extends MyFunSuite {
       .toIndexedSeq
     tracer.out().printfIndentln("points = %s", ps.mkString(","))
     val interpolation = new NewtonInterpolation(ps, prime)
-    val newtonCoefficients = interpolation.computeCoefficients()
-    val newtonPolynomial = new NewtonPolynomial(SAMPLES - 1, ps.take(SAMPLES - 1).map(p => p._1), newtonCoefficients, prime)
+    val newtonPolynomial = interpolation.newtonPolynomial
     assert(newtonPolynomial.degree == polynomial.degree)
     tracer.out().printfIndentln("newtonPolynomial = %s", newtonPolynomial)
     val coDomain = Range(0, prime).map(x => {
@@ -145,7 +143,7 @@ class NewtonInterpolationSuite extends MyFunSuite {
    *
    * Now we even compute a random polynom in canonical form with degree 8 and
    * sample some random points. Next we feed this points into the interpolation
-   * algorithm to compute the Newton coefficients. Finally we compare the whole
+   * algorithm to compute the Newton polynomial. Finally we compare the whole
    * co-domain (inclusive the original points) calculated by the Horner scheme
    * against the results from the canonical form.
    */
@@ -177,8 +175,7 @@ class NewtonInterpolationSuite extends MyFunSuite {
       .toIndexedSeq
     tracer.out().printfIndentln("points = %s", ps.mkString(","))
     val interpolation = new NewtonInterpolation(ps, prime)
-    val newtonCoefficients = interpolation.computeCoefficients()
-    val newtonPolynomial = new NewtonPolynomial(SAMPLES - 1, ps.take(SAMPLES - 1).map(p => p._1), newtonCoefficients, prime)
+    val newtonPolynomial = interpolation.newtonPolynomial
     assert(newtonPolynomial.degree == polynomial.degree)
     tracer.out().printfIndentln("newtonPolynomial = %s", newtonPolynomial)
     val coDomain = Range(0, prime.toInt).map(x => {
