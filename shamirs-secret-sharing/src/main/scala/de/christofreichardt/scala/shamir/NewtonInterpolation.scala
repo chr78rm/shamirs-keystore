@@ -30,23 +30,19 @@ import scala.annotation.tailrec
  * @constructor Creates a new NewtonInterpolation by applying some supporting points and a prime number.
  *
  * @param supportingPoints some pairwise different supporting points
- * @param prime a prime number
+ * @param prime            a prime number
  */
-class NewtonInterpolation(
-  val supportingPoints: IndexedSeq[(BigInt, BigInt)],
-  val prime:            BigInt) extends Tracing {
+class NewtonInterpolation(val supportingPoints: IndexedSeq[(BigInt, BigInt)], val prime: BigInt) extends Tracing {
 
   require(prime.isProbablePrime(CERTAINTY), String.format("%s isn't prime.", prime))
   require(pairWiseDifferent(supportingPoints), "Supporting points must be pairwise different and unambiguous.")
 
-  /**
-   * n supporting points give a polynom of degree n - 1.
-   */
-  val degree = supportingPoints.length - 1
+  /** n supporting points give a polynom of degree n - 1 */
+  val degree: Int = supportingPoints.length - 1
 
   /**
-   * Creates lazily the NewtonPolynomial by computing the Newton Coefficients. For the definition of a NewtonPolynomial with degree n we need only n - 1 supporting points whereas
-   * all of them are needed for the computation of the coefficients.
+   * Creates lazily the NewtonPolynomial by computing the Newton Coefficients. For the definition of a NewtonPolynomial with degree n - 1 we need only n - 1 x values projected
+   * from the supporting points whereas n of them are needed for the computation of the coefficients.
    */
   lazy val newtonPolynomial: NewtonPolynomial = new NewtonPolynomial(degree, supportingPoints.take(supportingPoints.length - 1).map(p => p._1), computeCoefficients(), prime)
 
@@ -60,15 +56,20 @@ class NewtonInterpolation(
         else check(ps.tail, xs + x)
       }
     }
+
     check(points, Set.empty[BigInt])
   }
 
   /**
-   * Computes (x(i) - x(0))*(x(i) - x(1))* ... *(x(i) - x(j)), i > j
-   * 
-   * Expressions of this form need to be computed during the calculation
+   * Computes below expression.
+   *
+   * <pre>
+   *   (x(i) - x(0))*(x(i) - x(1))* ... *(x(i) - x(j)), i > j
+   * </pre>
+   *
+   * Expressions of this form need to be evaluated during the calculation
    * of the Newton coefficients.
-   * 
+   *
    * @param i references the x-ccordinate of a supporting point (always in minuend position)
    * @param j denotes the upper index of the x-coordinates in subtrahend position 
    * @return the value of the term (mod prime)
@@ -82,29 +83,31 @@ class NewtonInterpolation(
         .map(k => {
           tracer.out().printfIndentln("xs(%d) = %s, xs(%d) = %s", i: Integer, xs(i), k: Integer, xs(k))
           (xs(i) - xs(k)).mod(prime)
-          })
+        })
         .foldLeft(BigInt(1))((x1, x2) => (x1 * x2).mod(prime))
     }
   }
 
   /**
    * Supporting points :=  (x(0), y(0)), ..., (x(n), y(n)).
-   * 
+   *
    * Computes the newton coefficients c(n)...c(0) by dynamic programming. 
-   * 
+   *
+   * <pre>
    *         y(n) - c(0) - c(1)*(x(n) - x(0)) - ... - c(n-1)*((x(n) - x(0))*...*(x(n) - x(n-2))
    * c(n) := ---------------------------------------------------------------------------------- (mod prime)
-   *                            (x(n) - x(0))* ... *(x(n) - x(n-1))
-   *                             
+   *                             (x(n) - x(0))* ... *(x(n) - x(n-1))
+   *
    *         y(1) - c(0)
    * c(1) := ----------- (mod prime)
    *         x(1) - x(0)
-   *         
+   *
    * c(0) := y(0) (mod prime)
-   * 
+   * </pre>
+   *
    * Following applies: (n + 1) == number of supporting points. This gives a polynom of degree n 
    * with (n + 1) Newton coefficients.
-   * 
+   *
    * @return the calculated newton coefficients
    */
   def computeCoefficients(): IndexedSeq[BigInt] = {
@@ -148,7 +151,7 @@ class NewtonInterpolation(
       Range(0, supportingPoints.length).map(i => memoCoefficients(i))
     }
   }
-  
+
   override def toString: String = String.format("NewtonInterpolation[supportingPoints=(%s), prime=%s]", supportingPoints.mkString(","), prime)
 
   override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer

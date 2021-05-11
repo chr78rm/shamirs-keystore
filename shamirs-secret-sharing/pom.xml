@@ -85,6 +85,19 @@
 				<version>${scala-maven-plugin.version}</version>
 				<executions>
 					<execution>
+						<!-- use mvn scala:doc@Scaladoc to generate the documentation -->
+						<id>Scaladoc</id>
+						<goals>
+							<goal>doc</goal>
+						</goals>
+						<configuration>
+							<args>
+								<arg>-no-link-warnings</arg>
+							</args>
+						</configuration>
+					</execution>
+					<execution>
+						<id>Scalac</id>
 						<goals>
 							<goal>compile</goal>
 							<goal>testCompile</goal>

@@ -19,24 +19,41 @@
 
 package de.christofreichardt.scala.shamir
 
+import de.christofreichardt.scala.diagnosis.Tracing
+
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-
-import de.christofreichardt.scala.diagnosis.Tracing
 import javax.json.{Json, JsonArray, JsonObject}
-
 import scala.jdk.CollectionConverters
 
+/**
+ * Recovers the original secret bytes by combining the given shares.
+ *
+ * @constructor Creates a immutable `SecretMerging` instance.
+ *
+ * @param sharePoints the shares
+ * @param prime the prime modulus
+ */
 class SecretMerging(
-  val sharePoints: IndexedSeq[(BigInt, BigInt)],
-  val prime:       BigInt) extends Tracing {
+                     val sharePoints: IndexedSeq[(BigInt, BigInt)],
+                     val prime: BigInt) extends Tracing {
 
+  /** Newtons interpolation method */
   val interpolation: NewtonInterpolation = new NewtonInterpolation(sharePoints, prime)
+  /** The interpolated NewtonPolynomial */
   val newtonPolynomial: NewtonPolynomial = interpolation.newtonPolynomial
+  /** the (recovered) encoded secret */
   val s: BigInt = newtonPolynomial.evaluateAt(BigInt(0))
+  /** the actual (recovered) secret bytes */
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
+
+  /**
+   * Computes a character sequence from the recovered secret bytes by applying UTF-8 encoding.
+   *
+   * @return the decoded password
+   */
   def password: Array[Char] = {
     val byteBuffer = ByteBuffer.wrap(this.secretBytes.toArray)
     val charBuffer = StandardCharsets.UTF_8.newDecoder().decode(byteBuffer)
@@ -44,10 +61,27 @@ class SecretMerging(
   }
 }
 
+/**
+ * This object provides some operations to create `SecretMerging` instances.
+ */
 object SecretMerging {
 
+  /**
+   * Directly calls the `SecretMerging` primary constructor.
+   *
+   * @param sharePoints the shares
+   * @param prime the prime modulus
+   *
+   * @return the immutable `SecretMerging` instance
+   */
   def apply(sharePoints: IndexedSeq[(BigInt, BigInt)], prime: BigInt): SecretMerging = new SecretMerging(sharePoints, prime)
 
+  /**
+   * Evaluates a JSON file containing shares needed to recover the secret.
+   *
+   * @param path the path to the JSON file
+   * @return the immutable `SecretMerging` instance
+   */
   def apply(path: Path): SecretMerging = {
     val jsonObject = {
       val fileIn = new FileInputStream(path.toFile)
@@ -68,6 +102,12 @@ object SecretMerging {
     new SecretMerging(ps.take(threshold), prime)
   }
 
+  /**
+   * Combines several JSON files containing shares needed to recover the secret.
+   *
+   * @param paths the paths to the JSON files
+   * @return the immutable `SecretMerging` instance
+   */
   def apply(paths: Iterable[Path]): SecretMerging = {
     val jsonObjects = paths.map(
       path => {
@@ -99,8 +139,20 @@ object SecretMerging {
     new SecretMerging(ps.take(threshold), prime)
   }
 
+  /**
+   * Combines several JSON files containing shares needed to recover the secret.
+   *
+   * @param paths the paths to the JSON files
+   * @return the immutable `SecretMerging` instance
+   */
   def apply(paths: Array[Path]): SecretMerging = apply(paths.toIterable)
 
+  /**
+   * Combines JsonObjects each containing a slice of shares needed to recover the secret.
+   *
+   * @param slices the JsonArray containing the slices
+   * @return the immutable `SecretMerging` instance
+   */
   def apply(slices: JsonArray): SecretMerging = {
     val iter = CollectionConverters.IteratorHasAsScala(slices.iterator()).asScala
     val jsonObjects = iter.map(jsonValue => jsonValue.asJsonObject()).toIndexedSeq

@@ -22,6 +22,9 @@ package de.christofreichardt.scala
 import java.nio.CharBuffer
 import java.nio.charset.StandardCharsets
 
+/**
+ * Contains the core classes needed for sharing or merging of secrets.
+ */
 package object shamir {
 
   import scala.annotation.tailrec
@@ -61,21 +64,33 @@ package object shamir {
   }
 
   /**
-   * Converts the given bytes into a non-negative BigInt number by padding 0x7F as head.
+   * Converts the given bytes into a non-negative `BigInt` number by padding 0x7F upfront.
    *
    * @param bytes the to be converted bytes
-   * @return the resulting BigInt number
+   * @return the resulting non-negative BigInt number
    */
   def bytes2BigInt(bytes: IndexedSeq[Byte]): BigInt = {
     val paddedBytes = 0x7F.toByte +: bytes
     BigInt(paddedBytes.toArray)
   }
 
+  /**
+   * Converts the given `BigInt` number into bytes by discarding the leading byte.
+   *
+   * @param s the to be converted `BigInt` number
+   * @return the resulting bytes
+   */
   def bigIntToBytes(s: BigInt): IndexedSeq[Byte] = {
     val paddedBytes = s.toByteArray
     paddedBytes.tail.toIndexedSeq
   }
 
+  /**
+   * Encodes a given character sequence as bytes ba applying UTF-8 encoding.
+   *
+   * @param charSequence the to be encoded characters
+   * @return the encoded character sequence
+   */
   def charSequenceToByteArray(charSequence: CharSequence): Array[Byte] = {
     val charBuffer = CharBuffer.wrap(charSequence)
     val encoder = StandardCharsets.UTF_8.newEncoder()

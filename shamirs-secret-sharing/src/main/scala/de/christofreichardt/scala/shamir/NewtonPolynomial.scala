@@ -22,6 +22,15 @@ package de.christofreichardt.scala.shamir
 import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
 
+/**
+ * Defines a Newton Polynomial.
+ *
+ * @constructor Creates an instance of a Newton Polynomial suitable for calculations using finite field algebra.
+ * @param degree the degree of the polynomial
+ * @param basis the Newton basis polynomials
+ * @param coefficients The Newton coefficients
+ * @param prime the prime modulus
+ */
 class NewtonPolynomial(
   val degree:       Int,
   val basis:        IndexedSeq[BigInt],  
@@ -29,11 +38,18 @@ class NewtonPolynomial(
   val prime:        BigInt) extends Tracing {
 
   require(prime.isProbablePrime(CERTAINTY))
+
+  /** alias for `degree` */
   val n: Int = degree
+
   require(basis.length == n)
   require(coefficients.length == n + 1)
+
+  /** the residues of the `coefficients` mod `prime` */
   val c: Seq[BigInt] = coefficients.map(b => b.mod(prime))
+  /** the residues of the `basis` mod `prime` */
   val xx: Seq[BigInt] = basis.map(b => b.mod(prime))
+
   require(pairwiseDifferent(xx.toList), "Basis values must be pairwise different.")
 
   def pairwiseDifferent(values: List[BigInt]): Boolean = {
@@ -45,6 +61,12 @@ class NewtonPolynomial(
     }
   }
 
+  /**
+   * Computes y = P(x).
+   *
+   * @param x the x value
+   * @return the y value
+   */
   def evaluateAt(x: BigInt): BigInt = {
     val tracer = getCurrentTracer()
 
@@ -60,6 +82,11 @@ class NewtonPolynomial(
     }
   }
 
+  /**
+   * Returns a string representation of the NewtonPolynomial.
+   *
+   * @return the string representation of the NewtonPolynomial
+   */
   override def toString: String = String.format("NewtonPolynomial[degree=%d, c=(%s), x=(%s), prime=%s]", n: Integer, c.mkString(","), xx.mkString(","), prime)
 
   override def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer

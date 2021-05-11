@@ -42,10 +42,10 @@ class NewtonInterpolationSuite extends MyFunSuite {
    */
   testWithTracing(this, "Preconditions-2") {
     val tracer = getCurrentTracer()
-    val prime = BigInt(6)
-    val violatingPreconditionPoints: IndexedSeq[(BigInt, BigInt)] = IndexedSeq((BigInt(5), BigInt(25)), (BigInt(4), BigInt(16)), (BigInt(6), BigInt(30)))
+    val badPrime = BigInt(6)
+    val ps: IndexedSeq[(BigInt, BigInt)] = IndexedSeq((BigInt(5), BigInt(25)), (BigInt(4), BigInt(16)), (BigInt(6), BigInt(30)))
     val caught = intercept[IllegalArgumentException] {
-      new NewtonInterpolation(violatingPreconditionPoints, prime)
+      new NewtonInterpolation(ps, badPrime)
     }
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }

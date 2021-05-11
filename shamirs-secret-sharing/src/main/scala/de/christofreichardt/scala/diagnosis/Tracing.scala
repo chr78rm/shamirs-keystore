@@ -23,9 +23,19 @@ import de.christofreichardt.diagnosis.TracerFactory
 import de.christofreichardt.diagnosis.AbstractTracer
 
 trait Tracing {
-	def withTracer[T](resultTypeAsString: String, callee: AnyRef, methodSignature: String)(block: => T): T = {
+  /**
+   * Can be used to generate tracing output for methods.
+   *
+   * @param resultType denotes the return type
+   * @param callee the call site
+   * @param method denotes the method signature
+   * @param block the embraced code block
+   * @tparam T the actual type of the embraced code block
+   * @return returns whatever block returns
+   */
+	def withTracer[T](resultType: String, callee: AnyRef, method: String)(block: => T): T = {
 	  val tracer = getCurrentTracer()
-	  tracer.entry(resultTypeAsString, callee, methodSignature)
+	  tracer.entry(resultType, callee, method)
     try {
       block
     }
@@ -33,6 +43,11 @@ trait Tracing {
       tracer.wayout()
     }
 	}
-	
+
+  /**
+   * Returns the present tracer for this object.
+   *
+   * @return the current tracer
+   */
 	def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer()
 }
