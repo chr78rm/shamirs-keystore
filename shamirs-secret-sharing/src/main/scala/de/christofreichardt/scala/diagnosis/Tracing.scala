@@ -22,9 +22,12 @@ package de.christofreichardt.scala.diagnosis
 import de.christofreichardt.diagnosis.TracerFactory
 import de.christofreichardt.diagnosis.AbstractTracer
 
+/**
+ * Contains some add-ons for the <a href="http://www.christofreichardt.de/Projektstudien/TraceLogger/index.html">TraceLogger</a> library.
+ */
 trait Tracing {
   /**
-   * Can be used to generate tracing output for methods.
+   * Custom control structure for tracing of embraced code blocks.
    *
    * @param resultType denotes the return type
    * @param callee the call site
@@ -47,7 +50,7 @@ trait Tracing {
   /**
    * Returns the present tracer for this object.
    *
-   * @return the current tracer
+   * @return the current tracer, by default the NullTracer
    */
 	def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer()
 }

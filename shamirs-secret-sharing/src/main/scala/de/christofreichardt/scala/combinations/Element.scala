@@ -19,6 +19,15 @@
 
 package de.christofreichardt.scala.combinations
 
+/**
+ * Acts as container for items which can either be SELECTED, DISCARDED or unprocessed (NEITHER).
+ *
+ * @constructor Creates a SELECTED, DISCARDED or unprocessed (NEITHER) Element.
+ *
+ * @param item the item
+ * @param state SELECTED, DISCARDED or unprocessed (NEITHER)
+ * @tparam T the type of the item
+ */
 class Element[T](val item: T, val state: State.Value) {
   override def toString: String = state.toString + "(" + item.toString + ")"
 }

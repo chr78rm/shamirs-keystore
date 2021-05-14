@@ -80,38 +80,40 @@ class SecretSharing(
    */
   def this(shares: Int, threshold: Int, password: CharSequence) = this(shares, threshold, charSequenceToByteArray(password))
 
-  /** an alias for shares */
+  /** An alias for shares */
   val n: Int = shares
-  /** an alias for threshold */
+  /** An alias for threshold */
   val k: Int = threshold
 
   require(n >= 2 && k >= 2, "We need at least two shares, otherwise we wouldn't need shares at all.")
   require(k <= n, "The threshold must be less than or equal to the number of shares.")
   require(secretBytes.length >= 2, "Too few secret bytes.")
 
-  /** the secret encoded as BigInt */
+  /** The secret encoded as non-negative BigInt */
   val s: BigInt = bytes2BigInt(secretBytes)
-  /** used to compute a LazyList of random BigInt numbers */
+  /** Used to compute a LazyList of random BigInt numbers */
   val randomGenerator: RandomGenerator = new RandomGenerator(random)
-  /** the modulus */
+  /** The prime modulus */
   val prime: BigInt = choosePrime
 
   require((BigInt(n)*BigInt(n)) <= prime, "Too much shares for given secret.")
   require(s < prime, "The encoded secret must be strictly smaller than the prime modulus.")
 
-  /** a random polynomial in the canonical form used to compute the shares */
+  /** A random polynomial in the canonical form used to compute the shares */
   val polynomial: Polynomial = choosePolynomial(k - 1)
-  /** the actual shares */
+  /** The actual shares */
   val sharePoints: IndexedSeq[(BigInt, BigInt)] = computeShares
 
   require(polynomial.degree == k - 1)
   require(this.sharePoints.map(point => point._1).distinct.length == n, String.format("%d distinct sharepoints are needed: %s", n, this.sharePoints))
 
-  /** the partition id */
+  /** The partition id */
   val id: String = UUID.randomUUID().toString
-  /** all shares converted into a JSON object */
+  /** All shares converted into a JSON object */
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
-  /** indicates if the cross checks with all possible and valid combinations of shares have been successful */
+  /**
+   * Indicates if cross checks with all possible and valid combinations of shares have been successful. This is a potentially expensive operation.
+   */
   lazy val verified: Boolean = verifyAll
 
   /**

@@ -22,6 +22,15 @@ package de.christofreichardt.scala.combinations
 import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
 
+/**
+ * A particular combination of either selected, discarded or unprocessed items.
+ *
+ * @constructor Creates a particular combination.
+ *
+ * @param elements the items
+ * @param k the number of to be selected items
+ * @tparam T the type of the items
+ */
 class Combination[T](val elements: IndexedSeq[Element[T]], val k: Int) extends Tracing {
   require(k >= 0)
   require(elements.dropWhile(elem => elem.state == State.SELECTED || elem.state == State.DISCARDED).forall(elem => elem.state == State.NEITHER))
@@ -29,8 +38,8 @@ class Combination[T](val elements: IndexedSeq[Element[T]], val k: Int) extends T
   val start: Int = elements.size - elements.dropWhile(elem => elem.state == State.SELECTED || elem.state == State.DISCARDED).size
   require(start <= elements.size)
 
-  val n = elements.dropWhile(elem => elem.state == State.SELECTED || elem.state == State.DISCARDED).size
-  require(n >= k)
+  val remaining = elements.dropWhile(elem => elem.state == State.SELECTED || elem.state == State.DISCARDED).size
+  require(remaining >= k)
 
   def selectFirst(): Combination[T] = {
     withTracer("Combination[T]", this, "selectFirst()") {
@@ -62,6 +71,6 @@ class Combination[T](val elements: IndexedSeq[Element[T]], val k: Int) extends T
 //  }
 
   override def toString: String = {
-    String.format("Combination[n=%d, k=%d, start=%d, elements=%s]", n, k, start, elements.mkString(","))
+    String.format("Combination[remaining=%d, k=%d, start=%d, elements=%s]", remaining, k, start, elements.mkString(","))
   }
 }
