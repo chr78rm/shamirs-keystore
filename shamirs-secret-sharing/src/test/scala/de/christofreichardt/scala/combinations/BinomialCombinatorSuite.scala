@@ -22,6 +22,7 @@ package de.christofreichardt.scala.combinations
 import de.christofreichardt.scalatest.MyFunSuite
 
 class BinomialCombinatorSuite extends MyFunSuite {
+
   testWithTracing(this, "BinomialCombinator(IndexedSeq(1,2,3,4), 2)") {
     val tracer = getCurrentTracer()
     val items = IndexedSeq(1,2,3,4)
@@ -92,5 +93,42 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val solutions = binomialCombinator.produce
     tracer.out().printfIndentln("size = %d", binomialCombinator.solutions.size)
     assert(binomialCombinator.solutions.size == 15504)
+  }
+
+  testWithTracing(this, "BinomialCombinator(IndexedSeq(1,2,3,4,), 0)") {
+    val tracer = getCurrentTracer()
+    val items = IndexedSeq(1,2,3,4)
+    val n = items.size
+    val k = 0
+    val binomialCombinator: BinomialCombinator[Int] = new BinomialCombinator[Int](items, k)
+    tracer.out().printfIndentln("binomialCombinator = %s", binomialCombinator)
+    assert(binomialCombinator.combination.start == 0)
+    val solutions = binomialCombinator.produce
+    tracer.out().printfIndentln("size = %d", binomialCombinator.solutions.size)
+    assert(binomialCombinator.solutions.size == 1)
+  }
+
+  testWithTracing(this, "BinomialCombinator(IndexedSeq(1,2,3,4,), 4)") {
+    val tracer = getCurrentTracer()
+    val items = IndexedSeq(1,2,3,4)
+    val n = items.size
+    val k = 4
+    val binomialCombinator: BinomialCombinator[Int] = new BinomialCombinator[Int](items, k)
+    tracer.out().printfIndentln("binomialCombinator = %s", binomialCombinator)
+    assert(binomialCombinator.combination.start == 0)
+    val solutions = binomialCombinator.produce
+    tracer.out().printfIndentln("size = %d", binomialCombinator.solutions.size)
+    assert(binomialCombinator.solutions.size == 1)
+  }
+
+  testWithTracing(this, "BinomialCombinator(IndexedSeq(1,2,3,4,), 5)") {
+    val tracer = getCurrentTracer()
+    val items = IndexedSeq(1,2,3,4)
+    val n = items.size
+    val k = 5
+    val caught = intercept[IllegalArgumentException] {
+      val binomialCombinator: BinomialCombinator[Int] = new BinomialCombinator[Int](items, k)
+    }
+    tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
 }

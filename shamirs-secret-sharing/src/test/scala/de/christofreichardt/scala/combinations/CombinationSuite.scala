@@ -29,7 +29,7 @@ class CombinationSuite extends MyFunSuite {
     val k = 2
     val combination = new Combination(elements, k)
     tracer.out().printfIndentln("combination = %s", combination)
-    assert(combination.n == items.size)
+    assert(combination.remaining == items.size)
     assert(combination.k == k)
   }
 
@@ -40,7 +40,7 @@ class CombinationSuite extends MyFunSuite {
     val k = 2
     val combination = new Combination(elements, k).selectFirst()
     tracer.out().printfIndentln("combination = %s", combination)
-    assert(combination.n == items.size - 1)
+    assert(combination.remaining == items.size - 1)
     assert(combination.k == k - 1)
   }
 
@@ -61,7 +61,7 @@ class CombinationSuite extends MyFunSuite {
     val k = 2
     val combination = new Combination(elements, k).discardFirst()
     tracer.out().printfIndentln("combination = %s", combination)
-    assert(combination.n == items.size - 1)
+    assert(combination.remaining == items.size - 1)
     assert(combination.k == k)
   }
 
