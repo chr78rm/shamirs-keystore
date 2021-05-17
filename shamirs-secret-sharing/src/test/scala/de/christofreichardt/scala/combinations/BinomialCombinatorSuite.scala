@@ -131,4 +131,26 @@ class BinomialCombinatorSuite extends MyFunSuite {
     }
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
+
+  testWithTracing(this, "LazyBinomialCombinator(6, 3)") {
+    val tracer = getCurrentTracer()
+    val n = 6
+    val k = 3
+    val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
+    tracer.out().printfIndentln("lazyBinomialCombinator.firstSolution = [%s]", lazyBinomialCombinator.firstSolution.mkString(","))
+    val solutions = lazyBinomialCombinator.solutions(lazyBinomialCombinator.firstSolution)
+    solutions.foreach(solution => tracer.out().printfIndentln("solution = %s", solution.mkString(",")))
+    tracer.out().printfIndentln("solutions.size = %d", solutions.size)
+  }
+
+  testWithTracing(this, "LazyBinomialCombinator(10, 5)") {
+    val tracer = getCurrentTracer()
+    val n = 10
+    val k = 5
+    val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
+    tracer.out().printfIndentln("lazyBinomialCombinator.firstSolution = [%s]", lazyBinomialCombinator.firstSolution.mkString(","))
+    val solutions = lazyBinomialCombinator.solutions(lazyBinomialCombinator.firstSolution)
+    solutions.foreach(solution => tracer.out().printfIndentln("solution = %s", solution.mkString(",")))
+    tracer.out().printfIndentln("solutions.size = %d", solutions.size)
+  }
 }
