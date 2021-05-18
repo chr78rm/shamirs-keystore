@@ -20,16 +20,14 @@
 package de.christofreichardt.scala
 package shamir
 
-import java.nio.charset.StandardCharsets
-
-import de.christofreichardt.scalatest.MyFunSuite
+import de.christofreichardt.scala.combinations.LazyBinomialCombinator
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
-import java.security.SecureRandom
+import de.christofreichardt.scalatest.MyFunSuite
+
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-
-import de.christofreichardt.scala.combinations.BinomialCombinator
+import java.security.SecureRandom
 import javax.json.Json
-
 import scala.jdk.CollectionConverters
 
 class SecretMergingSuite extends MyFunSuite {
@@ -235,7 +233,7 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("caught.getMessage = %s", caught.getMessage)
   }
 
-  testWithTracing(this, "Exhaustive-Verification-1") {
+  testWithTracing(this, "Exhaustive-Verification-1 (n=8, k=4)") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes
     val SHARES = 8
@@ -248,7 +246,7 @@ class SecretMergingSuite extends MyFunSuite {
     assert(secretSharing.verified)
   }
 
-  testWithTracing(this, "Exhaustive-Verification-2") {
+  testWithTracing(this, "Exhaustive-Verification-2 (n=12, k=6)") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes
     val SHARES = 12
@@ -261,21 +259,21 @@ class SecretMergingSuite extends MyFunSuite {
     assert(secretSharing.verified)
   }
 
-  //
-  // Takes several minutes to complete.
-  //
-  //  testWithTracing(this, "Exhaustive-Verification-3") {
-  //    val tracer = getCurrentTracer()
-  //    val SECRET_SIZE = 16 // Bytes
-  //    val SHARES = 16
-  //    val THRESHOLD = 8
-  //    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
-  //    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
-  //    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
-  //    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-  //    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
-  //    assert(secretSharing.verified)
-  //  }
+  /*
+   * Somewhat expensive
+   */
+  ignore(this, "Exhaustive-Verification-3 (n=16, k=8)") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 16
+    val THRESHOLD = 8
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
+    assert(secretSharing.verified)
+  }
 
   /*
    * Merging with one sharepoint less than the required threshold must not produce the
@@ -290,9 +288,8 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, SHARES), THRESHOLD - 1)
-    tracer.out().printfIndentln("size = %d", combinator.solutions.size)
-    val falsified = combinator.solutions
+    val lazyCombinator = new LazyBinomialCombinator(SHARES, THRESHOLD - 1)
+    val falsified = lazyCombinator.produceAll
       .map(combination => {
         val indices = combination
         val selectedPoints = indices.map(index => secretSharing.sharePoints(index))

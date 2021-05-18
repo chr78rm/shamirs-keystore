@@ -19,7 +19,7 @@
 
 package de.christofreichardt.scala.shamir
 
-import de.christofreichardt.scala.combinations.BinomialCombinator
+import de.christofreichardt.scala.combinations.LazyBinomialCombinator
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 
@@ -170,8 +170,8 @@ class SecretSharing(
    * @return indicates the outcome of all possible and valid cross checks
    */
   def verifyAll: Boolean = {
-    val combinator = new BinomialCombinator[Int](IndexedSeq.range(0, n), k)
-    combinator.solutions
+    val combinator = new LazyBinomialCombinator(this.n, this.k)
+    combinator.produceAll
       .map(combination => {
         val indices = combination
         val selectedPoints = indices.map(index => sharePoints(index))
