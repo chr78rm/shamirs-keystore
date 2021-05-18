@@ -42,8 +42,8 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<encoding>UTF-8</encoding>
-		<scala.version>2.13.5</scala.version>
-		<scalatest.version>3.2.5</scalatest.version>
+		<scala.version>2.13.6</scala.version>
+		<scalatest.version>3.2.7</scalatest.version>
 		<scala-maven-plugin.version>4.5.1</scala-maven-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.0.2</scalatest-maven-plugin.version>
