@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2020, Christof Reichardt
+ * Copyright (C) 2017, 2021, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,12 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * Protects a {@link KeyStore KeyStore} instance and its entries by applying Shamirs Secret Sharing algorithm. Passwords have been
+ * splitted into several secret shares and have to been merged again to recover the original password. In order to create
+ * a {@code ShamirsProtection} instance someone has to provide access to a certain subset of secret shares, e.g. paths to different
+ * slices (JSON files) of shares.
+ */
 public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroyable {
     private final char[] password;
     private boolean destroyed = false;
@@ -42,10 +48,20 @@ public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroya
         this.password = mergePassword(paths);
     }
 
+    /**
+     * Creates a Shamir protection parameter by providing the paths to the different slices containing the shares.
+     *
+     * @param paths a {@code Collection} of {@code Path}s pointing to the JSON files (slices) containing the shares
+     */
     public ShamirsProtection(Collection<Path> paths) {
         this(paths.toArray(new Path[0]));
     }
 
+    /**
+     * Creates a Shamir protection parameter by providing a {@link JsonArray JsonArray} comprising slices of secret shares.
+     *
+     * @param slices a {@link JsonArray JsonArray} comprising slices of secret shares
+     */
     public ShamirsProtection(JsonArray slices) {
         this.password = mergePassword(slices);
     }
@@ -58,6 +74,11 @@ public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroya
         return SecretMerging.apply(slices).password();
     }
 
+    /**
+     * Returns the recovered password, provided that the instance hasn't been destroyed.
+     *
+     * @return the recovered password
+     */
     public char[] getPassword() {
         if (destroyed) {
             throw new IllegalStateException("Password has been cleared.");

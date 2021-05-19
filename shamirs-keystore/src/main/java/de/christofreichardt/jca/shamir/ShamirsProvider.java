@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2020, Christof Reichardt
+ * Copyright (C) 2017, 2021, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,24 @@
 
 package de.christofreichardt.jca.shamir;
 
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.ProviderException;
 
-public final class ShamirsProvider extends java.security.Provider {
+/**
+ * A {@link Provider Provider} for the Java Security API allocating a {@link KeyStore KeyStore} instance of type {@code ShamirsKeystore}.
+ */
+public final class ShamirsProvider extends Provider {
 
 	private static final long serialVersionUID = 1L;
+
+	/** the provider name */
 	public static final String NAME = "Christofs Crypto Lib";
 
+	/**
+	 * Constructs the specific {@link Provider Provider}. Such an instance is required to install the provider within an application.
+	 */
 	public ShamirsProvider() {
 		super(NAME, "0.0.1", "A pkcs12 KeyStore implementation which supports shared passwords.");
 		put("KeyStore.ShamirsKeystore", "de.christofreichardt.jca.shamir.ShamirsKeystore");
@@ -34,7 +44,7 @@ public final class ShamirsProvider extends java.security.Provider {
 
 	private static final class ProviderService extends Service {
 
-		public ProviderService(java.security.Provider provider, String type, String algorithm, String className) {
+		public ProviderService(Provider provider, String type, String algorithm, String className) {
 			super(provider, type, algorithm, className, null, null);
 		}
 

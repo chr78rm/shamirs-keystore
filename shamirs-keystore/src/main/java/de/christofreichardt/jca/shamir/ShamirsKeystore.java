@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2020, Christof Reichardt
+ * Copyright (C) 2017, 2021, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,21 @@ import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Enumeration;
 
+/**
+ * The actual implementation of the JCA engine class {@link KeyStoreSpi KeyStoreSpi}. This interpretation uses some specific
+ * {@link KeyStore.LoadStoreParameter KeyStore.LoadStoreParameter} and {@link KeyStore.ProtectionParameter KeyStore.ProtectionParameter} classes, see
+ * {@link ShamirsLoadParameter ShamirsLoadParameter} and {@link ShamirsProtection ShamirsProtection}. The idea is that the password required to
+ * load the KeyStore has been splitted by Shamirs Secret Sharing algorithm into several secret shares. Some subset of these shares is needed to
+ * recover the original password. Those methods which aren't expecting one of the protection parameter simply delegate to the underlying
+ * PKCS#12 KeyStore implementation of the JDK.
+ */
 public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 
     private KeyStore keyStore;
 
+    /**
+     * Creates a PKCS#12 KeyStore instance provided by the Java platform.
+     */
     public ShamirsKeystore() {
         super();
         try {
@@ -90,6 +101,18 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
         this.keyStore.setKeyEntry(alias, key, chain);
     }
 
+    /**
+     * This method expects a {@link ShamirsProtection ShamirsProtection} instance as {@link KeyStore.ProtectionParameter KeyStore.ProtectionParameter}. Otherwise
+     * an {@link IllegalArgumentException IllegalArgumentException} will be thrown. After the recovering of the password the underlying PKCS#12 Keystore of the
+     * JDK will be called.
+     *
+     * @param alias get the {@link KeyStore.Entry KeyStore.Entry} for this alias
+     * @param protectionParameter the {@link ShamirsProtection ShamirsProtection} used to protect this entry
+     * @return the {@link KeyStore.Entry KeyStore.Entry} for the specified alias, or null if there is no such entry
+     * @throws KeyStoreException if the operation failed
+     * @throws NoSuchAlgorithmException if the algorithm for recovering the entry cannot be found, that would be an algorithm for password based encryption
+     * @throws UnrecoverableEntryException if the key entry cannot be recovered, e.g. the specified {@code protectionParameter} were insufficient or invalid
+     */
     @Override
     public KeyStore.Entry engineGetEntry(String alias, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
         KeyStore.Entry entry;
@@ -108,6 +131,16 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
         return entry;
     }
 
+    /**
+     * This method expects a {@link ShamirsProtection ShamirsProtection} instance as {@link KeyStore.ProtectionParameter KeyStore.ProtectionParameter}. Otherwise
+     * an {@link IllegalArgumentException IllegalArgumentException} will be thrown. After the recovering of the password the underlying PKCS#12 Keystore of the
+     * JDK will be called.
+     *
+     * @param alias save the {@link KeyStore.Entry KeyStore.Entry} under this alias
+     * @param entry the {@link KeyStore.Entry KeyStore.Entry} to save
+     * @param protectionParameter the {@link ShamirsProtection ShamirsProtection} used to protect the Entry
+     * @throws KeyStoreException if this operation fails
+     */
     @Override
     public void engineSetEntry(String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protectionParameter) throws KeyStoreException {
         if (!(protectionParameter instanceof ShamirsProtection)) {
@@ -192,6 +225,16 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
         }
     }
 
+    /**
+     * This method expects a {@link ShamirsLoadParameter ShamirsLoadParameter} instance as {@link KeyStore.LoadStoreParameter KeyStore.LoadStoreParameter}. Otherwise
+     * an {@link IllegalArgumentException IllegalArgumentException} will be thrown. After the recovering of the password the underlying PKCS#12 Keystore of the
+     * JDK will be called.
+     *
+     * @param loadStoreParameter the {@link ShamirsLoadParameter ShamirsLoadParameter} that specifies how to store the keystore
+     * @throws IOException if there was an I/O problem with data
+     * @throws NoSuchAlgorithmException if the appropriate data integrity algorithm could not be found
+     * @throws CertificateException if any of the certificates included in the keystore data could not be stored
+     */
     @Override
     public void engineStore(LoadStoreParameter loadStoreParameter) throws IOException, NoSuchAlgorithmException, CertificateException {
         if (!(loadStoreParameter instanceof ShamirsLoadParameter)) {
@@ -215,6 +258,16 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
         this.keyStore.load(stream, password);
     }
 
+    /**
+     * This method expects a {@link ShamirsLoadParameter ShamirsLoadParameter} instance as {@link KeyStore.LoadStoreParameter KeyStore.LoadStoreParameter}. Otherwise
+     * an {@link IllegalArgumentException IllegalArgumentException} will be thrown. After the recovering of the password the underlying PKCS#12 Keystore of the
+     * JDK will be called.
+     *
+     * @param loadStoreParameter the {@link ShamirsLoadParameter ShamirsLoadParameter} that specifies how to load the keystore
+     * @throws IOException if there is an I/O or format problem with the keystore data or if the recovered password was incorrect
+     * @throws NoSuchAlgorithmException if the algorithm used to check the integrity of the keystore cannot be found
+     * @throws CertificateException if any of the certificates in the keystore could not be loaded
+     */
     @Override
     public void engineLoad(LoadStoreParameter loadStoreParameter) throws IOException, NoSuchAlgorithmException, CertificateException {
         AbstractTracer tracer = getCurrentTracer();
@@ -249,6 +302,11 @@ public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
         }
     }
 
+    /**
+     * Switched off.
+     *
+     * @return the NullTracer
+     */
     @Override
     public AbstractTracer getCurrentTracer() {
         return TracerFactory.getInstance().getDefaultTracer();

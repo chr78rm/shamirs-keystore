@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2020, Christof Reichardt
+ * Copyright (C) 2017, 2021, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,9 +34,12 @@ import java.util.stream.Stream;
 
 import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
+/**
+ * Generates passwords with specified length and basic character set.
+ */
 public class PasswordGenerator implements Traceable {
 
-    public static class ArrayUtils {
+    static class ArrayUtils {
         static public char[] concat(char[] a1, char[] a2) {
             char[] result = new char[a1.length + a2.length];
             System.arraycopy(a1, 0, result, 0, a1.length);
@@ -56,26 +59,56 @@ public class PasswordGenerator implements Traceable {
     private static final char[] ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS = ArrayUtils.concat(ALPHANUMERIC, PUNCTUATION_AND_SYMBOLS);
     private static final char[] ALL = ArrayUtils.concat(ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS, UMLAUTS);
 
+    /**
+     * Defines the character set comprising alphanumeric symbols.
+     *
+     * @return all alphanumeric characters
+     */
     public static char[] alphanumeric() {
         return Arrays.copyOf(ALPHANUMERIC, ALPHANUMERIC.length);
     }
 
+    /**
+     * Defines the character set comprising german umlauts.
+     *
+     * @return all german umlauts
+     */
     public static char[] umlauts() {
         return Arrays.copyOf(UMLAUTS, UMLAUTS.length);
     }
 
+    /**
+     * Defines the character set comprising several punctuation marks and symbols.
+     *
+     * @return some punctuation marks and symbols
+     */
     public static char[] punctuationAndSymbols() {
         return Arrays.copyOf(PUNCTUATION_AND_SYMBOLS, PUNCTUATION_AND_SYMBOLS.length);
     }
 
+    /**
+     * The union of {@link PasswordGenerator#alphanumeric() alphanumeric} and {@link PasswordGenerator#umlauts() umlaut} characters.
+     *
+     * @return all alphanumeric characters and all german umlauts
+     */
     public static char[] alphanumericWithUmlauts() {
         return Arrays.copyOf(ALPHANUMERIC_WITH_UMLAUTS, ALPHANUMERIC_WITH_UMLAUTS.length);
     }
 
+    /**
+     * The union of {@link PasswordGenerator#alphanumeric() alphanumeric} and {@link PasswordGenerator#punctuationAndSymbols()} punctuationAndSymbol} characters.
+     * @return all alphanumeric characters and some punctuation marks and symbols
+     */
     public static char[] alphanumericWithPunctuationAndSymbols() {
         return Arrays.copyOf(ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS, ALPHANUMERIC_WITH_PUNCTUATION_AND_SYMBOLS.length);
     }
 
+    /**
+     * The union of all specific character sets ({@link PasswordGenerator#alphanumeric() alphanumeric}, {@link PasswordGenerator#umlauts() umlauts},
+     * {@link PasswordGenerator#punctuationAndSymbols() punctuationAndSymbols}).
+     *
+     * @return all of them
+     */
     public static char[] all() {
         return Arrays.copyOf(ALL, ALL.length);
     }
@@ -84,10 +117,23 @@ public class PasswordGenerator implements Traceable {
     final int length;
     final char[] symbols;
 
+    /**
+     * Creates a PasswordGenerator instance with the specified length and alphanumeric symbols as basic character set.
+     *
+     * @param length the length of the generated passwords
+     * @throws GeneralSecurityException if no provider supports the required {@link SecureRandom SecureRandom} instance
+     */
     public PasswordGenerator(int length) throws GeneralSecurityException {
         this(length, ALPHANUMERIC);
     }
 
+    /**
+     * Creates a PasswordGenerator instance with the specified length and given basic character set.
+     *
+     * @param length the length of the generated passwords
+     * @param symbols the basic character set from which the passwords will be generated
+     * @throws GeneralSecurityException if no provider supports the required {@link SecureRandom SecureRandom} instance
+     */
     public PasswordGenerator(int length, char[] symbols) throws GeneralSecurityException {
         this.secureRandom = SecureRandom.getInstance("DRBG", DrbgParameters.instantiation(
                 256, PR_AND_RESEED, "christof".getBytes()));
@@ -95,6 +141,11 @@ public class PasswordGenerator implements Traceable {
         this.symbols = Arrays.copyOf(symbols, symbols.length);
     }
 
+    /**
+     * Generates a stream of passwords which will be built from the basic character set with the specified length.
+     *
+     * @return a password stream
+     */
     public Stream<CharSequence> generate() {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate()");
@@ -105,6 +156,13 @@ public class PasswordGenerator implements Traceable {
         }
     }
 
+    /**
+     * Generates a stream of passwords which will be built from the basic character set with the specified length. The generated passwords will contain at least
+     * one of the required characters.
+     *
+     * @param requiredChars each generated password contains at least one of them
+     * @return a password stream
+     */
     public Stream<CharSequence> generate(char[] requiredChars) {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
@@ -155,6 +213,13 @@ public class PasswordGenerator implements Traceable {
                 });
     }
 
+    /**
+     *  Generates a stream of passwords which will be built from the basic character set with the specified length. The generated passwords will contain at least
+     *  one of the characters of each required character set.
+     *  .
+     * @param requiredCharSets each generated password contains at least one character of each required character set
+     * @return a password stream
+     */
     public Stream<CharSequence> generate(Set<char[]> requiredCharSets) {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Stream<CharSequence>", this, "generate(char[] requiredChars)");
@@ -190,6 +255,11 @@ public class PasswordGenerator implements Traceable {
         }
     }
 
+    /**
+     * Switched off.
+     *
+     * @return the NullTracer
+     */
     @Override
     public AbstractTracer getCurrentTracer() {
         return TracerFactory.getInstance().getDefaultTracer();
