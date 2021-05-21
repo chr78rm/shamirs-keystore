@@ -42,10 +42,8 @@ class SecretMerging(
 
   /** Newtons interpolation method */
   val interpolation: NewtonInterpolation = new NewtonInterpolation(sharePoints, prime)
-  /** The interpolated NewtonPolynomial */
-  val newtonPolynomial: NewtonPolynomial = interpolation.newtonPolynomial
   /** the (recovered) encoded secret */
-  val s: BigInt = newtonPolynomial.evaluateAt(BigInt(0))
+  val s: BigInt = interpolation.newtonPolynomial.evaluateAt(BigInt(0))
   /** the actual (recovered) secret bytes */
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
 
