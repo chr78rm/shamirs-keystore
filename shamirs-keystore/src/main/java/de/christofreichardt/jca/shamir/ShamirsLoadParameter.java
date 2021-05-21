@@ -28,6 +28,8 @@ import java.util.Optional;
 
 /**
  * Specifies how to load and store a {@link KeyStore KeyStore} instance of type {@code ShamirsKeystore}.
+ *
+ * @author Christof Reichardt
  */
 public class ShamirsLoadParameter implements KeyStore.LoadStoreParameter {
 

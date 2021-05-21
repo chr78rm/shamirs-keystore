@@ -36,6 +36,8 @@ import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
 /**
  * Generates passwords with specified length and basic character set.
+ *
+ * @author Christof Reichardt
  */
 public class PasswordGenerator implements Traceable {
 
@@ -157,7 +159,7 @@ public class PasswordGenerator implements Traceable {
     }
 
     /**
-     * Generates a stream of passwords which will be built from the basic character set with the specified length. The generated passwords will contain at least
+     * Generates a stream of passwords which will be built from the basic character set with the specified length. All of the generated passwords will contain at least
      * one of the required characters.
      *
      * @param requiredChars each generated password contains at least one of them
@@ -214,9 +216,9 @@ public class PasswordGenerator implements Traceable {
     }
 
     /**
-     *  Generates a stream of passwords which will be built from the basic character set with the specified length. The generated passwords will contain at least
+     *  Generates a stream of passwords which will be built from the basic character set with the specified length. All of the generated passwords will contain at least
      *  one of the characters of each required character set.
-     *  .
+     *
      * @param requiredCharSets each generated password contains at least one character of each required character set
      * @return a password stream
      */

@@ -34,6 +34,8 @@ import java.util.Collection;
  * splitted into several secret shares and have to been merged again to recover the original password. In order to create
  * a {@code ShamirsProtection} instance someone has to provide access to a certain subset of secret shares, e.g. paths to different
  * slices (JSON files) of shares.
+ *
+ * @author Christof Reichardt
  */
 public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroyable {
     private final char[] password;

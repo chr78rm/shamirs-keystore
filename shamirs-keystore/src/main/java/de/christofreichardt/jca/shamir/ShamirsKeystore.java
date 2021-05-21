@@ -38,6 +38,8 @@ import java.util.Enumeration;
  * load the KeyStore has been splitted by Shamirs Secret Sharing algorithm into several secret shares. Some subset of these shares is needed to
  * recover the original password. Those methods which aren't expecting one of the protection parameter simply delegate to the underlying
  * PKCS#12 KeyStore implementation of the JDK.
+ *
+ * @author Christof Reichardt
  */
 public class ShamirsKeystore extends KeyStoreSpi implements Traceable {
 

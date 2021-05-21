@@ -26,6 +26,8 @@ import java.security.ProviderException;
 
 /**
  * A {@link Provider Provider} for the Java Security API allocating a {@link KeyStore KeyStore} instance of type {@code ShamirsKeystore}.
+ *
+ * @author Christof Reichardt
  */
 public final class ShamirsProvider extends Provider {
 
