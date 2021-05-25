@@ -93,6 +93,8 @@
 						<configuration>
 							<args>
 								<arg>-no-link-warnings</arg>
+								<arg>-doc-footer</arg>
+								<arg>Copyright &#x00A9; 2017, 2021, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</arg>
 							</args>
 						</configuration>
 					</execution>

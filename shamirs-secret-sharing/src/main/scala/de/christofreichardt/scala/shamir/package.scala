@@ -24,13 +24,15 @@ import java.nio.charset.StandardCharsets
 
 /**
  * Contains the core classes needed for sharing or merging of secrets.
+ *
+ * @see <a href="https://chr78rm.github.io/shamirs-keystore/">Shamir's Keystore</a>
  */
 package object shamir {
 
   import scala.annotation.tailrec
 
   /**
-   * defines the certainty of a number being prime, that is between 2^64 primes computed by 
+   * defines the certainty of a number being prime, that is between 2&#94;64 primes computed by
    * the underlying algorithm there is one false positive.
    */
   val CERTAINTY = 64

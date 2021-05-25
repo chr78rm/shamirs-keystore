@@ -90,6 +90,7 @@
           <a class="menu" href="#9">7. User Manual</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#14">7.1 Demo App</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#15">7.2 Keystore Engine</a><br/>
+          <a class="menu" href="#16">8. API Docs</a><br/>
           <a class="menu" href="#imprint">Imprint</a>
         </div>
       </div>
@@ -710,7 +711,7 @@ Version: 3
         On my system I'm getting the following output:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">provider[SUN] = SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; PKCS12, JKS & DKS keystores; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
+        <p class="code" style="white-space: pre">provider[SUN] = SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; PKCS12, JKS &amp; DKS keystores; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
 provider[SunRsaSign] = Sun RSA signature provider
 provider[SunEC] = Sun Elliptic Curve provider (EC, ECDSA, ECDH)
 provider[SunJSSE] = Sun JSSE provider(PKCS12, SunX509/PKIX key/trust factories, SSLv3/TLSv1/TLSv1.1/TLSv1.2/TLSv1.3/DTLSv1.0/DTLSv1.2)
@@ -770,6 +771,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
 
 
   </td>
+                  </tr>
                   <tr>
                     <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(07)</td>
                   </tr>
@@ -786,7 +788,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
                     <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Path dir = Path.of(".", "test-workspace");</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Set<Path> paths = Set.of(Path.of("demo-1.json"), Path.of("demo-3.json"), Path.of("demo-4.json"))
+                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Set&lt;Path&gt; paths = Set.of(Path.of("demo-1.json"), Path.of("demo-3.json"), Path.of("demo-4.json"))
     .stream()
     .map(path -> dir.resolve(path))
     .collect(Collectors.toSet());</td>
@@ -839,6 +841,30 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
       <p class="section">
         For further examples I am referring to the source code of the demo app.
       </p>
+      <p class="section">
+        <a href="#1">[ToC]</a>
+      </p>
+      <p id="16" class="headline-1">8. API Documentation</p>
+      <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
+        <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 50%">Module</th>
+            <th class="cell" style="width: 50%">API Documentation</th>
+          </tr>
+          <tr style="">
+            <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">shamirs-secret-sharing</td>
+            <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">
+              <a href="http://www.christofreichardt.de/Projektstudien/Shamirs-Lib/shamirs-secret-sharing/scaladocs/de/christofreichardt/scala/shamir/index.html">shamirs-secret-sharing 1.1.0 API</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="border-bottom-style: none; border-bottom-width: 1px; width: 50%; background-color: rgb(146,197,222)">shamirs-keystore</td>
+            <td style="border-bottom-style: none; border-bottom-width: 1px; width: 50%; background-color: rgb(146,197,222)">
+              <a href="http://www.christofreichardt.de/Projektstudien/Shamirs-Lib/shamirs-keystore/apidocs/index.html">shamirs-keystore 1.1.0 API</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>

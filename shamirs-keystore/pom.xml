@@ -91,6 +91,8 @@
                         <version>3.2.0</version>
                         <configuration>
                             <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                            <header>shamirs-keystore ${project.version} API</header>
+                            <bottom>Copyright &#x00A9; 2017, 2021, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</bottom>
                         </configuration>
                     </plugin>
                 </plugins>
