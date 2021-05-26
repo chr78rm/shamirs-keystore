@@ -211,7 +211,7 @@ class SecretSharing(
     */
   def sharePointPartition(sizes: Iterable[Int]): List[IndexedSeq[(BigInt, BigInt)]] = {
     require(sizes.sum == sharePoints.length, "The sum of the shares of each slice doesn't match the number of overall shares.")
-    require(sizes.forall(s => s <= k), "A partition must not exceed the threshold.")
+    require(sizes.forall(s => s <= k), "A particular slice must not exceed the threshold.")
 
     @tailrec
     def partition(sizes: Iterable[Int], remainingPoints: IndexedSeq[(BigInt, BigInt)], partitions: List[IndexedSeq[(BigInt, BigInt)]]): List[IndexedSeq[(BigInt, BigInt)]] = {
