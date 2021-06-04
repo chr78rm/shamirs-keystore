@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MAVEN_REPO=$HOME/.m2/repository/
-VERSION=1.1.0
+VERSION=1.2.0
 echo Using "${MAVEN_REPO}" and "${VERSION}" ...
 
 echo
