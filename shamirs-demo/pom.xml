@@ -57,12 +57,12 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <includes>
                         <include>de/christofreichardt/jca/shamirsdemo/ShamirsDemoUnit.java</include>
                     </includes>
-                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
                     <systemPropertyVariables>
                         <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/shamirsdemo/trace-config.xml</de.christofreichardt.junit5.traceConfig>
                         <de.christofreichardt.junit5.summary>../reports/shamirs-demo-summary.txt</de.christofreichardt.junit5.summary>
@@ -88,7 +88,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.3</version>
+                        <version>3.2.4</version>
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">

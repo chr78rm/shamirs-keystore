@@ -61,12 +61,12 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <includes>
                         <include>de/christofreichardt/jca/shamir/ShamirsKeystoreUnit.java</include>
                     </includes>
-                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
                     <systemPropertyVariables>
                         <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/trace-config.xml</de.christofreichardt.junit5.traceConfig>
                         <de.christofreichardt.junit5.summary>../reports/shamirs-keystore-summary.txt</de.christofreichardt.junit5.summary>
