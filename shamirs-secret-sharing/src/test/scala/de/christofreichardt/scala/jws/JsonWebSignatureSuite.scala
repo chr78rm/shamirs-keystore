@@ -51,7 +51,7 @@ class JsonWebSignatureSuite extends MyFunSuite {
     val decoded = decodeJson(Files.readAllBytes(Paths.get("json", "jws", "encoded-secret-share.txt")))
     val prettyPrinter = new JsonPrettyPrinter
     prettyPrinter.print(Paths.get("json", "jws", "decoded-secret-share.json"), decoded)
-    assert(Files.readAllBytes(Paths.get("json", "jws", "secret-share.json")).toIterable == Files.readAllBytes(Paths.get("json", "jws", "decoded-secret-share.json")).toIterable)
+    assert(Files.readAllBytes(Paths.get("json", "jws", "secret-share.json")).toSeq == Files.readAllBytes(Paths.get("json", "jws", "decoded-secret-share.json")).toSeq)
   }
 
   testWithTracing(this, "Hmac-1") {

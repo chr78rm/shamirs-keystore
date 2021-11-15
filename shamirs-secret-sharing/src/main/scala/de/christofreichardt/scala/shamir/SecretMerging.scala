@@ -143,7 +143,7 @@ object SecretMerging {
    * @param paths the paths to the JSON files
    * @return the immutable `SecretMerging` instance
    */
-  def apply(paths: Array[Path]): SecretMerging = apply(paths.toIterable)
+  def apply(paths: Array[Path]): SecretMerging = apply(paths.toSeq)
 
   /**
    * Combines JsonObjects each containing a slice of shares needed to recover the secret.
