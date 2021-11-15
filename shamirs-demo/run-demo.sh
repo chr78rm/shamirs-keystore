@@ -23,4 +23,5 @@ ${BIN_JAVA} -Djava.security.egd=file:/dev/urandom -cp target/shamirs-demo-${VERS
 "${MAVEN_REPO}"/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar:\
 "${MAVEN_REPO}"/org/bouncycastle/bcpkix-jdk15on/1.69/bcpkix-jdk15on-1.69.jar:\
 "${MAVEN_REPO}"/org/bouncycastle/bcprov-jdk15on/1.69/bcprov-jdk15on-1.69.jar:\
+"${MAVEN_REPO}"/org/bouncycastle/bcutil-jdk15on/1.69/bcutil-jdk15on-1.69.jar:\
  de.christofreichardt.jca.shamirsdemo.App
