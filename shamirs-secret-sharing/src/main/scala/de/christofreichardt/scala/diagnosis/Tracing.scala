@@ -30,27 +30,27 @@ trait Tracing {
    * Custom control structure for tracing of embraced code blocks.
    *
    * @param resultType denotes the return type
-   * @param callee the call site
-   * @param method denotes the method signature
-   * @param block the embraced code block
+   * @param callee     the call site
+   * @param method     denotes the method signature
+   * @param block      the embraced code block
    * @tparam T the actual type of the embraced code block
    * @return returns whatever block returns
    */
-	def withTracer[T](resultType: String, callee: AnyRef, method: String)(block: => T): T = {
-	  val tracer = getCurrentTracer()
-	  tracer.entry(resultType, callee, method)
+  def withTracer[T](resultType: String, callee: AnyRef, method: String)(block: => T): T = {
+    val tracer = getCurrentTracer()
+    tracer.entry(resultType, callee, method)
     try {
       block
     }
     finally {
       tracer.wayout()
     }
-	}
+  }
 
   /**
    * Returns the present tracer for this object.
    *
    * @return the current tracer, by default the NullTracer
    */
-	def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer()
+  def getCurrentTracer(): AbstractTracer = TracerFactory.getInstance().getDefaultTracer()
 }
