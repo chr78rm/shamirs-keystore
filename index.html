@@ -5,34 +5,33 @@
     <title>Shamir's Keystore</title>
     <script>(function(l){var i,s={touchend:function(){}};for(i in s)l.addEventListener(i,s);})(document);</script>
     <style>
-      @import url('https://fonts.googleapis.com/css?family=Crimson+Text|Fira+Code|Montserrat&amp;display=swap');
       div.main {
         width: 80%; border-style: outset; border-width: 1px; border-radius: 3px; border-color: rgb(224,224,224); margin-left: auto; margin-right: auto;
         padding-left: 1em; padding-right: 1em; padding-top: 0.25em; padding-bottom: 0.25em; background-color: rgb(224,224,224)
       }
       p.headline-0 {
-        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; 
+        background-color: rgb(178,24,43); color: rgb(253,219,199); font-family: sans-serif; padding: 3px; border-radius: 3px; font-size: 1.5em; 
         padding-left: 1rem; padding-right: 0.75rem; font-weight: bold;
       }
       p.headline-1 {
-        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: 'Montserrat', sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; 
+        background-color: rgb(77,77,77); color: rgb(253,219,199); font-family: sans-serif; padding: 3px; border-radius: 3px; font-size: 1em; 
         padding-left: 1rem; font-weight: bold;
       }
       p.section {
-        color: rgb(26,26,26); font-family: 'Crimson Text', serif; text-align: justify
+        color: rgb(26,26,26); font-family: serif; text-align: justify
       }
       div.code {
         border-style: dashed; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); width: 80%; margin-left: auto; 
         margin-right: auto; overflow-x: auto; white-space: nowrap
       }
       p.code {
-        font-family: 'Fira Code', monospace; font-size: 12px; text-align: left; padding-left: 1rem
+        font-family: monospace; font-size: 12px; text-align: left; padding-left: 1rem
       }
       p.formula {
-        font-style: italic; font-family: 'Fira Code', monospace; text-align: center; overflow-x: auto; white-space: nowrap; overflow-y: hidden
+        font-style: italic; font-family: monospace; text-align: center; overflow-x: auto; white-space: nowrap; overflow-y: hidden; font-size: 16px;
       }
       span.formula {
-        font-style: italic; font-family: 'Fira Code', monospace;
+        font-style: italic; font-family: monospace; font-size: 16px;
       }
       div.drop-down-button {
         height: 0rem; padding-right: 1rem; position: relative; float: right;
@@ -48,7 +47,7 @@
         display: inline-block;
       }
       a.menu {
-        color: rgb(77,77,77); font-size: 0.9rem; line-height: 100%; font-family: 'Montserrat', sans-serif;
+        color: rgb(77,77,77); font-size: 0.9rem; line-height: 100%; font-family: sans-serif;
       }
       th.cell {
         border-bottom-style: none; border-width: 1px; width: 25%; border-top-style: none; background-color: rgb(244,165,130)
@@ -61,17 +60,17 @@
         margin-right: auto; overflow-x: auto; white-space: nowrap
       }
       p.console {
-        font-family: 'Fira Code', monospace; font-size: 12px; text-align: left; padding-left: 1rem
+        font-family: monospace; font-size: 12px; text-align: left; padding-left: 1rem
       }
       span.code {
         border-style: solid; border-width: 1px; border-color: rgb(103,0,31); background-color: rgb(253,219,199); border-radius: 3px;
-        font-family: 'Fira Code', monospace; font-size: 11px;
+        font-family: monospace; font-size: 11px;
       }
     </style>
   </head>
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
-      <p style="color: rgb(26,26,26); font-family: 'Crimson Text', serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
+      <p style="color: rgb(26,26,26); font-family: serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
          border-bottom-color: rgb(26,26,26)">Last updated: 2021-05-31</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
@@ -193,18 +192,18 @@
         A Newton polynomial of degree <span class="formula">k-1</span> is given by
       </p>
       <p class="formula">
-        P<sub>k-1</sub>(x) = <span style="font-size: 18px; font-style: normal">&#x1D768;</span>
-        <sub style="font-size: 10px; position: relative; top: 0.25em; left: -0.75em">i=0</sub>
-        <sup style="position: relative; left: -3.5em; top: -0.25em; font-size: 10px">k-1</sup>
+        P<sub>k-1</sub>(x) = <span style="font-size: 18px; font-style: normal">&#x1D768; </span>
+        <sub style="font-size: 10px; position: relative; top: 0em; left: -0.75em">i=0</sub>
+        <sup style="position: relative; left: -3.1em; top: -0.25em; font-size: 10px">k-1</sup>
         <span style="position: relative; left: -2.25em;">c<sub>i</sub>N<sub>i</sub>(x)</span>
       </p>
       <p class="section">
         with Newton coefficients <span class="formula">c<sub>0</sub>,c<sub>1</sub>,...,c<sub>k-1</sub></span> and the Newton basis polynomials
         <span class="formula">N<sub>0</sub> = 1</span> and 
         <span class="formula">
-          N<sub>i</sub> = <span style="font-size: 18px; font-style: normal">&#x1D79F;</span>
-          <sub style="font-size: 10px; position: relative; top: 0.25em; left: -1em">j=0</sub>
-          <sup style="position: relative; left: -3.75em; top: -0.25em; font-size: 10px">i-1</sup>
+          N<sub>i</sub> = <span style="font-size: 18px; font-style: normal">&#x1D79F; </span>
+          <sub style="font-size: 10px; position: relative; top: 0em; left: -1em">j=0</sub>
+          <sup style="position: relative; left: -3.1em; top: -0.25em; font-size: 10px">i-1</sup>
           <span style="position: relative; left: -2.5em;">(x - x<sub>j</sub>).</span>
         </span>
       </p>
@@ -264,12 +263,12 @@
         <a href="#1">[ToC]</a>
       </p>
       <p id="6" class="headline-1">4. UML Diagrams</p>
-      <p id="10" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">4.1 Component Diagrams</p>
+      <p id="10" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">4.1 Component Diagrams</p>
       <div style="text-align: center">
         <img style="width: 80%; height: auto" src="uml/component-diagram-1.png" alt="component-diagram-1"/>
         <img style="width: 80%; height: auto; margin-top: 1em" src="uml/component-diagram-2.png" alt="component-diagram-2"/>
       </div>
-      <p id="11" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">4.2 Class Diagram</p>
+      <p id="11" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">4.2 Class Diagram</p>
       <div style="text-align: center">
         <img style="width: 80%" src="uml/class-diagram.png" alt="class-diagram"/>
       </div>
@@ -284,7 +283,7 @@
         <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested">nested tests</a>. The two linked reports below have been generated by a custom 
         JUnit5 <a href="https://junit.org/junit5/docs/current/user-guide/#launcher-api-listeners-custom">TestExecutionListener</a> during the last build.
       </p>
-      <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
+      <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Artifact</th>
@@ -306,7 +305,7 @@
         <a href="http://doc.scalatest.org/3.1.1/org/scalatest/Reporter.html">Reporter</a>
         is used to collect the events occurring throughout the execution of the tests. The linked report below has been generated during the last build.
       </p>
-      <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
+      <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Artifact</th>
@@ -322,7 +321,7 @@
         <a href="#1">[ToC]</a>
       </p>
       <p id="8" class="headline-1">6. Download</p>
-      <p id="12" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">6.1 Demo App</p>
+      <p id="12" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.1 Demo App</p>
       <p class="section">
         By the time I initially experimented with this Maven multi module project I had run into difficulties regarding the automatic execution of unit tests
         when applying the principles of the new Java module system (Jigsaw). I decided to waste no further time in finding workable solutions and leave this for
@@ -332,7 +331,7 @@
         encapsulation anyway.
         The subsequent provided download contains the demo app and both the core module with the algorithm and the actual JCA provider.
       </p>
-      <table style="font-family: 'Crimson Text', serif; width: 80%; margin-left: auto; margin-right: auto">
+      <table style="font-family: serif; width: 85%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 15%">Artifact</th>
@@ -387,7 +386,7 @@
         the JSON-Processing provider from <a href="https://resteasy.github.io/">RESTEasy</a> and
         the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>.
       </p>
-      <p id="13" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">6.1 Maven Coordinates</p>
+      <p id="13" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.1 Maven Coordinates</p>
       <p class="section">
         The KeyStore engine together with the relevant artifacts had been deployed to Maven Central and can be used within your applications by referencing the subsequent Maven coordinates:
       </p>
@@ -406,7 +405,7 @@
         <a href="#1">[ToC]</a>
       </p>
       <p id="9" class="headline-1">7. User Manual</p>
-      <p id="14" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
+      <p id="14" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
       <p class="section">
           <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
         commands into their <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> equivalents if you are working on Windows and aren't using 
@@ -676,7 +675,7 @@ Version: 3
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
-      <p id="15" class="section" style="font-family: 'Montserrat', sans-serif; padding-left: 2rem; font-weight: bold">7.2 Keystore Engine</p>
+      <p id="15" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">7.2 Keystore Engine</p>
       <p class="section">
         See section <a href="#13">6.2 Maven Coordinates</a> for the version of the present distribution. Subsequently, I give a simple example how to use the keystore engine within your 
         application. First, you need to install the provider:
@@ -688,13 +687,13 @@ Version: 3
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(01)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(01)</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(02)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(02)</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(03)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(03)</td>
                   </tr>
                 </tbody>
               </table>
@@ -703,13 +702,13 @@ Version: 3
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsProvider myProvider = new ShamirsProvider();</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">ShamirsProvider myProvider = new ShamirsProvider();</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Security.addProvider(myProvider);</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">Security.addProvider(myProvider);</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Stream.of(Security.getProviders()).forEach(provider -> System.out.printf("provider[%s] = %s\n", provider.getName(), provider.getInfo()));</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">Stream.of(Security.getProviders()).forEach(provider -> System.out.printf("provider[%s] = %s\n", provider.getName(), provider.getInfo()));</td>
                   </tr>
                 </tbody>
               </table>
@@ -746,7 +745,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(04)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(04)</td>
                   </tr>
                 </tbody>
               </table>
@@ -755,7 +754,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", myProvider);</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">KeyStore keyStore = KeyStore.getInstance("ShamirsKeystore", myProvider);</td>
                   </tr>
                 </tbody>
               </table>
@@ -774,19 +773,19 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(05)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(05)</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(06)
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(06)
 
 
   </td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(07)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(07)</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(08)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(08)</td>
                   </tr>
                 </tbody>
               </table>
@@ -795,19 +794,19 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Path dir = Path.of(".", "test-workspace");</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">Path dir = Path.of(".", "test-workspace");</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">Set&lt;Path&gt; paths = Set.of(Path.of("demo-1.json"), Path.of("demo-3.json"), Path.of("demo-4.json"))
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">Set&lt;Path&gt; paths = Set.of(Path.of("demo-1.json"), Path.of("demo-3.json"), Path.of("demo-4.json"))
     .stream()
     .map(path -> dir.resolve(path))
     .collect(Collectors.toSet());</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsProtection shamirsProtection = new ShamirsProtection(paths);</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">ShamirsProtection shamirsProtection = new ShamirsProtection(paths);</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">File keyStoreFile = dir.resolve("my-keys.p12").toFile();</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">File keyStoreFile = dir.resolve("my-keys.p12").toFile();</td>
                   </tr>
                 </tbody>
               </table>
@@ -825,10 +824,10 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(09)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(09)</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">(10)</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">(10)</td>
                   </tr>
                 </tbody>
               </table>
@@ -837,10 +836,10 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
               <table>
                 <tbody>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">ShamirsLoadParameter shamirsLoadParameter = new ShamirsLoadParameter(keyStoreFile, shamirsProtection);</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: 'Fira Code', monospace; font-size: 12px;">keyStore.load(shamirsLoadParameter);</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">keyStore.load(shamirsLoadParameter);</td>
                   </tr>
                 </tbody>
               </table>
@@ -855,7 +854,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
         <a href="#1">[ToC]</a>
       </p>
       <p id="16" class="headline-1">8. API Documentation</p>
-      <table style="font-family: 'Crimson Text', serif; width: 40%; margin-left: auto; margin-right: auto">
+      <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Module</th>
