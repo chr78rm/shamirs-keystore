@@ -54,19 +54,19 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
     withTracer("Status", this, "runTest(testName: String, args: Args)") {
       tracer.logMessage(LogLevel.INFO, testName + " started ...", getClass(), "runTest(testName: String, args: Args)")
       tracer.out().printfIndentln("testName = %s", testName)
-//      val myArgs = new Args(new MyReporter(args.reporter), args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
-//          args.distributedTestSorter, args.distributedSuiteSorter)
+      //      val myArgs = new Args(new MyReporter(args.reporter), args.stopper, args.filter, args.configMap, args.distributor, args.tracker, args.chosenStyles, args.runTestInNewInstance,
+      //          args.distributedTestSorter, args.distributedSuiteSorter)
       tracer.out().printfIndentln("args = %s", args)
       super.runTest(testName, args)
     }
   }
-  
+
   override def afterAll(): Unit = {
     val tracer = getCurrentTracer()
     withTracer("Unit", this, "afterAll()") {
     }
   }
-  
+
   override def getCurrentTracer(): AbstractTracer = {
     try {
       TracerFactory.getInstance().getTracer("TestTracer")
@@ -75,19 +75,19 @@ class MyFunSuite extends AnyFunSuite with Tracing with BeforeAndAfterAll with Be
       case ex: TracerFactory.Exception => TracerFactory.getInstance().getDefaultTracer
     }
   }
-  
-  def testWithTracing[T](callee : Any, testName : String)(block : => T) : Unit = {
+
+  def testWithTracing[T](callee: Any, testName: String)(block: => T): Unit = {
     test(testName) {
       withTracer("Unit", this, testName) {
         block
       }
     }
   }
-  
-  def ignore[T](callee : Any, testName : String)(block : => T) : Unit = {
-     val tracer = getCurrentTracer()
+
+  def ignore[T](callee: Any, testName: String)(block: => T): Unit = {
+    val tracer = getCurrentTracer()
     ignore(testName) {
-       block
-     }
+      block
+    }
   }
 }

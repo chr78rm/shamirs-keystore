@@ -7,7 +7,7 @@
     <parent>
         <artifactId>shamirs-lib</artifactId>
         <groupId>de.christofreichardt</groupId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>shamirs-demo</artifactId>
@@ -57,12 +57,12 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <includes>
                         <include>de/christofreichardt/jca/shamirsdemo/ShamirsDemoUnit.java</include>
                     </includes>
-                    <argLine>-Dfile.encoding=${project.build.sourceEncoding} --add-opens de.christofreichardt.jca/de.christofreichardt.jca=ALL-UNNAMED</argLine>
+                    <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
                     <systemPropertyVariables>
                         <de.christofreichardt.junit5.traceConfig>de/christofreichardt/jca/shamirsdemo/trace-config.xml</de.christofreichardt.junit5.traceConfig>
                         <de.christofreichardt.junit5.summary>../reports/shamirs-demo-summary.txt</de.christofreichardt.junit5.summary>
@@ -88,7 +88,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.3</version>
+                        <version>3.2.4</version>
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -164,7 +164,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>tracelogger</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>de.christofreichardt</groupId>
@@ -175,31 +175,31 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.68</version>
+            <version>1.70</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.2</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.2</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>1.7.2</version>
+            <version>1.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.19.0</version>
+            <version>3.22.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

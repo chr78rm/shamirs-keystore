@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>shamirs-lib</artifactId>
 		<groupId>de.christofreichardt</groupId>
-		<version>1.1.0</version>
+		<version>1.2.0</version>
 	</parent>
 
 	<artifactId>shamirs-secret-sharing</artifactId>
@@ -42,28 +42,27 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<encoding>UTF-8</encoding>
-		<scala.version>2.13.6</scala.version>
-		<scalatest.version>3.2.7</scalatest.version>
-		<scala-maven-plugin.version>4.5.2</scala-maven-plugin.version>
+		<scala.version>3.1.1</scala.version>
+		<scalatest.version>3.2.11</scalatest.version>
+		<scala-maven-plugin.version>4.6.1</scala-maven-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.0.2</scalatest-maven-plugin.version>
-		<javax.json.version>1.1.4</javax.json.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
+			<artifactId>scala3-library_3</artifactId>
 			<version>${scala.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.christofreichardt</groupId>
 			<artifactId>tracelogger</artifactId>
-			<version>1.8.0</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.13</artifactId>
+			<artifactId>scalatest_3</artifactId>
 			<version>${scalatest.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -109,7 +108,7 @@
 							<scalaVersion>${scala.version}</scalaVersion>
 							<args>
 								<arg>-deprecation</arg>
-								<arg>-target:11</arg>
+								<arg>-release:11</arg>
 								<arg>-encoding</arg>
 								<arg>utf-8</arg>
 							</args>
@@ -184,7 +183,7 @@
 									<scalaVersion>${scala.version}</scalaVersion>
 									<args>
 										<arg>-deprecation</arg>
-										<arg>-target:11</arg>
+										<arg>-release:11</arg>
 										<arg>-encoding</arg>
 										<arg>utf-8</arg>
 									</args>

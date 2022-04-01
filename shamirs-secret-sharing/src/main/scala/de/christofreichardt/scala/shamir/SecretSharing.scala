@@ -260,7 +260,7 @@ class SecretSharing(
    * @param sizes denotes the partition
    * @param path the path to the partition file
    */
-  def savePartition(sizes: Array[Int], path: Path): Unit = savePartition(sizes.reverse.toIterable, path)
+  def savePartition(sizes: Array[Int], path: Path): Unit = savePartition(sizes.reverse.toSeq, path)
 
   /**
    * Gives a textual representation of this particular secret sharing sheme.
