@@ -14,11 +14,11 @@ fi
 ${BIN_JAVA} -version
 
 ${BIN_JAVA} -Djava.security.egd=file:/dev/urandom -cp target/shamirs-demo-${VERSION}.jar:\
-"${MAVEN_REPO}"/de/christofreichardt/tracelogger/1.8.0/tracelogger-1.8.0.jar:\
+"${MAVEN_REPO}"/de/christofreichardt/tracelogger/1.9.0/tracelogger-1.9.0.jar:\
 "${MAVEN_REPO}"/de/christofreichardt/shamirs-keystore/${VERSION}/shamirs-keystore-${VERSION}.jar:\
 "${MAVEN_REPO}"/de/christofreichardt/shamirs-secret-sharing/${VERSION}/shamirs-secret-sharing-${VERSION}.jar:\
 "${MAVEN_REPO}"/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar:\
-"${MAVEN_REPO}"/org/scala-lang/scala3-library_3/3.1.0/scala3-library_3-3.1.0.jar:\
+"${MAVEN_REPO}"/org/scala-lang/scala3-library_3/3.1.1/scala3-library_3-3.1.1.jar:\
 "${MAVEN_REPO}"/org/jboss/resteasy/resteasy-json-p-provider/resteasy-json-p-provider-4.5.3.Final.jar:\
 "${MAVEN_REPO}"/org/glassfish/jakarta.json/1.1.6/jakarta.json-1.1.6.jar:\
 "${MAVEN_REPO}"/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar:\
