@@ -164,7 +164,7 @@
         <dependency>
             <groupId>de.christofreichardt</groupId>
             <artifactId>tracelogger</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>de.christofreichardt</groupId>
@@ -174,8 +174,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.71</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -199,7 +199,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.21.0</version>
+            <version>3.23.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

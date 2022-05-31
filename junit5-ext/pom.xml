@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>de.christofreichardt</groupId>
 			<artifactId>tracelogger</artifactId>
-			<version>1.8.0</version>
+			<version>1.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
