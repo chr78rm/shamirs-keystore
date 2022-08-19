@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,11 @@ package de.christofreichardt.scala
 package shamir
 
 import de.christofreichardt.diagnosis.TracerFactory
-
+import de.christofreichardt.scala.utils.RandomGenerator
+import de.christofreichardt.scalatest.MyFunSuite
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import java.security.SecureRandom
-import de.christofreichardt.scala.utils.RandomGenerator
-import de.christofreichardt.scalatest.MyFunSuite
 
 class SecretSharingSuite extends MyFunSuite {
   val randomGenerator = new RandomGenerator(new SecureRandom)

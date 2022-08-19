@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import de.christofreichardt.jca.shamir.ShamirsProtection;
 import de.christofreichardt.jca.shamir.ShamirsProvider;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;

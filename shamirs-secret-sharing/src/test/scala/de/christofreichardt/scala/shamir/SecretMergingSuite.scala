@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ package shamir
 import de.christofreichardt.scala.combinations.LazyBinomialCombinator
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import de.christofreichardt.scalatest.MyFunSuite
-
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.security.SecureRandom

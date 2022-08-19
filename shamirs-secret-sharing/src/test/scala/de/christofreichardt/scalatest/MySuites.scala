@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,14 @@
 
 package de.christofreichardt.scalatest
 
+import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
+import de.christofreichardt.scala.diagnosis.Tracing
 import java.io.{File, PrintStream}
 import java.nio.file.{Files, Paths}
 import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant, LocalDateTime, ZoneId}
-
-import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
-import de.christofreichardt.scala.diagnosis.Tracing
-import org.scalatest._
-import org.scalatest.events.{TestCanceled, TestFailed, TestIgnored, TestStarting, TestSucceeded}
+import org.scalatest.*
+import org.scalatest.events.*
 
 class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with BeforeAndAfterAll with SequentialNestedSuiteExecution {
 

@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,14 +20,13 @@
 package de.christofreichardt.jca.shamir;
 
 import de.christofreichardt.scala.shamir.SecretMerging;
-
-import javax.json.JsonArray;
-import javax.security.auth.DestroyFailedException;
-import javax.security.auth.Destroyable;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.json.JsonArray;
+import javax.security.auth.DestroyFailedException;
+import javax.security.auth.Destroyable;
 
 /**
  * Protects a {@link KeyStore KeyStore} instance and its entries by applying Shamirs Secret Sharing algorithm. Passwords have been

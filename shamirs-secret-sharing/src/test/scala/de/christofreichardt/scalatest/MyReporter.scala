@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,11 @@
 
 package de.christofreichardt.scalatest
 
-import java.io.PrintStream
-
-import org.scalatest.Reporter
-import org.scalatest.events.{Event, TestCanceled, TestFailed, TestIgnored, TestSucceeded}
-import de.christofreichardt.diagnosis.AbstractTracer
-import de.christofreichardt.diagnosis.TracerFactory
+import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
-
+import java.io.PrintStream
+import org.scalatest.Reporter
+import org.scalatest.events.*
 import scala.collection.mutable.ArrayBuffer
 
 class MyReporter(reporter: Reporter) extends Reporter with Tracing {

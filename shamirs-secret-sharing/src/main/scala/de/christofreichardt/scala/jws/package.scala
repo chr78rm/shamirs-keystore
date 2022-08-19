@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,12 @@ package de.christofreichardt.scala
 
 package object jws {
 
-  import java.io.ByteArrayInputStream
-  import java.io.FileInputStream
+  import java.io.{ByteArrayInputStream, FileInputStream}
   import java.nio.charset.StandardCharsets
   import java.nio.file.Path
   import java.util.Base64
-  import javax.crypto.Mac
-  import javax.crypto.SecretKey
-  import javax.json.Json
-  import javax.json.JsonStructure
+  import javax.crypto.{Mac, SecretKey}
+  import javax.json.{Json, JsonStructure}
 
   def parse(path: Path): JsonStructure = {
     val jsonReader = Json.createReader(new FileInputStream(path.toFile()))

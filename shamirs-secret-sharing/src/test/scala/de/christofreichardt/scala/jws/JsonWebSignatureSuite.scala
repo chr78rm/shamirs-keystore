@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,15 @@
 package de.christofreichardt.scala
 package jws
 
-import de.christofreichardt.scalatest.MyFunSuite
-import javax.json.Json
-import java.nio.file.Paths
-import java.io.FileInputStream
-import java.nio.file.Path
-import javax.json.JsonStructure
 import de.christofreichardt.scala.utils.JsonPrettyPrinter
-import java.nio.file.Files
+import de.christofreichardt.scalatest.MyFunSuite
+import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
-import java.security.Key
-import javax.crypto.KeyGenerator
-import java.security.SecureRandom
-import java.security.Security
-import java.security.KeyPairGenerator
+import java.nio.file.{Files, Path, Paths}
+import java.security.{Key, KeyPairGenerator, SecureRandom, Security}
 import java.security.spec.ECGenParameterSpec
+import javax.crypto.KeyGenerator
+import javax.json.{Json, JsonStructure}
 
 class JsonWebSignatureSuite extends MyFunSuite {
 

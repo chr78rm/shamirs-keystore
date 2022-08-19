@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@
 
 package de.christofreichardt.scala.utils
 
-import java.io._
+import de.christofreichardt.diagnosis.AbstractTracer
+import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-
-import de.christofreichardt.diagnosis.AbstractTracer
 import javax.json.stream.JsonGenerator
 import javax.json.{Json, JsonObject, JsonStructure}
 

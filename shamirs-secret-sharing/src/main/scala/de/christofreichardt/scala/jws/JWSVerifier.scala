@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,9 @@
 package de.christofreichardt.scala
 package jws {
 
-  import java.security.Key
-  import javax.crypto.SecretKey
-  import javax.crypto.Mac
   import java.nio.charset.StandardCharsets
-  import java.security.PublicKey
-  import java.security.Signature
+  import java.security.{Key, PublicKey, Signature}
+  import javax.crypto.{Mac, SecretKey}
 
   abstract class JWSVerifier(val kid: String) {
     val verifyingKey = retrieveVerificationKey()

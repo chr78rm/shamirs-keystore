@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ package de.christofreichardt.jca.shamir;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
-
 import java.security.DrbgParameters;
+import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -31,8 +31,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 
 /**
  * Generates passwords with specified length and basic character set.

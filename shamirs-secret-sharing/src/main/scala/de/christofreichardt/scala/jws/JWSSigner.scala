@@ -1,7 +1,7 @@
 /*
  * Shamirs Keystore
  *
- * Copyright (C) 2017, 2021, Christof Reichardt
+ * Copyright (C) 2017, 2022, Christof Reichardt
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,14 @@
 package de.christofreichardt.scala
 package jws {
 
-  import java.nio.charset.StandardCharsets
-  import java.security.Key
-  import java.security.PrivateKey
-
-  import de.christofreichardt.diagnosis.AbstractTracer
-  import de.christofreichardt.diagnosis.TracerFactory
+  import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
   import de.christofreichardt.scala.diagnosis.Tracing
-  import javax.crypto.SecretKey
-  import javax.json.Json
-  import javax.json.JsonObject
+  import java.nio.charset.StandardCharsets
+  import java.security.{Key, PrivateKey, Signature}
   import java.security.interfaces.ECPrivateKey
   import java.security.spec.ECFieldFp
-  import java.security.Signature
+  import javax.crypto.SecretKey
+  import javax.json.{Json, JsonObject}
 
   abstract class JWSSigner(val kid: String) extends Tracing {
     val signingKey = retrieveSigningKey()
