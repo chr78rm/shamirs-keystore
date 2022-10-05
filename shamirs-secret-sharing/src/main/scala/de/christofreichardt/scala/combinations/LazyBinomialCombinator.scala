@@ -19,6 +19,7 @@
 
 package de.christofreichardt.scala.combinations
 
+import de.christofreichardt.diagnosis.{AbstractTracer, TracerFactory}
 import de.christofreichardt.scala.diagnosis.Tracing
 
 /**
@@ -31,7 +32,6 @@ import de.christofreichardt.scala.diagnosis.Tracing
  * example that would be 20. To compute actual solution sizes , see <a href="https://www.wolframalpha.com/input/?i=binomial+coefficient">WolframAlpha</a>.
  *
  * @constructor Creates a problem instance "n choose k".
- *
  * @param n defines the basic set of integers
  * @param k the number of integers which are to be chosen from the basic set
  */
@@ -40,27 +40,36 @@ class LazyBinomialCombinator(val n: Int, val k: Int) extends Tracing {
   /** The lexicographic smallest solution */
   val firstSolution: IndexedSeq[Int] = IndexedSeq.tabulate(this.k)(index => index)
 
+  /** indicates the highest possible values for every column and therefore the terminating condition as well */
+  val highWatermark: IndexedSeq[Int] = IndexedSeq.tabulate(this.k)(index => this.n - 1 - index).reverse
+
+  /** we need to look backwards into a solution when checking for the next solution */
+  val reversedIndices: IndexedSeq[Int] = this.firstSolution.indices.reverse
+
   /**
    * Checks if there is a next solution for a given word.
    *
    * @param solution the current solution
    * @return true if there is another solution
    */
-  def hasNextSolution(solution: IndexedSeq[Int]): Boolean =
-    solution.indices.zip(solution.indices.reverse).exists(index => solution(index._2) < n - 1 - index._1)
+  def hasNextSolution(solution: IndexedSeq[Int]): Boolean = this.reversedIndices.exists(reversedIndex => solution(reversedIndex) < this.highWatermark(reversedIndex))
 
   /**
-   * Given a solution the lexicographic next solution will be produced, if any.
+   * Given a solution the lexicographic next solution will be produced, if any. Most of the time only the value of the last (lowest-order or rightmost) column changes from one solution
+   * to the next solution. Sometimes more values are flipping. Depending on the position of the leftmost (discriminator) column with a changing value there are three cases to consider:
+   *
+   * (1) the value at the position of the dicriminator column will be incremented by one related to the value of the previous solution at this position
+   *
+   * (2) values to the left of the discriminator column will be copied from the previous solution
+   *
+   * (3) values to the right of the discriminator column will be incremeted one by one based on the new value at the discriminator column
    *
    * @param solution the current solution
    * @return some solution or none
    */
-  def findNextSolution(solution: IndexedSeq[Int]): Option[IndexedSeq[Int]] = {
+  def findNextSolution(solution: IndexedSeq[Int]): Option[IndexedSeq[Int]] = withTracer("Option[IndexedSeq[Int]]", this, "findNextSolution(solution: IndexedSeq[Int])") {
 
-    def findNextColumn: Option[Int] =
-      solution.indices.zip(solution.indices.reverse)
-        .find(index => solution(index._2) < n - 1 - index._1)
-        .map(index => index._2)
+    def findNextColumn: Option[Int] = this.reversedIndices.find(reversedIndex => solution(reversedIndex) < this.highWatermark(reversedIndex))
 
     val nextColumn = findNextColumn
     nextColumn.map(column =>
@@ -101,4 +110,5 @@ class LazyBinomialCombinator(val n: Int, val k: Int) extends Tracing {
    * @return the textual presentation
    */
   override def toString: String = String.format("LazyBinomialCombinator[n=%d, k=%d]", this.n, this.k)
+
 }

@@ -139,6 +139,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val tracer = getCurrentTracer()
     val n = 10
     val k = 5
+    val EXPECTED_SIZE = 252
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
@@ -146,25 +147,30 @@ class BinomialCombinatorSuite extends MyFunSuite {
     tracer.out().printfIndentln("Solutions")
     tracer.out().printfIndentln("=========")
     solutions.take(59).foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
+    tracer.out().println()
     tracer.out().printfIndentln("...")
     tracer.out().println()
+    solutions.drop(EXPECTED_SIZE - 10).foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
-    assert(solutions.size == 252)
+    assert(solutions.size == EXPECTED_SIZE)
   }
 
   testWithTracing(this, "LazyBinomialCombinator(20, 5)") {
     val tracer = getCurrentTracer()
     val n = 20
     val k = 5
+    val EXPECTED_SIZE = 15504
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
     tracer.out().println()
     tracer.out().printfIndentln("Solutions")
     tracer.out().printfIndentln("=========")
-    solutions.take(10).foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
+    solutions.take(20).foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
+    tracer.out().println()
     tracer.out().printfIndentln("...")
     tracer.out().println()
+    solutions.drop(EXPECTED_SIZE - 20).foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 15504)
   }
@@ -176,6 +182,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
+    solutions.foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 1)
     assert(solutions.head == IndexedSeq.empty)
@@ -188,6 +195,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
+    solutions.foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 1)
     assert(solutions.head == IndexedSeq(0,1,2,3))
@@ -200,6 +208,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
+    solutions.foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 4)
   }
@@ -211,6 +220,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
     val lazyBinomialCombinator = new LazyBinomialCombinator(n, k)
     tracer.out().printfIndentln("lazyBinomialCombinator = %s", lazyBinomialCombinator)
     val solutions = lazyBinomialCombinator.produceAll
+    solutions.foreach(solution => tracer.out().printfIndentln(solution.mkString(",")))
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 1)
   }
