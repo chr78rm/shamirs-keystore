@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.json.JsonArray;
+import jakarta.json.JsonArray;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
 

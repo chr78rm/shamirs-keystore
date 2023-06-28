@@ -24,7 +24,7 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import javax.json.{Json, JsonArray, JsonObject}
+import jakarta.json.{Json, JsonArray, JsonObject}
 import scala.jdk.CollectionConverters
 
 /**

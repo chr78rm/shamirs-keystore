@@ -26,7 +26,7 @@ import de.christofreichardt.scalatest.MyFunSuite
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.security.SecureRandom
-import javax.json.Json
+import jakarta.json.Json
 import scala.jdk.CollectionConverters
 
 class SecretMergingSuite extends MyFunSuite {

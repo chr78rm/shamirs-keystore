@@ -25,7 +25,7 @@ import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import java.nio.file.Path
 import java.security.SecureRandom
 import java.util.UUID
-import javax.json.{Json, JsonArray, JsonObject}
+import jakarta.json.{Json, JsonArray, JsonObject}
 import scala.annotation.tailrec
 
 /**

@@ -23,8 +23,8 @@ import de.christofreichardt.diagnosis.AbstractTracer
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import javax.json.stream.JsonGenerator
-import javax.json.{Json, JsonObject, JsonStructure}
+import jakarta.json.stream.JsonGenerator
+import jakarta.json.{Json, JsonObject, JsonStructure}
 
 class JsonPrettyPrinter {
   val properties = new java.util.HashMap[String, AnyRef]
