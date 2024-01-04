@@ -25,6 +25,7 @@ import de.christofreichardt.diagnosis.TracerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -190,10 +191,14 @@ public class MyTestExecutionListener implements TestExecutionListener, Traceable
         try {
             if (this.traceConfig != null) {
                 TracerFactory.getInstance().reset();
-                InputStream resourceAsStream = MyTestExecutionListener.class.getClassLoader()
-                        .getResourceAsStream(this.traceConfig);
-                if (resourceAsStream != null) {
-                    TracerFactory.getInstance().readConfiguration(resourceAsStream);
+                try {
+                    try (InputStream resourceAsStream = MyTestExecutionListener.class.getClassLoader().getResourceAsStream(this.traceConfig)) {
+                        if (resourceAsStream != null) {
+                            TracerFactory.getInstance().readConfiguration(resourceAsStream);
+                        }
+                    }
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
                 }
                 TracerFactory.getInstance().openPoolTracer();
                 AbstractTracer tracer = getCurrentTracer();
