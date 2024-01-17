@@ -8,5 +8,6 @@ if [ "x${JAVA_HOME}" == "x" ]
 fi
 ${BIN_JAVA} -version
 
-java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.2.1.jar
+SHAMIRS_VERSION=1.3.0
+java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-${SHAMIRS_VERSION}.jar
 
