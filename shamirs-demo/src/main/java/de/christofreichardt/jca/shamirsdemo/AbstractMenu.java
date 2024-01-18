@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 abstract public class AbstractMenu implements Menu, Traceable {
 
-    final App app;
+    final AppCallback app;
     final Map<String, Command> shortCuts;
 
     class Console {
@@ -104,7 +104,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
 
     final Console console = new Console();
 
-    public AbstractMenu(App app) {
+    public AbstractMenu(AppCallback app) {
         this.app = app;
         this.shortCuts = computeShortCutMap();
     }

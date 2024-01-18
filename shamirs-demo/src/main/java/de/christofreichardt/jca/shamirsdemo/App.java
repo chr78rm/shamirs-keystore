@@ -35,19 +35,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-public class App implements Traceable {
+public class App implements Traceable, AppCallback {
 
     final String currentDate = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
     private Path currentWorkspace;
     private Menu menu;
 
-    public App() throws IOException {
-        this.setCurrentWorkspace(initWorkspace());
-        this.menu = new MainMenu(this);
+    public App() {
     }
 
+    @Override
     public Path getCurrentWorkspace() {
         return currentWorkspace;
     }
@@ -56,33 +56,31 @@ public class App implements Traceable {
         this.currentWorkspace = currentWorkspace;
     }
 
-    public Menu getMenu() {
-        return menu;
-    }
-
+    @Override
     public void setMenu(Menu menu) {
         this.menu = menu;
     }
 
-    Path initWorkspace() throws IOException {
+    void initWorkspace() throws IOException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "initWorkspace()");
         try {
             final int RECENT_WORKSPACE_DIRS = 5;
             Path workspaceDir = Paths.get(".", "workspace");
-            Stream.of(workspaceDir.toFile().listFiles(file -> file.isDirectory()))
+            Stream.of(Objects.requireNonNull(workspaceDir.toFile().listFiles(file -> file.isDirectory())))
                     .sorted((file1, file2) -> file1.getName().compareTo(file2.getName()))
                     .forEachOrdered(file -> tracer.out().printfIndentln("workspace = %s", file));
             Path workspace = workspaceDir.resolve(this.currentDate);
             if (Files.exists(workspace)) {
                 if (!Files.isDirectory(workspace)) {
-                    throw new IOException(String.format("%s isn't a directory."));
+                    throw new IOException(String.format("%s isn't a directory.", workspace));
                 }
             } else {
                 Files.createDirectory(workspace);
             }
 
-            return workspace;
+            this.currentWorkspace = workspace;
+            this.menu = new MainMenu(this);
         } finally {
             tracer.wayout();
         }
@@ -158,6 +156,7 @@ public class App implements Traceable {
                 }
                 Security.addProvider(new ShamirsProvider());
                 App app = new App();
+                app.initWorkspace();
                 app.mainLoop();
                 System.console().printf("\n");
             } finally {

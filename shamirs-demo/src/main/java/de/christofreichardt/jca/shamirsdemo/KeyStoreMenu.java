@@ -86,7 +86,7 @@ public class KeyStoreMenu extends AbstractMenu {
     private final KeyStore keyStore;
     private final ShamirsLoadParameter shamirsLoadParameter;
 
-    public KeyStoreMenu(App app, KeyStore keyStore, ShamirsLoadParameter shamirsLoadParameter) {
+    public KeyStoreMenu(AppCallback app, KeyStore keyStore, ShamirsLoadParameter shamirsLoadParameter) {
         super(app);
         this.keyStore = keyStore;
         this.shamirsLoadParameter = shamirsLoadParameter;
@@ -323,7 +323,7 @@ public class KeyStoreMenu extends AbstractMenu {
                             try {
                                 Certificate[] certificates = session.getPeerCertificates();
                                 tracer.out().printfIndentln("certificates.length = %d", certificates.length);
-                                for (int i=0; i<certificates.length; i++) {
+                                for (int i = 0; i < certificates.length; i++) {
                                     this.keyStore.setCertificateEntry(alias + i, certificates[i]);
                                 }
                             } catch (SSLPeerUnverifiedException | KeyStoreException ex) {

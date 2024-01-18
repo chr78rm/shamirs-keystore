@@ -80,7 +80,7 @@ public class MainMenu  extends AbstractMenu {
 
     private boolean exit = false;
 
-    public MainMenu(App app) {
+    public MainMenu(AppCallback app) {
         super(app);
     }
 
