@@ -33,7 +33,7 @@ public interface Menu {
 
     void print();
     Command readCommand() throws IOException;
-    <T extends Command> void execute(T command) throws IOException, GeneralSecurityException;
+    void execute(Command command) throws IOException, GeneralSecurityException;
     boolean isExit();
     Map<String, Command> computeShortCutMap();
 }

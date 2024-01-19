@@ -138,7 +138,7 @@ public class KeyStoreMenu extends AbstractMenu {
     }
 
     @Override
-    public <T extends Command> void execute(T command) throws IOException, GeneralSecurityException {
+    public void execute(Command command) throws IOException, GeneralSecurityException {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("void", this, "execute(Command command)");
         try {
