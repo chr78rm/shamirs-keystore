@@ -26,12 +26,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 abstract public class AbstractMenu implements Menu, Traceable {
 
     final AppCallback app;
-    final Map<String, Command> shortCuts;
+    private Map<String, Command> shortCuts;
 
     class Console {
         String readString(String regex, String label) {
@@ -106,7 +107,6 @@ abstract public class AbstractMenu implements Menu, Traceable {
 
     public AbstractMenu(AppCallback app) {
         this.app = app;
-        this.shortCuts = computeShortCutMap();
     }
 
     @Override
@@ -114,6 +114,9 @@ abstract public class AbstractMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Command", this, "readCommand()");
         try {
+            if (Objects.isNull(this.shortCuts)) {
+                this.shortCuts = computeShortCutMap();
+            }
             Command selectedCommand = null;
             System.console().printf("\n");
             do {
