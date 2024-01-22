@@ -105,7 +105,13 @@ public class App implements Traceable, AppCallback {
                 } catch (IOException | IllegalArgumentException | NoSuchElementException | GeneralSecurityException ex) {
                     ex.printStackTrace();
                     Throwable throwable = ex;
+                    boolean hasCause = false;
                     do {
+                        if (hasCause) {
+                            tracer.out().printfIndentln("Caused by: %s", throwable);
+                        } else {
+                            tracer.out().printfIndentln("%s", throwable);
+                        }
                         StackTraceElement[] stackTraceElements = throwable.getStackTrace();
                         for (StackTraceElement stackTraceElement : stackTraceElements) {
                             tracer.out().printfIndentln("  at %s.%s(%s:%d)", stackTraceElement.getClassName(),
@@ -113,11 +119,8 @@ public class App implements Traceable, AppCallback {
                                     stackTraceElement.getLineNumber());
                         }
                         throwable = throwable.getCause();
-                        if (throwable != null) {
-                            tracer.out().printfIndentln("caused by = %s: %s", throwable.getClass().getName(),
-                                    throwable.getMessage());
-                        }
-                    } while (throwable != null);
+                        hasCause = throwable != null;
+                    } while (hasCause);
 
                 }
             } while(!this.menu.isExit());
