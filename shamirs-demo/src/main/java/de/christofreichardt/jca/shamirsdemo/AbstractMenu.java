@@ -114,26 +114,27 @@ abstract public class AbstractMenu implements Menu, Traceable {
         AbstractTracer tracer = getCurrentTracer();
         tracer.entry("Command", this, "readCommand()");
         try {
-            Command command = null;
+            Command selectedCommand = null;
             System.console().printf("\n");
             do {
                 String line = System.console().readLine("%s-> ", this.app.getCurrentWorkspace().getFileName());
                 tracer.out().printfIndentln("line = %s, %d", line, (line != null ? line.length() : -1));
                 tracer.out().flush();
                 if (line != null) {
-                    String found = this.shortCuts.keySet().stream()
-                            .filter(shortCut -> line.startsWith(shortCut))
-                            .findFirst()
-                            .orElseThrow();
-
-                    tracer.out().printfIndentln("found = %s, %b, %s", found, this.shortCuts.containsKey(found), this.shortCuts.get(found));
+                    if (this.shortCuts.containsKey(line)) {
+                        selectedCommand = this.shortCuts.get(line);
+                    } else {
+                        selectedCommand = this.shortCuts.values().stream()
+                                .filter(command -> command.getFullName().startsWith(line))
+                                .findFirst()
+                                .orElseThrow();
+                    }
+                    tracer.out().printfIndentln("command = %s", selectedCommand);
                     tracer.out().flush();
-
-                    command = this.shortCuts.get(found);
                 }
-            } while (command == null);
+            } while (selectedCommand == null);
 
-            return command;
+            return selectedCommand;
         } finally {
             tracer.wayout();
         }
