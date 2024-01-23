@@ -128,4 +128,21 @@ class BinomialCombinatorSuite extends MyFunSuite {
     tracer.out().printfIndentln("solutions.size = %d", solutions.size)
     assert(solutions.size == 1)
   }
+
+  testWithTracing(this, "7th row of Pascal's Triangle") {
+    val tracer = getCurrentTracer()
+    val metaCombinator = new MetaCombinator(7)
+    val solutions = metaCombinator.solutions
+    solutions.zipWithIndex.foreach(solutions => {
+      val k: Int = solutions._2
+      val combinations: LazyList[IndexedSeq[Int]] = solutions._1
+      tracer.out().printfIndentln("=> 7 choose %d", k)
+      combinations.foreach(combination => tracer.out().printfIndentln(combination.mkString("(", ",", ")")))
+      tracer.out().printfIndentln("combinations.size = %d", combinations.size)
+      tracer.out().printfIndentln("------------------------------")
+    })
+    val row_7: String = solutions.map(solution => solution.size).mkString("(", ",", ")")
+    tracer.out().printfIndentln("7th row of Pascal's Triangle: %s", solutions.map(solution => solution.size).mkString("(", ",", ")"))
+    assert(row_7 == "(1,7,21,35,35,21,7,1)")
+  }
 }
