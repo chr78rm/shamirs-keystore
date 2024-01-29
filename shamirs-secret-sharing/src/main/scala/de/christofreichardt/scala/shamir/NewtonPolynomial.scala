@@ -52,14 +52,7 @@ class NewtonPolynomial(
 
   require(pairwiseDifferent(xx.toList), "Basis values must be pairwise different.")
 
-  def pairwiseDifferent(values: List[BigInt]): Boolean = {
-    values match {
-      case List(_) => true
-      case head :: tail =>
-        if (tail.contains(head)) false
-        else pairwiseDifferent(tail)
-    }
-  }
+  def pairwiseDifferent(values: List[BigInt]): Boolean = values.distinct.length == values.length
 
   /**
    * Computes y = P(x).
