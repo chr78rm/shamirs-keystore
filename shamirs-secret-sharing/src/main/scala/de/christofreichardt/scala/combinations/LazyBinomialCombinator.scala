@@ -36,6 +36,7 @@ import de.christofreichardt.scala.diagnosis.Tracing
  * @param k the number of integers which are to be chosen from the basic set
  */
 class LazyBinomialCombinator(val n: Int, val k: Int) extends Tracing {
+  require(n >= k)
 
   /** The lexicographic smallest solution */
   val firstSolution: IndexedSeq[Int] = IndexedSeq.tabulate(this.k)(index => index)
