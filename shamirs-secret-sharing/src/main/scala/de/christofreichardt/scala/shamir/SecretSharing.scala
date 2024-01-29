@@ -19,7 +19,7 @@
 
 package de.christofreichardt.scala.shamir
 
-import de.christofreichardt.scala.combinations.LazyBinomialCombinator
+import de.christofreichardt.scala.combinations.{LazyBinomialCombinator, MetaCombinator}
 import de.christofreichardt.scala.diagnosis.Tracing
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import java.nio.file.Path
@@ -219,6 +219,23 @@ class SecretSharing(
     }
 
     partition(sizes, sharePoints, List())
+  }
+
+  def verifiedSharePointPartition(sizes: Iterable[Int]): (IndexedSeq[IndexedSeq[(BigInt, BigInt)]], Int) = {
+    val partition = sharePointPartition(sizes).toIndexedSeq
+    val metaCombinator = new MetaCombinator(partition.length)
+    val validSliceCombinations = metaCombinator.solutions
+      .flatten
+      .dropWhile(indices => indices.isEmpty)
+      .map(indices => indices.flatMap(index => partition(index)))
+      .filter(sliceCombination => sliceCombination.length >= threshold)
+    val count = validSliceCombinations.length
+    validSliceCombinations.map(sliceCombination => new SecretMerging(sliceCombination, prime))
+      .map(merger => merger.secretBytes)
+      .forall(bytes => bytes == secretBytes)
+      .ensuring(verified => verified)
+
+    (partition, count)
   }
 
   /**

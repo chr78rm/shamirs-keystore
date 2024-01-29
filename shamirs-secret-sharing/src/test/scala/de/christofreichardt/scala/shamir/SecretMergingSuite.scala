@@ -302,6 +302,37 @@ class SecretMergingSuite extends MyFunSuite {
     assert(falsified)
   }
 
+  testWithTracing(this, "Slices-Verification-1") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 6
+    val THRESHOLD = 3
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val (partitions, count) = secretSharing.verifiedSharePointPartition(Seq(3, 1, 1, 1))
+    partitions.zipWithIndex.foreach({
+      case (slice, index) => tracer.out().printfIndentln("slice[%d] = %s", index, slice.mkString("{", ",", "}"))
+    })
+    tracer.out().printfIndentln("Verified combinations = %d", count)
+  }
+
+  testWithTracing(this, "Slices-Verification-2") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val (partitions, count) = secretSharing.verifiedSharePointPartition(Seq(4, 2, 2, 1, 1, 1, 1))
+    partitions.zipWithIndex.foreach({
+      case (slice, index) => tracer.out().printfIndentln("slice[%d] = %s", index, slice.mkString("{", ",", "}"))
+    })
+    tracer.out().printfIndentln("Verified combinations = %d", count)
+  }
 
   /*
    * A password containing several characters from the range 0080–00FF (Latin-1 Supplement), in particular

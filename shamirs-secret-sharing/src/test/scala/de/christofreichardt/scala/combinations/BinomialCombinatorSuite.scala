@@ -145,4 +145,13 @@ class BinomialCombinatorSuite extends MyFunSuite {
     tracer.out().printfIndentln("7th row of Pascal's Triangle: %s", solutions.map(solution => solution.size).mkString("(", ",", ")"))
     assert(row_7 == "(1,7,21,35,35,21,7,1)")
   }
+
+  testWithTracing(this, "MetaCombinator's flattened solutions") {
+    val tracer = getCurrentTracer()
+    val metaCombinator = new MetaCombinator(7)
+    val flattenedSolutions = metaCombinator.solutions.flatten
+    flattenedSolutions.foreach(combination => tracer.out().printfIndentln(combination.mkString("(", ",", ")")))
+    tracer.out().printfIndentln("flattenedSolutions.size = %d", flattenedSolutions.size)
+    assert(flattenedSolutions.size == 1 + 7 + 21 + 35 + 35 + 21 + 7 + 1)
+  }
 }
