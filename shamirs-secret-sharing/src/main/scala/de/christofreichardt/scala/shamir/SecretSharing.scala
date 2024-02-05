@@ -221,21 +221,31 @@ class SecretSharing(
     partition(sizes, sharePoints, List())
   }
 
-  def verifiedSharePointPartition(sizes: Iterable[Int]): (IndexedSeq[IndexedSeq[(BigInt, BigInt)]], Int) = {
-    val partition = sharePointPartition(sizes).toIndexedSeq
-    val metaCombinator = new MetaCombinator(partition.length)
-    val validSliceCombinations = metaCombinator.solutions
-      .flatten
-      .dropWhile(indices => indices.isEmpty)
-      .map(indices => indices.flatMap(index => partition(index)))
-      .filter(sliceCombination => sliceCombination.length >= threshold)
-    val count = validSliceCombinations.length
-    validSliceCombinations.map(sliceCombination => new SecretMerging(sliceCombination, prime))
-      .map(merger => merger.secretBytes)
-      .forall(bytes => bytes == secretBytes)
-      .ensuring(verified => verified)
+  case class CertificationResult(falsified: Int, verified: Int)
 
-    (partition, count)
+  def certifySharePointPartition(partition: List[IndexedSeq[(BigInt, BigInt)]]): CertificationResult  = {
+
+    def evaluateSharePointPartition(seqSizePredicate: IndexedSeq[(BigInt, BigInt)] => Boolean,
+                                    bytesPredicate: IndexedSeq[Byte] => Boolean): Int = {
+      val indexedPartition = partition.toIndexedSeq
+      val metaCombinator = new MetaCombinator(indexedPartition.length)
+      val validSliceCombinations = metaCombinator.solutions
+        .flatten
+        .dropWhile(indices => indices.isEmpty)
+        .map(indices => indices.flatMap(index => indexedPartition(index)))
+        .filter(seqSizePredicate)
+      val count = validSliceCombinations.length
+      validSliceCombinations.map(sliceCombination => new SecretMerging(sliceCombination, this.prime))
+        .map(merger => merger.secretBytes)
+        .forall(bytesPredicate)
+        .ensuring(verified => verified)
+
+      count
+    }
+
+    val falsifiedCount = evaluateSharePointPartition((points: IndexedSeq[(BigInt, BigInt)]) => points.size < this.threshold, (bytes: IndexedSeq[Byte]) => bytes != this.secretBytes)
+    val verifiedCount = evaluateSharePointPartition((points: IndexedSeq[(BigInt, BigInt)]) => points.size >= this.threshold, (bytes: IndexedSeq[Byte]) => bytes == this.secretBytes)
+    CertificationResult(falsifiedCount, verifiedCount)
   }
 
   /**
@@ -253,21 +263,29 @@ class SecretSharing(
   }
 
   /**
-   * Saves the desired partition. For technical reasons this method delivers the slices in reverse order as given by the sizes.
+   * Saves the desired partition. The partition can optionally be certified by verifying all slice combinations containing share points equal or above the threshold
+   * and by falsifying all other (invalid) slice combinations.
    *
    * @param sizes denotes the partition
    * @param path the path to the partition file
+   * @param certified indicates if the partition is to be certified
+   * @return the certification result indicating the number of verified and falsified slice combinations
    */
-  def savePartition(sizes: Iterable[Int], path: Path): Unit = {
+  def savePartition(sizes: Iterable[Int], path: Path, certified: Boolean = false): Option[CertificationResult] = {
     require(path.getParent.toFile.exists() && path.getParent.toFile.isDirectory)
     val prettyPrinter = new JsonPrettyPrinter
-    prettyPrinter.print(path.getParent.resolve(path.getFileName.toString + ".json").toFile, sharePointsAsJson)
+    prettyPrinter.print(path.getParent.resolve(path.getFileName.toString + ".json").toFile, this.sharePointsAsJson)
     val partition = sharePointPartition(sizes)
+    val certificationResult = {
+      if (certified) Option(certifySharePointPartition(partition))
+      else Option.empty
+    }
     partition.map(part => sharePointsAsJson(part))
       .zipWithIndex
       .foreach({
         case (jsonObject, i) => prettyPrinter.print(path.getParent.resolve(path.getFileName.toString + "-" + i + ".json").toFile, jsonObject)
       })
+    certificationResult
   }
 
   /**
@@ -276,7 +294,9 @@ class SecretSharing(
    * @param sizes denotes the partition
    * @param path the path to the partition file
    */
-  def savePartition(sizes: Array[Int], path: Path): Unit = savePartition(sizes.reverse.toSeq, path)
+  def savePartition(sizes: Array[Int], path: Path): Option[CertificationResult] = savePartition(sizes.reverse.toSeq, path)
+
+  def savePartition(sizes: Array[Int], path: Path, certified: Boolean): Option[CertificationResult] = savePartition(sizes.reverse.toSeq, path, certified)
 
   /**
    * Gives a textual representation of this particular secret sharing sheme.

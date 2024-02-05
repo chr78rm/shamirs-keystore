@@ -20,7 +20,7 @@
 package de.christofreichardt.scala
 package shamir
 
-import de.christofreichardt.scala.combinations.LazyBinomialCombinator
+import de.christofreichardt.scala.combinations.{LazyBinomialCombinator, MetaCombinator}
 import de.christofreichardt.scala.utils.{JsonPrettyPrinter, RandomGenerator}
 import de.christofreichardt.scalatest.MyFunSuite
 import java.nio.charset.StandardCharsets
@@ -311,11 +311,15 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val (partitions, count) = secretSharing.verifiedSharePointPartition(Seq(3, 1, 1, 1))
-    partitions.zipWithIndex.foreach({
+    val partitionInstruction = Seq(3, 1, 1, 1)
+    val partition = secretSharing.sharePointPartition(partitionInstruction)
+    partition.zipWithIndex.foreach({
       case (slice, index) => tracer.out().printfIndentln("slice[%d] = %s", index, slice.mkString("{", ",", "}"))
     })
-    tracer.out().printfIndentln("Verified combinations = %d", count)
+    val certificationResult = secretSharing.certifySharePointPartition(partition)
+    tracer.out().printfIndentln("Verified combinations = %d, falsified combinations = %d", certificationResult.verified, certificationResult.falsified)
+    val metaCombinator = new MetaCombinator(partitionInstruction.size)
+    assert(metaCombinator.solutions.flatten.tail.size == certificationResult.verified + certificationResult.falsified)
   }
 
   testWithTracing(this, "Slices-Verification-2") {
@@ -327,11 +331,15 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val (partitions, count) = secretSharing.verifiedSharePointPartition(Seq(4, 2, 2, 1, 1, 1, 1))
-    partitions.zipWithIndex.foreach({
+    val partitionInstruction = Seq(4, 2, 2, 1, 1, 1, 1)
+    val partition = secretSharing.sharePointPartition(partitionInstruction)
+    partition.zipWithIndex.foreach({
       case (slice, index) => tracer.out().printfIndentln("slice[%d] = %s", index, slice.mkString("{", ",", "}"))
     })
-    tracer.out().printfIndentln("Verified combinations = %d", count)
+    val certificationResult = secretSharing.certifySharePointPartition(partition)
+    tracer.out().printfIndentln("Verified combinations = %d, falsified combinations = %d", certificationResult.verified, certificationResult.falsified)
+    val metaCombinator = new MetaCombinator(partitionInstruction.size)
+    assert(metaCombinator.solutions.flatten.tail.size == certificationResult.verified + certificationResult.falsified)
   }
 
   /*
