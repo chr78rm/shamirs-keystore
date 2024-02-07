@@ -111,7 +111,7 @@ class SecretSharing(
   /** All shares converted into a JSON object */
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
   /**
-   * Indicates if cross checks with all possible and valid combinations of shares have been successful. This is a potentially expensive operation.
+   * Indicates if cross checks with all possible and valid combinations of shares have been successful. This is a potentially very expensive operation.
    */
   lazy val verified: Boolean = verifyAll
 
@@ -221,8 +221,22 @@ class SecretSharing(
     partition(sizes, sharePoints, List())
   }
 
+  /**
+   * A mere data holder for recording the certification (both falsification and verification) results of a sharepoint partition.
+   *
+   * @param falsified the number of falsified slice combinations with a sharepoint count below the threshold
+   * @param verified the number of verified slice combinations with a sharepoint count equal or above the threshold
+   */
   case class CertificationResult(falsified: Int, verified: Int)
 
+  /**
+   * Certifies a given sharepoint partition by falsifying all slice combinations with a sharepoint count below the threshold and vice versa by verifying all valid
+   * slice combinations with a sharepoint count equal or above the threshold. This is a potentially very expensive calculation (both time and memory at present) since
+   * all combinations from 'n choose 1' up to 'n choose n' must be considered whereby n is given by the number of slices within the partition
+   *
+   * @param partition the given sharepoint partition
+   * @return the result of the certification if successful
+   */
   def certifySharePointPartition(partition: List[IndexedSeq[(BigInt, BigInt)]]): CertificationResult  = {
 
     def evaluateSharePointPartition(seqSizePredicate: IndexedSeq[(BigInt, BigInt)] => Boolean,
