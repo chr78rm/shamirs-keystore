@@ -137,7 +137,7 @@ class BinomialCombinatorSuite extends MyFunSuite {
       val k: Int = solutions._2
       val combinations: LazyList[IndexedSeq[Int]] = solutions._1
       tracer.out().printfIndentln("=> 7 choose %d", k)
-      combinations.foreach(combination => tracer.out().printfIndentln(combination.mkString("(", ",", ")")))
+      combinations.foreach(combination => tracer.out().printfIndentln(combination.mkString("{", ",", "}")))
       tracer.out().printfIndentln("combinations.size = %d", combinations.size)
       tracer.out().printfIndentln("------------------------------")
     })
