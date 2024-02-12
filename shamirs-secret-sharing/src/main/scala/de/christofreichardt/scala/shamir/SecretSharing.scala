@@ -111,9 +111,18 @@ class SecretSharing(
   /** All shares converted into a JSON object */
   lazy val sharePointsAsJson: JsonObject = sharePointsAsJson(sharePoints)
   /**
-   * Indicates if cross checks with all possible and valid combinations of shares have been successful. This is a potentially very expensive operation.
+   * Indicates if cross checks with all possible combinations of shares with a sharepoint count that equals the threshold have successfully produced the secret.
+   * This is backed by a potentially very expensive operation.
    */
   lazy val verified: Boolean = verifyAll
+  /**
+   * Ensures that all combinations of shares below the threshold have failed to produce the secret. This is backed by a potentially very expensive operation.
+   */
+  lazy val falsified: Boolean = falsifyAll
+  /**
+   * Indicates that both [[verified]] and [[falsified]] have produced the expected results
+   */
+  lazy val certified: Boolean = verified && falsified
 
   /**
    * Calculates a random prime p with the property s < p.
@@ -164,7 +173,8 @@ class SecretSharing(
   }
 
   /**
-   * Verifies that all valid combinations of shares recover the secret bytes.
+   * Verifies that all valid combinations of shares recover the secret bytes. That is all combinations of shares with a sharepoint count
+   * that equals the threshold will be considered.
    *
    * @return indicates the outcome of all possible and valid cross checks
    */
@@ -178,6 +188,26 @@ class SecretSharing(
         merger.secretBytes
       })
       .forall(bytes => bytes == secretBytes)
+  }
+
+  def falsifyAll: Boolean = {
+    val metaCombinator = new MetaCombinator(this.shares)
+    val solutions = metaCombinator.solutions
+    solutions.zipWithIndex
+      .tail // skips 'n choose 0' -> {}
+      .filter(indexedCombinations => {
+        val (_, k) = indexedCombinations
+        k < this.threshold
+      })
+      .forall(indexedCombinations => {
+        val (combinations, k) = indexedCombinations
+        !combinations.map(combination => {
+          val indices = combination
+          val selectedPoints = indices.map(index => sharePoints(index))
+          val merger = SecretMerging(selectedPoints, this.prime)
+          merger.secretBytes
+        }).contains(this.secretBytes)
+      })
   }
 
   /**

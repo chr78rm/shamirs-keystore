@@ -278,7 +278,7 @@ class SecretMergingSuite extends MyFunSuite {
    * Merging with one sharepoint less than the required threshold must not produce the
    * original secret at least not with overwhelming probability
    */
-  testWithTracing(this, "Exhaustive-Falsification") {
+  testWithTracing(this, "Exhaustive-Falsification-1") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes
     val SHARES = 8
@@ -302,7 +302,66 @@ class SecretMergingSuite extends MyFunSuite {
     assert(falsified)
   }
 
-  testWithTracing(this, "Slices-Verification-1") {
+  testWithTracing(this, "Exhaustive-Falsification-2") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val metaCombinator = new MetaCombinator(SHARES)
+    val solutions = metaCombinator.solutions
+    val falsified = solutions.zipWithIndex
+      .tail // skips '12 choose 0' -> {}
+      .filter(indexedCombinations => {
+        val (_, k) = indexedCombinations
+        k < THRESHOLD
+      })
+      .forall(indexedCombinations => {
+        val (combinations, k) = indexedCombinations
+        tracer.out().printfIndentln("%d choose %d", metaCombinator.n, k)
+        combinations.map(combination => {
+          tracer.out().printfIndentln("%s", combination.mkString("{", ",", "}"))
+          val indices = combination
+          val selectedPoints = indices.map(index => secretSharing.sharePoints(index))
+          val merger = SecretMerging(selectedPoints, secretSharing.prime)
+          merger.secretBytes
+        }).forall(bytes => bytes != secret)
+      })
+    tracer.out().printfIndentln("falsified = %b", falsified)
+    assert(falsified)
+  }
+
+  testWithTracing(this, "Exhaustive-Falsification-3") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val falsified = secretSharing.falsified
+    tracer.out().printfIndentln("falsified = %b", falsified)
+    assert(falsified)
+  }
+
+  testWithTracing(this, "Exhaustive-Certification") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 16 // Bytes
+    val SHARES = 12
+    val THRESHOLD = 4
+    val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+    tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+    val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    tracer.out().printfIndentln("certified = %b", secretSharing.certified)
+    assert(secretSharing.certified)
+  }
+
+  testWithTracing(this, "Slices-Certification-1") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes
     val SHARES = 6
