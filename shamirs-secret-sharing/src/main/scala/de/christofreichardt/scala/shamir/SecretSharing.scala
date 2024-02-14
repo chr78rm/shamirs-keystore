@@ -114,15 +114,18 @@ class SecretSharing(
    * Indicates if cross checks with all possible combinations of shares with a sharepoint count that equals the threshold have successfully produced the secret.
    * This is backed by a potentially very expensive operation.
    */
-  lazy val verified: Boolean = verifyAll
+  lazy val verified: (Boolean, Int) = verifyAll
   /**
    * Ensures that all combinations of shares below the threshold have failed to produce the secret. This is backed by a potentially very expensive operation.
    */
-  lazy val falsified: Boolean = falsifyAll
+  lazy val falsified: (Boolean, Int) = falsifyAll
   /**
    * Indicates that both [[verified]] and [[falsified]] have produced the expected results
    */
-  lazy val certified: Boolean = verified && falsified
+  lazy val certified: CertificationResult = {
+    assert(verified._1 && falsified._1)
+    CertificationResult(falsified._2, verified._2)
+  }
 
   /**
    * Calculates a random prime p with the property s < p.
@@ -178,22 +181,26 @@ class SecretSharing(
    *
    * @return indicates the outcome of all possible and valid cross checks
    */
-  def verifyAll: Boolean = {
+  def verifyAll: (Boolean, Int) = {
     val combinator = new LazyBinomialCombinator(this.n, this.k)
-    combinator.produceAll
+    var count = 0
+    val verified = combinator.produceAll
       .map(combination => {
         val indices = combination
         val selectedPoints = indices.map(index => sharePoints(index))
         val merger = SecretMerging(selectedPoints, prime)
+        count = count + 1
         merger.secretBytes
       })
       .forall(bytes => bytes == secretBytes)
+    (verified, count)
   }
 
-  def falsifyAll: Boolean = {
+  def falsifyAll: (Boolean, Int) = {
     val metaCombinator = new MetaCombinator(this.shares)
     val solutions = metaCombinator.solutions
-    solutions.zipWithIndex
+    var count = 0
+    val falsified = solutions.zipWithIndex
       .tail // skips 'n choose 0' -> {}
       .filter(indexedCombinations => {
         val (_, k) = indexedCombinations
@@ -205,9 +212,11 @@ class SecretSharing(
           val indices = combination
           val selectedPoints = indices.map(index => sharePoints(index))
           val merger = SecretMerging(selectedPoints, this.prime)
+          count = count + 1
           merger.secretBytes
         }).contains(this.secretBytes)
       })
+    (falsified, count)
   }
 
   /**
@@ -257,7 +266,9 @@ class SecretSharing(
    * @param falsified the number of falsified slice combinations with a sharepoint count below the threshold
    * @param verified the number of verified slice combinations with a sharepoint count equal or above the threshold
    */
-  case class CertificationResult(falsified: Int, verified: Int)
+  case class CertificationResult(falsified: Int, verified: Int) {
+    override def toString: String = String.format("(%d falsified, %d verified)", falsified, verified)
+  }
 
   /**
    * Certifies a given sharepoint partition by falsifying all slice combinations with a sharepoint count below the threshold and vice versa by verifying all valid
@@ -313,7 +324,7 @@ class SecretSharing(
    * @param sizes denotes the partition
    * @param path the path to the partition file
    * @param certified indicates if the partition is to be certified
-   * @return the certification result indicating the number of verified and falsified slice combinations
+   * @return the optional certification result indicating the number of verified and falsified slice combinations
    */
   def savePartition(sizes: Iterable[Int], path: Path, certified: Boolean = false): Option[CertificationResult] = {
     require(path.getParent.toFile.exists() && path.getParent.toFile.isDirectory)
@@ -340,7 +351,14 @@ class SecretSharing(
    */
   def savePartition(sizes: Array[Int], path: Path): Option[CertificationResult] = savePartition(sizes.reverse.toSeq, path)
 
-  def savePartition(sizes: Array[Int], path: Path, certified: Boolean): Option[CertificationResult] = savePartition(sizes.reverse.toSeq, path, certified)
+  /**
+   * a convenience method. Demands that the desired partition is to be certified before saving, see [[savePartition()]].
+   *
+   * @param sizes denotes the partition
+   * @param path the path to the partition file
+   * @return the certification result indicating the number of verified and falsified slice combinations
+   */
+  def saveCertifiedPartition(sizes: Array[Int], path: Path): CertificationResult = savePartition(sizes.reverse.toSeq, path, true).get
 
   /**
    * Gives a textual representation of this particular secret sharing sheme.

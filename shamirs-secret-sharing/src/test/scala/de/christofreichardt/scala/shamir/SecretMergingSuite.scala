@@ -241,8 +241,9 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
-    assert(secretSharing.verified)
+    tracer.out().printfIndentln("verified = %s", secretSharing.verified)
+    assert(secretSharing.verified._1)
+    assert(secretSharing.verified._2 == 70) // == '8 choose 4'
   }
 
   testWithTracing(this, "Exhaustive-Verification-2 (n=12, k=6)") {
@@ -254,8 +255,9 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
-    assert(secretSharing.verified)
+    tracer.out().printfIndentln("verified = %s", secretSharing.verified)
+    assert(secretSharing.verified._1)
+    assert(secretSharing.verified._2 == 924) // == '12 choose 6'
   }
 
   /*
@@ -270,8 +272,9 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    tracer.out().printfIndentln("verified = %b", secretSharing.verified: java.lang.Boolean)
-    assert(secretSharing.verified)
+    tracer.out().printfIndentln("verified = %s", secretSharing.verified)
+    assert(secretSharing.verified._1)
+    assert(secretSharing.verified._2 == 12870) // == '16 choose 8'
   }
 
   /*
@@ -343,9 +346,10 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val falsified = secretSharing.falsified
-    tracer.out().printfIndentln("falsified = %b", falsified)
+    val (falsified, count) = secretSharing.falsified
+    tracer.out().printfIndentln("falsified = %b, count = %d", falsified, count)
     assert(falsified)
+    assert(count == 298) // '12 choose 1' + '12 choose 2' + '12 choose 3' = 12 + 66 + 220 = 298
   }
 
   testWithTracing(this, "Exhaustive-Certification") {
@@ -357,8 +361,9 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    tracer.out().printfIndentln("certified = %b", secretSharing.certified)
-    assert(secretSharing.certified)
+    tracer.out().printfIndentln("certified = %s", secretSharing.certified)
+    assert(secretSharing.certified.falsified == 298) // '12 choose 1' + '12 choose 2' + '12 choose 3' = 12 + 66 + 220 = 298
+    assert(secretSharing.certified.verified == 495) //'12 choose 4' = 495
   }
 
   testWithTracing(this, "Slices-Certification-1") {
@@ -377,8 +382,8 @@ class SecretMergingSuite extends MyFunSuite {
     })
     val certificationResult = secretSharing.certifySharePointPartition(partition)
     tracer.out().printfIndentln("Verified combinations = %d, falsified combinations = %d", certificationResult.verified, certificationResult.falsified)
-    val metaCombinator = new MetaCombinator(partitionInstruction.size)
-    assert(metaCombinator.solutions.flatten.tail.size == certificationResult.verified + certificationResult.falsified)
+    assert(certificationResult.falsified == 6)
+    assert(certificationResult.verified == 9)
   }
 
   testWithTracing(this, "Slices-Verification-2") {
@@ -390,7 +395,7 @@ class SecretMergingSuite extends MyFunSuite {
     tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
     val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
     tracer.out().printfIndentln("secretSharing = %s", secretSharing)
-    val partitionInstruction = Seq(4, 2, 2, 1, 1, 1, 1)
+    val partitionInstruction = Seq(4, 2, 2, 1, 1, 1, 1) // 7 slices
     val partition = secretSharing.sharePointPartition(partitionInstruction)
     partition.zipWithIndex.foreach({
       case (slice, index) => tracer.out().printfIndentln("slice[%d] = %s", index, slice.mkString("{", ",", "}"))
@@ -398,7 +403,7 @@ class SecretMergingSuite extends MyFunSuite {
     val certificationResult = secretSharing.certifySharePointPartition(partition)
     tracer.out().printfIndentln("Verified combinations = %d, falsified combinations = %d", certificationResult.verified, certificationResult.falsified)
     val metaCombinator = new MetaCombinator(partitionInstruction.size)
-    assert(metaCombinator.solutions.flatten.tail.size == certificationResult.verified + certificationResult.falsified)
+    assert(certificationResult.verified + certificationResult.falsified == 127) // '7 choose 1' + '7 choose 2' + '7 choose 3' + '7 choose 4' + '7 choose 5' + '7 choose 6' + '7 choose 7' == 7 + 21 + 35 +35 + 21 + 7 + 1 == 127
   }
 
   /*
