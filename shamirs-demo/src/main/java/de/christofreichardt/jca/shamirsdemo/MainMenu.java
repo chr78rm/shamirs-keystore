@@ -200,10 +200,24 @@ public class MainMenu  extends AbstractMenu {
                 sum += size;
             }
             SecretSharing secretSharing = new SecretSharing(shares, threshold, passwordSeq);
-
             tracer.out().printfIndentln("secretSharing = %s", secretSharing);
 
-            secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+            String certificationMethod = this.console.readString("All|Slices|None", "Certification method", "Slices");
+            tracer.out().printfIndentln("certificationMethod = %s", certificationMethod);
+            if (Objects.equals("All", certificationMethod)) {
+                SecretSharing.CertificationResult certificationResult = secretSharing.certified();
+                tracer.out().printfIndentln("certificationResult = %s", certificationResult);
+                secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+                System.console().printf("-------------------------------------------------------------\n");
+                System.console().printf("certificationResult = %s\n", certificationResult);
+            } else if (Objects.equals("Slices", certificationMethod)) {
+                SecretSharing.CertificationResult certificationResult = secretSharing.saveCertifiedPartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+                tracer.out().printfIndentln("certificationResult = %s", certificationResult);
+                System.console().printf("-------------------------------------------------------------\n");
+                System.console().printf("certificationResult = %s\n", certificationResult);
+            } else {
+                secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+            }
         } finally {
             tracer.wayout();
         }

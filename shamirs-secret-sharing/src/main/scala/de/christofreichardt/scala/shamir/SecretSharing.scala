@@ -123,7 +123,7 @@ class SecretSharing(
    * Indicates that both [[verified]] and [[falsified]] have produced the expected results
    */
   lazy val certified: CertificationResult = {
-    assert(verified._1 && falsified._1)
+    assert(verified._1 && falsified._1, "Generic sharepoint certification failed.")
     CertificationResult(falsified._2, verified._2)
   }
 
@@ -293,7 +293,7 @@ class SecretSharing(
       validSliceCombinations.map(sliceCombination => new SecretMerging(sliceCombination, this.prime))
         .map(merger => merger.secretBytes)
         .forall(bytesPredicate)
-        .ensuring(verified => verified)
+        .ensuring(verified => verified, "Certification of sharepoint partition failed.")
 
       count
     }

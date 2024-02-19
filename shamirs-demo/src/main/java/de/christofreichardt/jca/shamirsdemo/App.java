@@ -103,27 +103,40 @@ public class App implements Traceable, AppCallback {
                         this.menu.execute(command);
                     }
                 } catch (IOException | IllegalArgumentException | NoSuchElementException | GeneralSecurityException ex) {
-                    ex.printStackTrace();
-                    Throwable throwable = ex;
-                    boolean hasCause = false;
-                    do {
-                        if (hasCause) {
-                            tracer.out().printfIndentln("Caused by: %s", throwable);
-                        } else {
-                            tracer.out().printfIndentln("%s", throwable);
-                        }
-                        StackTraceElement[] stackTraceElements = throwable.getStackTrace();
-                        for (StackTraceElement stackTraceElement : stackTraceElements) {
-                            tracer.out().printfIndentln("  at %s.%s(%s:%d)", stackTraceElement.getClassName(),
-                                    stackTraceElement.getMethodName(), stackTraceElement.getFileName(),
-                                    stackTraceElement.getLineNumber());
-                        }
-                        throwable = throwable.getCause();
-                        hasCause = throwable != null;
-                    } while (hasCause);
-
+                    traceException(ex);
+                } catch (AssertionError error) {
+                    if (!(error.getMessage().endsWith("Certification of sharepoint partition failed.") || error.getMessage().endsWith("Generic sharepoint certification failed."))) {
+                        throw error;
+                    }
+                    traceException(error);
                 }
             } while(!this.menu.isExit());
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    private void traceException(Throwable throwable) {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "traceException(Throwable throwable)");
+        try {
+            throwable.printStackTrace();
+            boolean hasCause = false;
+            do {
+                if (hasCause) {
+                    tracer.out().printfIndentln("Caused by: %s", throwable);
+                } else {
+                    tracer.out().printfIndentln("%s", throwable);
+                }
+                StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+                for (StackTraceElement stackTraceElement : stackTraceElements) {
+                    tracer.out().printfIndentln("  at %s.%s(%s:%d)", stackTraceElement.getClassName(),
+                            stackTraceElement.getMethodName(), stackTraceElement.getFileName(),
+                            stackTraceElement.getLineNumber());
+                }
+                throwable = throwable.getCause();
+                hasCause = throwable != null;
+            } while (hasCause);
         } finally {
             tracer.wayout();
         }
