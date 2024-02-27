@@ -64,6 +64,8 @@ package object shamir {
 
     check(items, Set.empty[T])
   }
+  
+  val PADDING_BYTE: Byte = 0x7F.toByte
 
   /**
    * Converts the given bytes into a non-negative `BigInt` number by padding 0x7F upfront.
@@ -72,7 +74,7 @@ package object shamir {
    * @return the resulting non-negative BigInt number
    */
   def bytes2BigInt(bytes: IndexedSeq[Byte]): BigInt = {
-    val paddedBytes = 0x7F.toByte +: bytes
+    val paddedBytes = PADDING_BYTE +: bytes
     BigInt(paddedBytes.toArray)
   }
 
