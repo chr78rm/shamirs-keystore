@@ -47,7 +47,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
         String readString(String regex, String label, String proposal) {
             String input;
             do {
-                input = (System.console().readLine("%s-> %s (%s): %s ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal));
+                input = (System.console().readLine("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal));
                 input = input.length() == 0 ? proposal : input;
             } while (!Pattern.matches(regex, input));
 
@@ -64,7 +64,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
                 CharBuffer input;
                 do {
                     input = CharBuffer.allocate(MAX_LENGTH);
-                    System.console().printf("%s-> %s (%s): %s ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
+                    System.console().printf("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
                     int actualRead = reader.read(input);
                     int length = actualRead - System.lineSeparator().length();
                     if (length > 0) {
