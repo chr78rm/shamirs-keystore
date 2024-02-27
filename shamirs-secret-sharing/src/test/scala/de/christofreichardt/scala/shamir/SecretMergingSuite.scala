@@ -352,7 +352,27 @@ class SecretMergingSuite extends MyFunSuite {
     assert(count == 298) // '12 choose 1' + '12 choose 2' + '12 choose 3' = 12 + 66 + 220 = 298
   }
 
-  testWithTracing(this, "Exhaustive-Certification") {
+  /*
+   * This will likely trigger a falsification error. A secret containing only two bytes will result in a similar small finite field. Five repetitions
+   * of '16 choose 1' (== 16 combinations) up to '16 choose 7' (== 11440 combinations) are usually sufficient to generate a distribution whose secret is
+   * recoverable by pure chance with less than k (== threshold) sharepoints.
+   */
+  ignore(this, "Exhaustive-Falsification-4") {
+    val tracer = getCurrentTracer()
+    val SECRET_SIZE = 2 // Bytes
+    val SHARES = 16
+    val THRESHOLD = 8
+    Range(0, 5).foreach(index => {
+      val secret: IndexedSeq[Byte] = randomGenerator.byteStream.take(SECRET_SIZE).toIndexedSeq
+      tracer.out().printfIndentln("secret = (%s)", formatBytes(secret))
+      val secretSharing = new SecretSharing(SHARES, THRESHOLD, secret)
+      tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+      tracer.out().printfIndentln("verified = %s", secretSharing.verified)
+      tracer.out().printfIndentln("falsified = %s", secretSharing.falsified)
+    })
+  }
+
+  testWithTracing(this, "Exhaustive-Certification-1") {
     val tracer = getCurrentTracer()
     val SECRET_SIZE = 16 // Bytes
     val SHARES = 12
