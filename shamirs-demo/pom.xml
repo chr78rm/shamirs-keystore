@@ -213,6 +213,7 @@
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>1.1.5</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>
