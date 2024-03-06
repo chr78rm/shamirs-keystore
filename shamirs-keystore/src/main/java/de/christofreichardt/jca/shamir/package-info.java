@@ -25,7 +25,7 @@
  * </ol>
  *
  * @see
- * <a href="https://docs.oracle.com/en/java/javase/16/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190">
+ * <a href="https://docs.oracle.com/en/java/javase/21/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190">
  *      Java Cryptography Architecture (JCA) Reference Guide
  * </a>
  *
