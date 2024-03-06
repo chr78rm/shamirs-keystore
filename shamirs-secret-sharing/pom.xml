@@ -45,7 +45,7 @@
 		<scala.version>3.3.1</scala.version>
 		<scalatest.version>3.2.17</scalatest.version>
 		<scala-maven-plugin.version>4.8.1-EXPERIMENTAL</scala-maven-plugin.version>
-		<maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.2.0</scalatest-maven-plugin.version>
 	</properties>
 
