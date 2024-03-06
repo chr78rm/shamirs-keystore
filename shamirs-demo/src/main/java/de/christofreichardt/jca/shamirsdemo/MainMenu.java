@@ -202,7 +202,7 @@ public class MainMenu  extends AbstractMenu {
             SecretSharing secretSharing = new SecretSharing(shares, threshold, passwordSeq);
             tracer.out().printfIndentln("secretSharing = %s", secretSharing);
 
-            String certificationMethod = this.console.readString("All|Slices|None", "Certification method", "Slices");
+            String certificationMethod = this.console.readString("All|Slices|None", "Certification method", "None");
             tracer.out().printfIndentln("certificationMethod = %s", certificationMethod);
             if (Objects.equals("All", certificationMethod)) {
                 SecretSharing.CertificationResult certificationResult = secretSharing.certified();
