@@ -9,7 +9,10 @@
  *         Dynamically register the provider with
  *         <div style="margin-top: 0.5em">
  *              <code>
- *                  ShamirsProvider myProvider = new ShamirsProvider(); <br/>
+ *                  ShamirsProvider myProvider = new ShamirsProvider();
+ *              </code>
+ *              <br>
+ *              <code>
  *                  Security.addProvider(myProvider);
  *              </code>
  *         </div>
