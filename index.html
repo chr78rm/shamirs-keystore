@@ -71,7 +71,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2022-07-14</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2024-03-12</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -86,22 +86,26 @@
           <a class="menu" href="#8">6. Download</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#12">6.1 Demo App</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#13">6.2 Maven Coordinates</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#18">6.3 Project Dependencies</a><br/>
           <a class="menu" href="#9">7. User Manual</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#14">7.1 Demo App</a><br/>
           <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#15">7.2 Keystore Engine</a><br/>
           <a class="menu" href="#16">8. API Docs</a><br/>
+          <a class="menu" href="#19">9. JSON Schema</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#20">9.1 Definitions</a><br/>
+          <a class="menu" style="font-size: 0.7rem; padding-left: 0.5rem" href="#21">9.2 Exapmple</a><br/>
           <a class="menu" href="#imprint">Imprint</a>
         </div>
       </div>
       <p id="1" class="headline-0">Shamir's Keystore</p>
       <p id="2" class="headline-1">Abstract</p>
       <p class="section">
-        This <a href="https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html">JCA provider</a> presently implements 
+        This <a href="https://docs.oracle.com/en/java/javase/21/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190">JCA provider</a> presently implements
         <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
-        Newton Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
-        as defined by the <a href="https://docs.oracle.com/en/java/javase/11/security/howtoimplaprovider.html">Java Cryptographic Architecture</a> is provided. Such a keystore instance might 
-        be unlocked - apart from the master password - by a previously computed subset of secret shares. In order to be able to reconstruct the master password a certain number of secret shares 
-        above a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
+        Newton Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
+        as defined by the <a href="https://docs.oracle.com/en/java/javase/21/security/howtoimplaprovider.html#GUID-C485394F-08C9-4D35-A245-1B82CDDBC031">Java Cryptographic Architecture</a> is provided. Such a keystore instance might
+        be unlocked - apart from the master password - by certain subsets of previously computed secret shares. In order to be able to reconstruct the master password a specific number of secret shares 
+        equal to (or above) a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
         password with fewer shares as defined by the given threshold. In this way, it is possible to enforce e.g. the four-eye-principle. The provided keystore implementation
         is PKCS12 compliant and internally relies on the implementation provided by the Java platform.
       </p>
@@ -110,16 +114,7 @@
       </p>
       <p id="3" class="headline-1">1. Build</p>
       <p class="section">
-          On Windows I recommend to use the <a href="https://git-scm.com/download/win">Git Bash</a>. Then you would have to disable the automatic conversion of Unix style end-of-line marker, 
-          otherwise one of the test cases might fail. But please also note the instructions when executing the <a href="#14">Demo App</a> within the Git Bash.
-      </p>
-      <div class="code">
-        <p class="code">
-          $ git config --global core.autocrlf false
-        </p>
-      </div>
-      <p class="section">
-        Now clone the project:
+          Clone the project (or download and unpack the <a href="https://github.com/chr78rm/shamirs-keystore/archive/refs/heads/master.zip">zip</a>):
       </p>
       <div class="code">
         <p class="code">
@@ -140,9 +135,15 @@
       </p>
       <p class="section">
         Note that the included demo app makes use of the pkix sub-module from the <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a> crypto library for 
-        programmatically generating self-signed X.509 certificates which is something that cannot be easily done with the JDK alone. Aside from this two other
-        dependencies must be mentioned: JSON processing by <a href="https://resteasy.github.io/">RESTEasy</a> and of course the 
-        <a href="https://www.scala-lang.org/">Scala</a>-Library since the core module containing the actual algorithm is written in Scala.
+        programmatically generating self-signed X.509 certificates which is something that cannot be easily done with the JDK alone. The library itself
+        depends on the <a href="https://www.scala-lang.org/">Scala</a>-Library (since the core module containing the actual algorithm is presently written in Scala) and
+        on <a href="https://jakarta.ee/specifications/jsonp/">Jakarta JSON Processing</a>. The latter is merely the specification of an API and hence
+        you additionally need an implementation for that at runtime, e.g. <a href="https://github.com/eclipse-ee4j/parsson">Eclipse Parsson</a>, if you want to use
+        the JCA provider in your applications. See section <a href="#13">6.2 Maven Coordinates</a> for further details.
+      </p>
+      <p class="section">
+          The project uses <a href="https://junit.org/junit5/">JUnit 5</a> together with <a href="https://assertj.github.io/doc/">AssertJ</a> or rather 
+          <a href="https://www.scalatest.org/">ScalaTest</a> for unit testing.
       </p>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -278,12 +279,13 @@
       <p id="7" class="headline-1">5. Reports</p>
       <p class="section">
         The two sub modules shamirs-keystore - containing the actual JCA provider - and shamirs-demo are both using <a href="https://junit.org/junit5/">JUnit5</a> for their 
-        unit testing. The currently recommended Maven <a href="https://maven.apache.org/surefire/maven-surefire-plugin/">surefire</a> plugin 
-        version 3.0.0-M4 doesn't accurately produce the test reports at least not when using 
-        <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested">nested tests</a>. The two linked reports below have been generated by a custom 
+        unit testing. The <a href="https://maven.apache.org/surefire/maven-surefire-plugin/">Maven Surefire Plugin</a> up to version 3.2.5 is confused about JUnit5's
+        <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-nested">nested tests</a> and hence
+        doesn't accurately produce the numbers for the reports. The two linked reports below have been generated by a custom 
         JUnit5 <a href="https://junit.org/junit5/docs/current/user-guide/#launcher-api-listeners-custom">TestExecutionListener</a> during the last build.
       </p>
       <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">JUnit5 reports</caption>
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Artifact</th>
@@ -302,10 +304,11 @@
       <p class="section">
         The sub module shamirs-secret-sharing - containing the actual algorithm - is written in <a href="https://www.scala-lang.org/">Scala</a> and uses 
         <a href="http://www.scalatest.org/">ScalaTest</a> for its unit testing. Again a custom 
-        <a href="http://doc.scalatest.org/3.1.1/org/scalatest/Reporter.html">Reporter</a>
+        <a href="https://www.scalatest.org/scaladoc/3.2.18/org/scalatest/Reporter.html">Reporter</a>
         is used to collect the events occurring throughout the execution of the tests. The linked report below has been generated during the last build.
       </p>
       <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">ScalaTest reports</caption>
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Artifact</th>
@@ -323,20 +326,16 @@
       <p id="8" class="headline-1">6. Download</p>
       <p id="12" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.1 Demo App</p>
       <p class="section">
-        By the time I initially experimented with this Maven multi module project I had run into difficulties regarding the automatic execution of unit tests
-        when applying the principles of the new Java module system (Jigsaw). I decided to waste no further time in finding workable solutions and leave this for
-        future versions. That is to say the module boundaries you see in the <a href="#6">UML Diagrams</a> section are respected by the different components 
-        but are not presently enforced. The demo application can optionally be packaged as uber-jar by the Apache Maven Shade plugin using a certain build profile.
-        Consequently the Maven Shade plugin is currently configured to strip off all module-info.class files from external libraries - shading would break the
-        encapsulation anyway.
-        The subsequent provided download contains the demo app and both the core module with the algorithm and the actual JCA provider.
+        The demo app has been packaged by the <a href="https://maven.apache.org/plugins/maven-shade-plugin/">Maven Shade Plugin</a>. The subsequently provided downloads contain the demo app and 
+        both the core module with the algorithm and the actual JCA provider.
       </p>
       <table style="font-family: serif; width: 85%; margin-left: auto; margin-right: auto">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">shamirs-demo</caption>
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 15%">Artifact</th>
             <th class="cell">Archive</th>
-            <th class="cell">Timestamp</th>
+            <th class="cell">Build Time</th>
             <th class="cell">sha512 checksum</th>
           </tr>
           <tr style="">
@@ -389,14 +388,24 @@
               <a href="./shamirs-demo-1.2.0.zip.sha512.txt">shamirs-demo-1.2.0.zip.sha512</a>
             </td>
           </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">shamirs-demo-1.3.0</td>
+            <td class="cell">
+              <a href="https://www.dropbox.com/scl/fi/f1whcxg2r4zj2xa9i4w61/shamirs-demo-1.3.0.zip?rlkey=avuxwmfygjk31mdda4zzkyi8k&dl=1">shamirs-demo-1.3.0.zip</a>
+            </td>
+            <td class="cell">2024-03-12 13:41:47.720 +0100</td>
+            <td class="cell">
+              <a href="./shamirs-demo-1.3.0.zip.sha512.txt">shamirs-demo-1.3.0.zip.sha512</a>
+            </td>
+          </tr>
         </tbody>
       </table>
       <p class="section">
         Note that the demo app includes binaries from external open source projects, namely the <a href="https://www.scala-lang.org/">Scala</a>-Library, 
-        the JSON-Processing provider from <a href="https://resteasy.github.io/">RESTEasy</a> and
-        the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>.
+        the Jakarta JSON-Processing implementation <a href="https://github.com/eclipse-ee4j/parsson">Eclipse Parsson</a> and
+        the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>. Section <a href="#14">7.1 Demo App</a> explains how to use the demo app.
       </p>
-      <p id="13" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.1 Maven Coordinates</p>
+      <p id="13" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.2 Maven Coordinates</p>
       <p class="section">
         The KeyStore engine together with the relevant artifacts had been deployed to Maven Central and can be used within your applications by referencing the subsequent Maven coordinates:
       </p>
@@ -404,13 +413,80 @@
         <p class="code" style="white-space: pre">&lt;dependency&gt;
     &lt;groupId&gt;de.christofreichardt&lt;/groupId&gt;
     &lt;artifactId&gt;shamirs-keystore&lt;/artifactId&gt;
-    &lt;version&gt;1.2.0&lt;/version&gt;
-    &lt;type&gt;jar&lt;/type&gt;
+    &lt;version&gt;1.3.0&lt;/version&gt;
 &lt;/dependency&gt;</p>
       </div>
       <p class="section">
-        See section <a href="#15">7.2 Keystore Engine</a> how to use the provider within your applications.
+        You will additionally need an implementation for the Jakarta JSON Processing API at runtime, e.g.
       </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.parsson&lt;/groupId&gt;
+    &lt;artifactId&gt;jakarta.json&lt;/artifactId&gt;
+    &lt;version&gt;1.1.5&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</p>
+      </div>
+      <p class="section">
+        Depending on your deployment the latter runtime dependency might not be necessary, e.g. if you are using a Jakarta EE application server. Starting with version 1.3.0 the library uses the
+        new <span class="code">jakarta.json</span> namespace instead of the legacy <span class="code">javax.json</span> and should therefore
+        be compatible with Jakarta EE 9 upwards. An alternative to Eclipse Parsson
+        is <a href="https://leadpony.github.io/joy/">Joy</a> but Eclipse Parsson seems to be more actively maintained and it is the reference implementation.
+      </p>
+      <p class="section">
+        Section <a href="#15">7.2 Keystore Engine</a> explains how to use the provider within your applications.
+      </p>
+      <p id="18" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.3 Project Dependencies</p>
+      <p class="section">
+        These are the third-party dependencies of the latest version:
+      </p>
+      <table style="font-family: serif; width: 85%; margin-left: auto; margin-right: auto; margin-top: 1rem">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">Dependencies</caption>
+        <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 15%">GroupId</th>
+            <th class="cell" style="width: 15%">ArtifactId</th>
+            <th class="cell" style="width: 15%">Version</th>
+            <th class="cell" style="width: 15%">Scope</th>
+            <th class="cell" style="width: 40%">License</th>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">de.christofreichardt</td>
+            <td class="cell" style="width: 15%">tracelogger</td>
+            <td class="cell" style="width: 15%">1.10.0</td>
+            <td class="cell" style="width: 15%">compile</td>
+            <td class="cell" style="width: 40%">Apache License, Version 2.0</td>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">org.scala-lang</td>
+            <td class="cell" style="width: 15%">scala3-library_3</td>
+            <td class="cell" style="width: 15%">3.3.3</td>
+            <td class="cell" style="width: 15%">compile</td>
+            <td class="cell" style="width: 40%">Apache License, Version 2.0</td>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">org.scala-lang</td>
+            <td class="cell" style="width: 15%">scala-library</td>
+            <td class="cell" style="width: 15%">2.13.12</td>
+            <td class="cell" style="width: 15%">compile</td>
+            <td class="cell" style="width: 40%">Apache License, Version 2.0</td>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">jakarta.json</td>
+            <td class="cell" style="width: 15%">jakarta.json-api</td>
+            <td class="cell" style="width: 15%">2.1.3</td>
+            <td class="cell" style="width: 15%">compile</td>
+            <td class="cell" style="width: 40%">GNU General Public License Version 2 with Classpath Exception,<br/>Eclipse Public License 2.0</td>
+          </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">org.eclipse.parsson</td>
+            <td class="cell" style="width: 15%">jakarta.json</td>
+            <td class="cell" style="width: 15%">1.1.5</td>
+            <td class="cell" style="width: 15%">provided</td>
+            <td class="cell" style="width: 40%">GNU General Public License Version 2 with Classpath Exception,<br/>Eclipse Public License 2.0</td>
+          </tr>
+        </tbody>
+      </table>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
@@ -427,7 +503,7 @@ $ ls
 LICENCE.txt  log/  NOTICE.txt  run-shamirs-demo.sh*  src/  target/  workspace/
 $ ls --recursive target workspace
 target:
-shamirs-demo-1.0.0.jar
+shamirs-demo-1.3.0.jar
 
 workspace:
 my-workspace-0/
@@ -437,63 +513,78 @@ my-keys.p12  test.json  test-0.json  test-1.json  test-2.json  test-3.json  test
       </div>
       <p class="section">
         On Linux the demo can be started with <span class="code">./run-shamirs-demo.sh</span>. On Windows and using the Git Bash you will instead need <span class="code">winpty sh -i -c ./run-shamirs-demo.sh</span>
-        or simply <span class="code">winpty java -jar target/shamirs-demo-1.0.0.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
-        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Console.html">Console</a> and 
-        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#console()">System.console()</a> would return null. Using the command interpreter
+        or simply <span class="code">winpty java -jar target/shamirs-demo-1.3.0.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Console.html">Console</a> and 
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/System.html#console()">System.console()</a> would return null. Using the command interpreter
         <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> of Windows you can simply type 
-        <span class="code">java -jar target/shamirs-demo-1.0.0.jar</span> to invoke the demo.
+        <span class="code">java -jar target/shamirs-demo-1.3.0.jar</span> to invoke the demo.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.0.0.jar
+        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.3.0.jar
 ...
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2021-01-06T19:17:30.3866762
-   Workspace: 2021-01-06
+Current time: 2024-02-20T16:39:09.7893644
+   Workspace: 2024-02-20
 
-2021-01-06-> Main menu
+2024-02-20-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2021-01-06-></p>
+2024-02-20-></p>
       </div>
       <p class="section">
         On Linux the explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
         when generating random passwords. See <a href="https://www.2uo.de/myths-about-urandom/">Myths about /dev/urandom</a> for a discussion about the confusion
         regarding the special device files which serve as (pseudo) random generators on Linux systems.
-        The string <span class="code">2021-01-06</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
+        The string <span class="code">2024-02-20</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
         the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
         a password:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> s
-2021-01-06-> split password
-2021-01-06-> Password ([A-Za-z0-9-]{8,45}): tJRUwW42tRwyhUnxrXicG5vPX
-2021-01-06-> Number of shares ([0-9]+): 12
-2021-01-06-> Threshold ([0-9]+): 4
-2021-01-06-> Name of partition ([A-Za-z]{1,10}): demo
-2021-01-06-> Number of slices ([0-9]+): 7
-2021-01-06-> Size[i=0, sum=0] ([0-9]+): 4
-2021-01-06-> Size[i=1, sum=4] ([0-9]+): 2
-2021-01-06-> Size[i=2, sum=6] ([0-9]+): 2
-2021-01-06-> Size[i=3, sum=8] ([0-9]+): 1
-2021-01-06-> Size[i=4, sum=9] ([0-9]+): 1
-2021-01-06-> Size[i=5, sum=10] ([0-9]+): 1
-2021-01-06-> Size[i=6, sum=11] ([0-9]+): 1</p>
+        <p class="code" style="white-space: pre">2024-02-20-> s
+2024-02-20-> split password
+2024-02-20-> Password ([A-Za-z0-9-]{8,45}) [t76B3TGw1W8CmDEGf0eXQIEPF]:
+2024-02-20-> Number of shares ([0-9]+): 12
+2024-02-20-> Threshold ([0-9]+): 4
+2024-02-20-> Name of partition ([A-Za-z]{1,10}): demo
+2024-02-20-> Number of slices ([0-9]+): 7
+2024-02-20-> Size[i=0, sum=0] ([0-9]+): 4
+2024-02-20-> Size[i=1, sum=4] ([0-9]+): 2
+2024-02-20-> Size[i=2, sum=6] ([0-9]+): 2
+2024-02-20-> Size[i=3, sum=8] ([0-9]+): 1
+2024-02-20-> Size[i=4, sum=9] ([0-9]+): 1
+2024-02-20-> Size[i=5, sum=10] ([0-9]+): 1
+2024-02-20-> Size[i=6, sum=11] ([0-9]+): 1
+2024-02-20-> Certification method (All|Slices|None) [None]: All
+-------------------------------------------------------------
+certificationResult = (298 falsified, 495 verified)</p>
       </div>
       <p class="section">
-        The app will make a password proposal. Every user provided input will be matched against the regular expression 
-        given in the brackets. In our example we instructed to generate 12 shares whereas 4 of them are needed to recover the original password. The shares
+        The app will make a password proposal (seen within the square brackets). Every user provided input will be matched against the regular expressions 
+        given in the round brackets. In our example we instructed to generate 12 shares whereas 4 of them are needed to recover the original password. The shares
         are grouped within a partition named <span class="code">demo</span>. The 12 shares were divided into 7 slices. The first slice had been given 4
-        shares. The next two slices had both received 2 shares and the remaining slices had been in each case given 1 share. Open another console
-        and review the content of the your workspace directory (workspace/yyyy-MM-dd):
+        shares. The next two slices had both received 2 shares and the remaining slices had been in each case given 1 share. The found solution can be optionally certified.
+        The preset is no certification at all. A certification by <span class="code">Slices</span> means that all slice combinations with a sharepoint count less than the threshold will be falsified 
+        and vice versa all slice combinations with a sharepoint count equal to or above the threshold will be verified. The certification method <span class="code">All</span> means that regardless 
+        of the chosen slices all combinations of shares below the threshold will be falsified and all combination of shares that equals the threshold will be verified. These are potentially very 
+        expensive operations depending on the number of combinations that have to be considered. You can consult <a href="https://www.wolframalpha.com/">WolframAlpha</a> for the computation of the binomial 
+        coefficients, e.g. <a href="https://www.wolframalpha.com/input?i=12+choose+4">12 choose 4</a> gives 495 as expected. A negative outcome would result in an 
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/AssertionError.html">AssertionError</a>. 
+      </p>
+      <p class="section">
+        (By pure chance a sharepoint combination below the threshold might result in the same y-intercept as the actual solution, that should be almost impossible if you are using long enough 
+        passwords which result in correspondingly big-sized finite fields).
+      </p>
+      <p class="section">
+          Now, open another console and review the content of the your workspace directory (workspace/yyyy-MM-dd):
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ ls workspace/2021-01-06/
+        <p class="code" style="white-space: pre">$ ls workspace/2024-02-20
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json</p>
       </div>
       <p class="section">
@@ -505,160 +596,160 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         <span class="code">(li)st workspace</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> li
-2021-01-06-> list workspace
-2021-01-06-> Partitions: [demo]
-2021-01-06-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2021-01-06-> Keystores: []</p>
+        <p class="code" style="white-space: pre">2024-02-20-> li
+2024-02-20-> list workspace
+2024-02-20-> Partitions: [demo]
+2024-02-20-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-02-20-> Keystores: []</p>
       </div>
       <p class="section">
         We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
         <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> m
-2021-01-06-> merge password
-2021-01-06-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json,demo-3.json,demo-6.json
-2021-01-06-> password = tJRUwW42tRwyhUnxrXicG5vPX</p>
+        <p class="code" style="white-space: pre">2024-02-20-> m
+2024-02-20-> merge password
+2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
+2024-02-20-> password = t76B3TGw1W8CmDEGf0eXQIEPF</p>
       </div>
       <p class="section">
-        As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
+        As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
         to the different slices and then applying Newtons Interpolation. That means the slices
         need not necessarily be located together in one directory as in our demo. In fact they could be distributed over the whole filesystem and could be
         located even on remote devices. Think of plugged-in USB memory sticks or network filesystems. Future versions might interpret the Paths as 
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/net/URI.html">URI</a>s and could fetch the slices via the internet if required. <br/>
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/URI.html">URI</a>s and could fetch the slices via the internet if required. <br/>
       </p>
       <p class="section">
         Now, let's create a keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> Main menu
+        <p class="code" style="white-space: pre">2024-02-20-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2021-01-06-> c
-2021-01-06-> create keystore
-2021-01-06-> Keystore name ([A-Za-z-]{1,20}): my-keys
-2021-01-06-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
+2024-02-20-> c
+2024-02-20-> create keystore
+2024-02-20-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
+2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2021-01-06T19:27:17.4092396
-   Workspace: 2021-01-06
+Current time: 2024-02-20T17:43:02.8641386
+   Workspace: 2024-02-20
 
-2021-01-06-> KeyStore menu [my-keys]
+2024-02-20-> KeyStore menu [donalds-keys]
 
          (l)ist entries          (p)rivate key           (s)ecret key
           (c)ertificate            (m)ain menu
 
-2021-01-06-></p>
+2024-02-20-></p>
       </div>
       <p class="section">
         We used four of the slices containing a single share to produce the credentials for the keystore. The demo app switched to a submenu regarding
         keystore functionality. At present the keystore is empty. A Java PKCS12 keystore can contain three different types of entries:
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/security/KeyStore.PrivateKeyEntry.html">Private Key</a>, 
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/security/KeyStore.SecretKeyEntry.html">Secret Key</a> and 
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/security/KeyStore.TrustedCertificateEntry.html">Certificate</a> entries.
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.PrivateKeyEntry.html">Private Key</a>, 
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.SecretKeyEntry.html">Secret Key</a> and 
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.TrustedCertificateEntry.html">Certificate</a> entries.
         Private and Secret Keys need protection whereas certificates need not since latter are public. Hence we will create a Private Key. A Private Key
         is always accompanied with a certifcate that attests the associated Public Key. From the start these certificates are self-signed but could
         be the result from a PKCS10 certificate request too.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> p
-2021-01-06-> private key
-2021-01-06-> Keygenerator algorithm (DSA|RSA|EC): EC
-2021-01-06-> Validity ([0-9]+): 100
-2021-01-06-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
-2021-01-06-> Locality ([A-Za-z- ]{5,30}): Entenhausen
-2021-01-06-> State ([A-Za-z- ]{5,30}): Bayern
-2021-01-06-> Country ([A-Za-z- ]{5,30}): Deutschland
-2021-01-06-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
+        <p class="code" style="white-space: pre">2024-02-20-> p
+2024-02-20-> private key
+2024-02-20-> Keygenerator algorithm (DSA|RSA|EC): EC
+2024-02-20-> Validity ([0-9]+): 100
+2024-02-20-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
+2024-02-20-> Locality ([A-Za-z- ]{5,30}): Entenhausen
+2024-02-20-> State ([A-Za-z- ]{5,30}): Bayern
+2024-02-20-> Country ([A-Za-z- ]{5,30}): Deutschland
+2024-02-20-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
       </div>
       <p class="section">
-        We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
+        We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
         algorithm and a validity of 100 days for the accompanying self-signed certificate. The remaining parameter constitute the so called
-        <a href="https://ldapwiki.com/wiki/Distinguished%20Names">Distinguished Name</a>.
+        <a href="https://datatracker.ietf.org/doc/html/rfc2253">Distinguished Name</a>.
       </p>
       <p class="section">
         Now, list the entries so far:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> l
-2021-01-06-> list entries
-2021-01-06-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:36:30:39:39:35:37:37:38:30:33:33:38, algorithm=EC, keytype=Private Key</p>
+        <p class="code" style="white-space: pre">2024-02-20-> l
+2024-02-20-> list entries
+2024-02-20-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:30:38:34:34:37:36:31:30:33:31:32, algorithm=EC, keytype=Private Key</p>
       </div>
       <p class="section">
         Go back to main menu:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> m
-2021-01-06-> main menu
+        <p class="code" style="white-space: pre">2024-02-20-> m
+2024-02-20-> main menu
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2021-01-06T19:33:32.4620796
-   Workspace: 2021-01-06
+Current time: 2024-02-20T17:55:52.2256648
+   Workspace: 2024-02-20
 
-2021-01-06-> Main menu
+2024-02-20-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2021-01-06-></p>
+2024-02-20-></p>
       </div>
       <p class="section">
         Now, list the workspace again:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> li
-2021-01-06-> list workspace
-2021-01-06-> Partitions: [demo]
-2021-01-06-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2021-01-06-> Keystores: [my-keys]</p>
+        <p class="code" style="white-space: pre">2024-02-20-> li
+2024-02-20-> list workspace
+2024-02-20-> Partitions: [demo]
+2024-02-20-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-02-20-> Keystores: [donalds-keys]</p>
       </div>
       <p class="section">
         Again, merge some of the slices to recover the password of the keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> m
-2021-01-06-> merge password
-2021-01-06-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
-2021-01-06-> password = tJRUwW42tRwyhUnxrXicG5vPX</p>
+        <p class="code" style="white-space: pre">2024-02-20-> m
+2024-02-20-> merge password
+2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
+2024-02-20-> password = t76B3TGw1W8CmDEGf0eXQIEPF</p>
       </div>
       <p class="section">
         Switch to a separate console since we want to investigate the keystore with 
-        <a href="https://docs.oracle.com/en/java/javase/14/docs/specs/man/keytool.html">keytool</a>. Note that your own workspace is probably
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html">keytool</a>. Note that your own workspace is probably
         different.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd workspace/2021-01-06  # workspace/yyyy-MM-dd
+        <p class="code" style="white-space: pre">$ cd workspace/2024-02-20  # workspace/yyyy-MM-dd
 $ ls
-demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  my-keys.p12
-$ keytool -J-Duser.language=en -list -keystore my-keys.p12 -storepass tJRUwW42tRwyhUnxrXicG5vPX -storetype pkcs12 -v
+demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  donalds-keys.p12
+$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass t76B3TGw1W8CmDEGf0eXQIEPF -storetype pkcs12 -v
 Keystore type: PKCS12
 Keystore provider: SUN
 
 Your keystore contains 1 entry
 
 Alias name: donalds-private-ec-key
-Creation date: 6 Jan 2021
+Creation date: 20 Feb 2024
 Entry type: PrivateKeyEntry
 Certificate chain length: 1
 Certificate[1]:
 Owner: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
 Issuer: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
-Serial number: 176d8f62a51
-Valid from: Wed Jan 06 19:29:40 CET 2021 until: Fri Apr 16 20:29:40 CEST 2021
+Serial number: 18dc769b231
+Valid from: Tue Feb 20 17:46:49 CET 2024 until: Thu May 30 18:46:49 CEST 2024
 Certificate fingerprints:
-         SHA1: 57:9B:C7:9F:D4:A5:33:42:29:BE:3E:29:21:AC:EC:1B:07:CF:C6:F6
-         SHA256: 6E:C7:D8:93:80:B9:DF:C5:15:0C:6D:7B:1E:D8:C0:FE:C2:BB:FC:5C:80:A6:A7:06:D1:50:D7:83:5F:5A:ED:9E
+         SHA1: E9:2F:E4:7E:A2:58:BE:BF:7B:95:0C:0A:50:84:1C:8D:FE:48:E9:7E
+         SHA256: AA:C7:5B:3C:50:F2:4A:68:20:1E:26:0C:50:96:98:6F:DD:71:36:72:C7:91:D6:93:3A:DB:0D:5C:EE:07:B7:8B
 Signature algorithm name: SHA256withECDSA
 Subject Public Key Algorithm: 521-bit EC (secp521r1) key
 Version: 3
@@ -669,18 +760,18 @@ Version: 3
       </div>
       <p class="section">
         Note that we used the recovered password in combination with keytool. This will be the end of our little tour. There are other
-        options to consider and there are some rough egdes as well. For example <a href="https://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha20</a> 
+        options to consider and there are some rough edges as well. For example <a href="https://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha20</a> 
         secret keys don't work since the underlying keystore implementation of the JDK doesn't regocnize them.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2021-01-06-> Main menu
+        <p class="code" style="white-space: pre">2024-02-20-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2021-01-06-> e
-2021-01-06-> exit</p>
+2024-02-20-> e
+2024-02-20-> exit</p>
       </div>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -865,6 +956,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
       </p>
       <p id="16" class="headline-1">8. API Documentation</p>
       <table style="font-family: serif; width: 40%; margin-left: auto; margin-right: auto">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">APIs</caption>
         <tbody style="text-align: center">
           <tr>
             <th class="cell" style="width: 50%">Module</th>
@@ -873,17 +965,94 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
           <tr style="">
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">shamirs-secret-sharing</td>
             <td style="border-bottom-style: none; border-width: 1px; width: 50%; border-top-style: none; background-color: rgb(146,197,222)">
-              <a href="http://www.christofreichardt.de/Projektstudien/Shamirs-Lib/shamirs-secret-sharing/scaladocs/de/christofreichardt/scala/shamir/index.html">shamirs-secret-sharing 1.1.0 API</a>
+              <a href="http://www.christofreichardt.de/project-studies/shamirs-lib/shamirs-secret-sharing/api/latest/scaladocs/de/christofreichardt/scala/shamir.html#">shamirs-secret-sharing 1.3.0 API</a>
             </td>
           </tr>
           <tr>
             <td style="border-bottom-style: none; border-bottom-width: 1px; width: 50%; background-color: rgb(146,197,222)">shamirs-keystore</td>
             <td style="border-bottom-style: none; border-bottom-width: 1px; width: 50%; background-color: rgb(146,197,222)">
-              <a href="http://www.christofreichardt.de/Projektstudien/Shamirs-Lib/shamirs-keystore/apidocs/index.html">shamirs-keystore 1.1.0 API</a>
+              <a href="http://www.christofreichardt.de/project-studies/shamirs-lib/shamirs-keystore/api/latest/apidocs/index.html">shamirs-keystore 1.3.0 API</a>
             </td>
           </tr>
         </tbody>
       </table>
+      <p class="section">
+        <a href="#1">[ToC]</a>
+      </p>
+      <p id="19" class="headline-1">9. JSON Schema</p>
+      <p id="20" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">9.1 Definitions</p>
+      <table style="font-family: serif; width: 60%; margin-left: auto; margin-right: auto">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">Partition</caption>
+        <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 20%">Name</th>
+            <th class="cell" style="width: 20%">Type</th>
+            <th class="cell" style="width: 60%">Comment</th>
+          </tr>
+          <tr style="">
+            <td class="cell">PartitionId</td>
+            <td class="cell">string</td>
+            <td class="cell">An Universally Unique Identifier</td>
+          </tr>
+          <tr style="">
+            <td class="cell">Prime</td>
+            <td class="cell">number</td>
+            <td class="cell">Interpreted as BigInteger</td>
+          </tr>
+          <tr style="">
+            <td class="cell">Threshold</td>
+            <td class="cell">number</td>
+            <td class="cell">Interpreted as 32-Bit Integer</td>
+          </tr>
+          <tr style="">
+            <td class="cell">SharePoints</td>
+            <td class="cell">array of <a href="#22">SharePoint</a></td>
+            <td class="cell"></td>
+          </tr>
+        </tbody>
+      </table>
+      <table style="font-family: serif; width: 60%; margin-left: auto; margin-right: auto; margin-top: 1rem">
+        <caption id="22" style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">SharePoint</caption>
+        <tbody style="text-align: center">
+          <tr>
+            <th class="cell" style="width: 20%">Name</th>
+            <th class="cell" style="width: 20%">Type</th>
+            <th class="cell" style="width: 60%">Comment</th>
+          </tr>
+          <tr style="">
+            <td class="cell">x</td>
+            <td class="cell">number</td>
+            <td class="cell">Interpreted as BigInteger</td>
+          </tr>
+          <tr style="">
+            <td class="cell">y</td>
+            <td class="cell">number</td>
+            <td class="cell">Interpreted as BigInteger</td>
+          </tr>
+        </tbody>
+      </table>
+      <p id="21" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">9.2 Example</p>
+      <div class="code">
+        <p class="code" style="white-space: pre">{
+    "PartitionId": "242e3fda-9c64-45f3-b40d-52bdcf3db8ca",
+    "Prime": 341494281274260103295293103126026736379588956778975874386655979,
+    "Threshold": 4,
+    "SharePoints": [
+        {
+            "SharePoint": {
+                "x": 115100532256754722181886210957822661071917163545119627890196490,
+                "y": 156627716112697373056443201494624435073664977495521717817469760
+            }
+        },
+        {
+            "SharePoint": {
+                "x": 22609839444392691960191176427554135723838878004964001329002259,
+                "y": 316594037802106556387665640965532931520415012810267565947034427
+            }
+        }
+    ]
+}</p>
+      </div>
       <p class="section">
         <a href="#1">[ToC]</a>
       </p>
