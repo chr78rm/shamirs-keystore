@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MAVEN_REPO=/d/m2-repo
-VERSION=1.3.0
+VERSION=1.3.1
 echo Using "${MAVEN_REPO}" and "${VERSION}" ...
 
 echo
