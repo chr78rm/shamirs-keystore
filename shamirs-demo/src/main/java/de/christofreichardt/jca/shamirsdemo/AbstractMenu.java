@@ -48,7 +48,7 @@ abstract public class AbstractMenu implements Menu, Traceable {
             String input;
             do {
                 input = (System.console().readLine("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal));
-                input = input.length() == 0 ? proposal : input;
+                input = input.isEmpty() ? proposal : input;
             } while (!Pattern.matches(regex, input));
 
             return input;
@@ -73,6 +73,23 @@ abstract public class AbstractMenu implements Menu, Traceable {
                     } else {
                         input = CharBuffer.wrap(proposal);
                     }
+                } while (!Pattern.matches(regex, input));
+
+                return input;
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        CharSequence readPassword(String regex, String label, CharSequence proposal) throws IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("CharSequence", this, "readCharSequence(String regex, String label, CharSequence proposal)");
+
+            try {
+                CharSequence input;
+                do {
+                    char[] buf = System.console().readPassword("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
+                    input = buf.length == 0 ? proposal : CharBuffer.wrap(buf);
                 } while (!Pattern.matches(regex, input));
 
                 return input;
