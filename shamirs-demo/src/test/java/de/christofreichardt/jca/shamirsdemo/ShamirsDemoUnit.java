@@ -29,10 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -240,12 +237,12 @@ public class ShamirsDemoUnit implements Traceable {
         tracer.entry("void", this, "requiredCharacterSets_1()");
 
         try {
-            final int LIMIT = 10, LENGTH = 25;
+            final int LIMIT = 50, LENGTH = 25;
             final int SHARES = 8;
             final int THRESHOLD = 4;
             PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.all());
 
-            Set<char[]> requiredCharSets = new HashSet<>();
+            final Set<char[]> requiredCharSets = new HashSet<>();
             requiredCharSets.add(PasswordGenerator.alphanumeric());
             requiredCharSets.add(PasswordGenerator.umlauts());
             requiredCharSets.add(PasswordGenerator.punctuationAndSymbols());
@@ -256,6 +253,28 @@ public class ShamirsDemoUnit implements Traceable {
                     .peek(password -> tracer.out().printfIndentln("password = %s", password))
                     .limit(LIMIT)
                     .collect(Collectors.toList());
+
+            class RequiredCharsetProver implements Predicate<CharSequence> {
+                @Override
+                public boolean test(CharSequence charSequence) {
+                    return requiredCharSets.stream()
+                            .allMatch(requiredCharset -> {
+                                boolean found = false;
+                                for (int i = 0; i < charSequence.length() && !found; i++) {
+                                    for (int j = 0; j < requiredCharset.length; j++) {
+                                        if (requiredCharset[j] == charSequence.charAt(i)) {
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                return found;
+                            });
+                }
+            }
+            assertThat(passwords.stream()
+                    .allMatch(new RequiredCharsetProver())
+            ).isTrue();
 
             List<CharSequence> recoveredPasswords = passwords.stream()
                     .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
