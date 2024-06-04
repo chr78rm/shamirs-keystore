@@ -54,7 +54,13 @@ class SecretMerging(
   def password: Array[Char] = {
     val byteBuffer = ByteBuffer.wrap(this.secretBytes.toArray)
     val charBuffer = StandardCharsets.UTF_8.newDecoder().decode(byteBuffer)
-    java.util.Arrays.copyOf(charBuffer.array(), charBuffer.limit())
+    val chars = Array.ofDim[Char](charBuffer.limit())
+    charBuffer.get(chars)
+    charBuffer.clear()
+    val fillingChars = Array.ofDim[Char](charBuffer.limit())
+    java.util.Arrays.fill(fillingChars, '\u0000')
+    charBuffer.put(fillingChars)
+    chars
   }
 }
 

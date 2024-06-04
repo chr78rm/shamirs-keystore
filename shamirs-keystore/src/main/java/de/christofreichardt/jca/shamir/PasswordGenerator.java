@@ -22,6 +22,7 @@ package de.christofreichardt.jca.shamir;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
+import java.nio.CharBuffer;
 import java.security.DrbgParameters;
 import static java.security.DrbgParameters.Capability.PR_AND_RESEED;
 import java.security.GeneralSecurityException;
@@ -250,6 +251,46 @@ public class PasswordGenerator implements Traceable {
             }
 
             return stringBuilder;
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    static public boolean erase(CharSequence charSequence, char fillingCharacter) {
+        AbstractTracer tracer = TracerFactory.getInstance().getCurrentPoolTracer();
+        tracer.entry("boolean", PasswordGenerator.class, "erase(CharSequence charSequence)");
+        try {
+            boolean erased;
+            tracer.out().printfIndentln("charSequence.getClass().getSimpleName() = %s", charSequence.getClass().getName());
+            if (charSequence instanceof CharBuffer) {
+                CharBuffer charBuffer = (CharBuffer) charSequence;
+                tracer.out().printfIndentln("charBuffer.hasArray() = %b", charBuffer.hasArray());
+                if (charBuffer.hasArray()) {
+                    Arrays.fill(charBuffer.array(), fillingCharacter);
+                } else {
+                    charBuffer.clear();
+                    char[] filling = new char[charBuffer.limit()];
+                    Arrays.fill(filling, fillingCharacter);
+                    charBuffer.put(filling);
+                }
+                erased = true;
+            } else if (charSequence instanceof StringBuilder) {
+                StringBuilder stringBuilder = (StringBuilder) charSequence;
+                for (int i=0; i<stringBuilder.length(); i++) {
+                    stringBuilder.setCharAt(i, fillingCharacter);
+                }
+                erased = true;
+            } else if (charSequence instanceof StringBuffer) {
+                StringBuffer stringBuffer = (StringBuffer) charSequence;
+                for (int i=0; i<stringBuffer.length(); i++) {
+                    stringBuffer.setCharAt(i, fillingCharacter);
+                }
+                erased = true;
+            } else {
+                erased = false;
+            }
+            
+            return erased;
         } finally {
             tracer.wayout();
         }

@@ -25,6 +25,10 @@ import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
@@ -36,10 +40,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShamirsDemoUnit implements Traceable {
@@ -372,6 +373,214 @@ public class ShamirsDemoUnit implements Traceable {
             ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp521r1");
             keyPairGenerator.initialize(ecGenParameterSpec);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("erasePasswords")
+    void erasePasswords() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "erasePasswords()");
+
+        try {
+            final int LIMIT = 5, LENGTH = 15, SHARES = 12, THRESHOLD = 4;
+            final char fillingChar = '*';
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
+            List<CharSequence> erasablePasswords = passwordGenerator.generate()
+                    .limit(LIMIT)
+                    .collect(Collectors.toList());
+            List<CharSequence> copiedPasswords = erasablePasswords.stream()
+                    .map(password -> password.toString())
+                    .collect(Collectors.toList());
+            List<CharSequence> recoveredPasswords = erasablePasswords.stream()
+                    .map(password -> {
+                        SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, password);
+                        PasswordGenerator.erase(password, fillingChar);
+                        return secretSharing;
+                    })
+                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                    .map(recoveredPassword -> CharBuffer.wrap(recoveredPassword))
+                    .collect(Collectors.toList());
+            assertThat(copiedPasswords.size()).isEqualTo(recoveredPasswords.size());
+            for (int i = 0; i < copiedPasswords.size(); i++) {
+                tracer.out().printfIndentln("%s  <->  %s", copiedPasswords.get(i), recoveredPasswords.get(i));
+                assertThat(CharSequence.compare(copiedPasswords.get(i), recoveredPasswords.get(i))).isEqualTo(0);
+            }
+            char[] filling = new char[LENGTH];
+            Arrays.fill(filling, fillingChar);
+            String yardstick = new String(filling);
+            assertThat(
+                    erasablePasswords.stream()
+                            .peek(erasedPassword -> tracer.out().printfIndentln("erasedPassword = %s", erasedPassword))
+                            .allMatch(erasedPassword -> CharSequence.compare(erasedPassword, yardstick) == 0)
+            ).isTrue();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("eraseCharBuffer")
+    void eraseCharBuffer() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "eraseCharBuffer()");
+        try {
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
+            CharBuffer charBuffer = CharBuffer.wrap(characters);
+            assertThat(CharSequence.compare("This is a Test.", charBuffer)).isEqualTo(0);
+            boolean erased = PasswordGenerator.erase(charBuffer, '*');
+            assertThat(erased).isTrue();
+            assertThat(CharSequence.compare("***************", charBuffer)).isEqualTo(0);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("eraseStringBuilder")
+    void eraseStringBuilder() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "eraseStringBuilder()");
+        try {
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(characters);
+            assertThat(CharSequence.compare("This is a Test.", stringBuilder)).isEqualTo(0);
+            boolean erased = PasswordGenerator.erase(stringBuilder, '*');
+            assertThat(erased).isTrue();
+            assertThat(CharSequence.compare("***************", stringBuilder)).isEqualTo(0);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("eraseStringBuffer")
+    void eraseStringBuffer() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "eraseStringBuffer()");
+        try {
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(characters);
+            assertThat(CharSequence.compare("This is a Test.", stringBuffer)).isEqualTo(0);
+            boolean erased = PasswordGenerator.erase(stringBuffer, '*');
+            assertThat(erased).isTrue();
+            assertThat(CharSequence.compare("***************", stringBuffer)).isEqualTo(0);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("cannotEraseString")
+    void cannotEraseString() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "cannotEraseString()");
+        try {
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
+            String string = new String(characters);
+            assertThat(CharSequence.compare("This is a Test.", string)).isEqualTo(0);
+            boolean erased = PasswordGenerator.erase(string, '*');
+            assertThat(erased).isFalse();
+            assertThat(CharSequence.compare("This is a Test.", string)).isEqualTo(0);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("bufferRefreshments_1")
+    @Disabled
+    void bufferRefreshments_1() {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "bufferRefreshments_1()");
+        try {
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
+            CharBuffer charBuffer = CharBuffer.wrap(characters);
+            tracer.out().printfIndentln("charBuffer.hasArray() = %b, charBuffer.isDirect() = %b", charBuffer.hasArray(), charBuffer.isDirect());
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+            char[] transfer = new  char[characters.length];
+            charBuffer.get(transfer);
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("bufferRefreshments_2")
+    @Disabled
+    void bufferRefreshments_2() throws CharacterCodingException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "bufferRefreshments_2()");
+        try {
+            tracer.out().printfIndentln("-- Wrap char array --");
+            char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 't', 'e', 's', 't', '.'};
+            CharBuffer charBuffer = CharBuffer.wrap(characters);
+            tracer.out().printfIndentln("charBuffer.hasArray() = %b, charBuffer.isDirect() = %b", charBuffer.hasArray(), charBuffer.isDirect());
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+
+            tracer.out().printfIndentln("-- Encode characters --");
+            CharsetEncoder charsetEncoder = StandardCharsets.UTF_8.newEncoder();
+            ByteBuffer byteBuffer = charsetEncoder.encode(charBuffer);
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+            tracer.out().printfIndentln("byteBuffer.hasArray() = %b, byteBuffer.isDirect() = %b", byteBuffer.hasArray(), byteBuffer.isDirect());
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+            tracer.out().printfIndentln("byteBuffer.array() = %s", formatBytes(byteBuffer.array()));
+
+            tracer.out().printfIndentln("-- Erase CharBuffer --");
+            charBuffer.clear();
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+            char[] fillingChars = new char[charBuffer.remaining()];
+            Arrays.fill(fillingChars, '*');
+            charBuffer.put(fillingChars);
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+            tracer.out().printfIndentln("charBuffer = %s", charBuffer);
+            charBuffer.clear();
+            tracer.out().printfIndentln("charBuffer = %s", charBuffer);
+
+            tracer.out().printfIndentln("-- Get encoded bytes --");
+            byte[] bytes = new byte[byteBuffer.remaining()];
+            byteBuffer.get(bytes);
+            tracer.out().printfIndentln("bytes = %s", formatBytes(bytes));
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+
+            tracer.out().printfIndentln("-- Erase ByteBuffer  --");
+            byteBuffer.clear();
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+            byte[] fillingBytes = new byte[byteBuffer.remaining()];
+            Arrays.fill(fillingBytes, (byte) 0);
+            byteBuffer.put(fillingBytes);
+            tracer.out().printfIndentln("byteBuffer.array() = %s", formatBytes(byteBuffer.array()));
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+
+            tracer.out().printfIndentln("-- Wrap encoded bytes  --");
+            byteBuffer = ByteBuffer.wrap(bytes);
+            tracer.out().printfIndentln("byteBuffer.array() = %s", formatBytes(byteBuffer.array()));
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+
+            tracer.out().printfIndentln("-- Decode bytes  --");
+            charBuffer = StandardCharsets.UTF_8.newDecoder().decode(byteBuffer);
+            tracer.out().printfIndentln("byteBuffer.capacity() = %d, byteBuffer.limit() = %d, byteBuffer.position() = %d, byteBuffer.remaining() = %d",
+                    byteBuffer.capacity(), byteBuffer.limit(), byteBuffer.position(), byteBuffer.remaining());
+            tracer.out().printfIndentln("charBuffer.hasArray() = %b, charBuffer.isDirect() = %b", charBuffer.hasArray(), charBuffer.isDirect());
+            tracer.out().printfIndentln("charBuffer.capacity() = %d, charBuffer.limit() = %d, charBuffer.position() = %d, charBuffer.remaining() = %d",
+                    charBuffer.capacity(), charBuffer.limit(), charBuffer.position(), charBuffer.remaining());
+            tracer.out().printfIndentln("charBuffer = %s", charBuffer);
         } finally {
             tracer.wayout();
         }
