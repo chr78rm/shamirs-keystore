@@ -56,10 +56,12 @@ class SecretMerging(
     val charBuffer = StandardCharsets.UTF_8.newDecoder().decode(byteBuffer)
     val chars = Array.ofDim[Char](charBuffer.limit())
     charBuffer.get(chars)
-    charBuffer.clear()
-    val fillingChars = Array.ofDim[Char](charBuffer.limit())
-    java.util.Arrays.fill(fillingChars, '\u0000')
-    charBuffer.put(fillingChars)
+    if (!charBuffer.isReadOnly) {
+      charBuffer.clear()
+      val fillingChars = Array.ofDim[Char](charBuffer.limit())
+      java.util.Arrays.fill(fillingChars, '\u0000')
+      charBuffer.put(fillingChars)
+    }
     chars
   }
 }

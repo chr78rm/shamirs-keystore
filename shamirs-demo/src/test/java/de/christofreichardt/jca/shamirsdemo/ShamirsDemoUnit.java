@@ -429,10 +429,16 @@ public class ShamirsDemoUnit implements Traceable {
         try {
             char[] characters = {'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 'T', 'e', 's', 't', '.'};
             CharBuffer charBuffer = CharBuffer.wrap(characters);
+            CharBuffer readOnlyCharBuffer = CharBuffer.wrap(Arrays.copyOf(charBuffer.array(), charBuffer.array().length)).asReadOnlyBuffer();
             assertThat(CharSequence.compare("This is a Test.", charBuffer)).isEqualTo(0);
+            assertThat(CharSequence.compare("This is a Test.", readOnlyCharBuffer)).isEqualTo(0);
             boolean erased = PasswordGenerator.erase(charBuffer, '*');
             assertThat(erased).isTrue();
             assertThat(CharSequence.compare("***************", charBuffer)).isEqualTo(0);
+            erased = PasswordGenerator.erase(readOnlyCharBuffer, '*');
+            assertThat(erased).isFalse();
+            assertThat(CharSequence.compare("***************", charBuffer)).isEqualTo(0);
+            assertThat(CharSequence.compare("This is a Test.", readOnlyCharBuffer)).isEqualTo(0);
         } finally {
             tracer.wayout();
         }

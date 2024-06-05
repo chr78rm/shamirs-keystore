@@ -101,10 +101,12 @@ package object shamir {
     val byteBuffer = encoder.encode(charBuffer)
     val bytes = Array.ofDim[Byte](byteBuffer.remaining())
     byteBuffer.get(bytes)
-    val fillingBytes = Array.ofDim[Byte](bytes.length)
-    java.util.Arrays.fill(fillingBytes, 0.toByte)
-    byteBuffer.clear()
-    byteBuffer.put(fillingBytes)
+    if (!byteBuffer.isReadOnly) {
+      val fillingBytes = Array.ofDim[Byte](bytes.length)
+      java.util.Arrays.fill(fillingBytes, 0.toByte)
+      byteBuffer.clear()
+      byteBuffer.put(fillingBytes)
+    }
     bytes
   }
 }
