@@ -433,6 +433,7 @@ public class ShamirsDemoUnit implements Traceable {
             assertThat(CharSequence.compare("This is a Test.", charBuffer)).isEqualTo(0);
             assertThat(CharSequence.compare("This is a Test.", readOnlyCharBuffer)).isEqualTo(0);
             boolean erased = PasswordGenerator.erase(charBuffer, '*');
+            charBuffer.clear();
             assertThat(erased).isTrue();
             assertThat(CharSequence.compare("***************", charBuffer)).isEqualTo(0);
             erased = PasswordGenerator.erase(readOnlyCharBuffer, '*');

@@ -266,14 +266,10 @@ public class PasswordGenerator implements Traceable {
                 CharBuffer charBuffer = (CharBuffer) charSequence;
                 tracer.out().printfIndentln("charBuffer.hasArray() = %b, charBuffer.isReadOnly() = %b", charBuffer.hasArray(), charBuffer.isReadOnly());
                 if (!charBuffer.isReadOnly()) {
-                    if (charBuffer.hasArray()) {
-                        Arrays.fill(charBuffer.array(), fillingCharacter);
-                    } else {
-                        charBuffer.clear();
-                        char[] filling = new char[charBuffer.limit()];
-                        Arrays.fill(filling, fillingCharacter);
-                        charBuffer.put(filling);
-                    }
+                    charBuffer.clear();
+                    char[] filling = new char[charBuffer.limit()];
+                    Arrays.fill(filling, fillingCharacter);
+                    charBuffer.put(filling);
                     erased = true;
                 } else {
                     erased = false;
