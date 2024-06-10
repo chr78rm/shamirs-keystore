@@ -25,6 +25,7 @@ import de.christofreichardt.diagnosis.TracerFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -64,14 +65,75 @@ abstract public class AbstractMenu implements Menu, Traceable {
                 CharBuffer input;
                 do {
                     input = CharBuffer.allocate(MAX_LENGTH);
+                    tracer.out().printfIndentln("input.limit() = %d", input.limit());
+                    tracer.out().printfIndentln("System.lineSeparator().length() = %d", System.lineSeparator().length());
                     System.console().printf("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
                     int actualRead = reader.read(input);
+                    tracer.out().printfIndentln("actualRead = %d", actualRead);
                     int length = actualRead - System.lineSeparator().length();
+                    tracer.out().printfIndentln("length = %d", length);
                     if (length > 0) {
                         input.rewind();
                         input = CharBuffer.wrap(input.subSequence(0, length));
                     } else {
                         input = CharBuffer.wrap(proposal);
+                    }
+                    tracer.out().printfIndentln("input = %s", input);
+                    tracer.out().flush();
+                } while (!Pattern.matches(regex, input));
+
+                return input;
+            } finally {
+                tracer.wayout();
+            }
+        }
+        
+        CharSequence readCharacters(String regex, String label, CharSequence proposal) throws IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("CharSequence", this, "readCharSequence(String regex, String label, CharSequence proposal)");
+
+            try {
+                int jdkSpecVersion = Integer.parseInt(System.getProperty("java.specification.version"));
+                tracer.out().printfIndentln("jdkSpecVersion = %d", jdkSpecVersion);
+                Reader reader = System.console().reader();
+                StringBuilder input;
+                tracer.out().printfIndentln("reader.getClass().getName() = %s", reader.getClass().getName());
+                tracer.out().flush();
+                do {
+                    input = new StringBuilder();
+                    System.console().printf("%s-> %s (%s) [%s]: ", AbstractMenu.this.app.getCurrentWorkspace().getFileName(), label, regex, proposal);
+                    int c, index = 0;
+                    do {
+                        c = reader.read();
+                        if (jdkSpecVersion >= 22) {
+                            tracer.out().printfIndentln("index = %d, c = %d", index, c);
+                            if (c != '\u0008') {
+                                index++;
+                                System.console().writer().print((char) c);
+                                input.appendCodePoint(c);
+                            } else {
+                                if (index > 0) {
+                                    index--;
+                                    input.deleteCharAt(index);
+                                    System.console().writer().print((char) c);
+                                }
+                            }
+                        } else {
+                            tracer.out().printfIndentln("c = %d", c);
+                            input.appendCodePoint(c);
+                        }
+                        tracer.out().flush();
+                    } while (c != 0x0A && c != 0x0D);
+                    if (jdkSpecVersion >= 22) {
+                        System.console().writer().println();
+                    }
+                    tracer.out().printfIndentln("input.chars() = %s", Arrays.toString(input.chars().toArray()));
+                    tracer.out().printfIndentln("input.codePoints() = %s", Arrays.toString(input.codePoints().toArray()));
+                    input.deleteCharAt(input.length() - 1);
+                    tracer.out().printfIndentln("input = %s, input.length() = %d", input, input.length());
+                    tracer.out().flush();
+                    if (input.length() == 0) {
+                        input = new StringBuilder(proposal);
                     }
                 } while (!Pattern.matches(regex, input));
 
