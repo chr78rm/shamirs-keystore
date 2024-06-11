@@ -90,13 +90,15 @@ abstract public class AbstractMenu implements Menu, Traceable {
         
         CharSequence readCharacters(String regex, String label, CharSequence proposal) throws IOException {
             AbstractTracer tracer = getCurrentTracer();
-            tracer.entry("CharSequence", this, "readCharSequence(String regex, String label, CharSequence proposal)");
+            tracer.entry("CharSequence", this, "readCharacters(String regex, String label, CharSequence proposal)");
 
             try {
-                int jdkSpecVersion = Integer.parseInt(System.getProperty("java.specification.version"));
-                tracer.out().printfIndentln("jdkSpecVersion = %d", jdkSpecVersion);
+                final boolean echo = Objects.equals("ON", System.getProperty("de.christofreichardt.jca.shamirsdemo.console.echo", "OFF"));
+                final char BACK_SPACE = '\u0008';
+                final int LINE_FEED = 0x0A, CARRIAGE_RETURN = 0x0D;
                 Reader reader = System.console().reader();
                 StringBuilder input;
+                tracer.out().printfIndentln("echo = %b", echo);
                 tracer.out().printfIndentln("reader.getClass().getName() = %s", reader.getClass().getName());
                 tracer.out().flush();
                 do {
@@ -105,26 +107,27 @@ abstract public class AbstractMenu implements Menu, Traceable {
                     int c, index = 0;
                     do {
                         c = reader.read();
-                        if (jdkSpecVersion >= 22) {
-                            tracer.out().printfIndentln("index = %d, c = %d", index, c);
-                            if (c != '\u0008') {
-                                index++;
+                        tracer.out().printfIndentln("index = %d, c = 0x%X, c = %d", index, c, c);
+                        tracer.out().flush();
+                        if (c != BACK_SPACE) {
+                            index++;
+                            if (echo) {
                                 System.console().writer().print((char) c);
-                                input.appendCodePoint(c);
-                            } else {
-                                if (index > 0) {
-                                    index--;
-                                    input.deleteCharAt(index);
-                                    System.console().writer().print((char) c);
+                            }
+                            input.appendCodePoint(c);
+                        } else {
+                            if (index > 0) {
+                                index--;
+                                input.deleteCharAt(index);
+                                if (echo) {
+                                    System.console().writer().print(BACK_SPACE);
+                                    System.console().writer().print(' ');
+                                    System.console().writer().print(BACK_SPACE);
                                 }
                             }
-                        } else {
-                            tracer.out().printfIndentln("c = %d", c);
-                            input.appendCodePoint(c);
                         }
-                        tracer.out().flush();
-                    } while (c != 0x0A && c != 0x0D);
-                    if (jdkSpecVersion >= 22) {
+                    } while (c != LINE_FEED && c != CARRIAGE_RETURN);
+                    if (echo) {
                         System.console().writer().println();
                     }
                     tracer.out().printfIndentln("input.chars() = %s", Arrays.toString(input.chars().toArray()));
@@ -143,9 +146,28 @@ abstract public class AbstractMenu implements Menu, Traceable {
             }
         }
 
+        CharSequence readChars(String regex, String label, CharSequence proposal) throws IOException {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("CharSequence", this, "readChars(String regex, String label, CharSequence proposal)");
+
+            try {
+                final int JDK_8308591 = 22; // see https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591
+                int jdkSpecVersion = Integer.parseInt(System.getProperty("java.specification.version"));
+                String jdkConsole = System.getProperty("jdk.console");
+                tracer.out().printfIndentln("java.specification.version = %d, jdk.console = %s", jdkSpecVersion, jdkConsole);
+                if (jdkSpecVersion < JDK_8308591 || Objects.equals("java.base", jdkConsole)) {
+                    return readCharSequence(regex, label, proposal);
+                } else {
+                    return readCharacters(regex, label, proposal);
+                }
+            } finally {
+                tracer.wayout();
+            }
+        }
+
         CharSequence readPassword(String regex, String label, CharSequence proposal) throws IOException {
             AbstractTracer tracer = getCurrentTracer();
-            tracer.entry("CharSequence", this, "readCharSequence(String regex, String label, CharSequence proposal)");
+            tracer.entry("CharSequence", this, "readPassword(String regex, String label, CharSequence proposal)");
 
             try {
                 CharSequence input;
