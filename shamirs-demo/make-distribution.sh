@@ -5,15 +5,13 @@ VERSION=$1
 NAME=$2
 
 echo "Creating distribution shamirs-demo-${VERSION} ..."
-if [ ! -d $DIST ]
-then
-  echo "Making directories ..."
-  mkdir --parents ${DIST}/shamirs-demo
-  mkdir --parents ${DIST}/shamirs-demo/log
-  mkdir --parents ${DIST}/shamirs-demo/target
-  mkdir --parents ${DIST}/shamirs-demo/workspace
-  mkdir --parents ${DIST}/shamirs-demo/src
-fi
+
+echo "Making directories as needed ..."
+mkdir --parents ${DIST}/shamirs-demo
+mkdir --parents ${DIST}/shamirs-demo/log
+mkdir --parents ${DIST}/shamirs-demo/target
+mkdir --parents ${DIST}/shamirs-demo/workspace
+mkdir --parents ${DIST}/shamirs-demo/src
 
 echo "Copying sources ..."
 cp --recursive src/main ${DIST}/shamirs-demo/src
