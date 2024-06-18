@@ -152,10 +152,9 @@ abstract public class AbstractMenu implements Menu, Traceable {
 
             try {
                 final int JDK_8308591 = 22; // see https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591
-                int jdkSpecVersion = Integer.parseInt(System.getProperty("java.specification.version"));
                 String jdkConsole = System.getProperty("jdk.console");
-                tracer.out().printfIndentln("java.specification.version = %d, jdk.console = %s", jdkSpecVersion, jdkConsole);
-                if (jdkSpecVersion < JDK_8308591 || Objects.equals("java.base", jdkConsole)) {
+                tracer.out().printfIndentln("jdk.console = %s, feature-release = %d", jdkConsole, Runtime.version().feature());
+                if (Runtime.version().feature() < JDK_8308591 || Objects.equals("java.base", jdkConsole)) {
                     return readCharSequence(regex, label, proposal);
                 } else {
                     return readCharacters(regex, label, proposal);
