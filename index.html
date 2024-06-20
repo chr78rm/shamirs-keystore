@@ -71,7 +71,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2024-03-12</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2024-06-20</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -398,6 +398,16 @@
               <a href="./shamirs-demo-1.3.0.zip.sha512.txt">shamirs-demo-1.3.0.zip.sha512</a>
             </td>
           </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">shamirs-demo-1.3.1</td>
+            <td class="cell">
+              <a href="https://www.dropbox.com/scl/fi/v6oo56s86ek6vs8ndvqsq/shamirs-demo-1.3.1.zip?rlkey=d85ky0lav9rm1tj44z7mgjq74&dl=1">shamirs-demo-1.3.1.zip</a>
+            </td>
+            <td class="cell">2024-06-19 16:36:40.012 +0200</td>
+            <td class="cell">
+              <a href="shamirs-demo-1.3.1.zip.sha512.txt">shamirs-demo-1.3.1.zip.sha512</a>
+            </td>
+          </tr>
         </tbody>
       </table>
       <p class="section">
@@ -493,74 +503,146 @@
       <p id="9" class="headline-1">7. User Manual</p>
       <p id="14" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
       <p class="section">
-          <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. You have to translate the subsequent bash 
-        commands into their <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> equivalents if you are working on Windows and aren't using 
-        the <a href="https://git-scm.com/download/win">Git Bash</a>. I discourage the usage of the Windows PowerShell. Following commands show the relevant content of the distribution:
+        <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. I am using the 
+        <a href="https://git-scm.com/download/win">Git Bash</a> for this manual but the default command line interpreter of Windows 
+        (<a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a>) works as well. Of course you can use the 
+        <a href="https://www.gnu.org/software/bash/">GNU Bash</a> on Linux systems too. I have tested the distribution with the Git Bash on Windows 10, with Windows Cmd on Windows 10 and with
+        the GNU Bash on Ubuntu 20.04.6 LTS (Focal Fossa) by randomly using a JDK-11, JDK-17, JDK-21 or JDK-22. 
+      </p>
+      <p class="section">
+        After unzipping the distribution exhibits the following structure:
+      </p>
+      <div class="code">
+        <p class="code" style="white-space: pre">shamirs-demo/
+├── log
+├── src
+│   └── main
+│       ├── java
+│       │   └── de
+│       │       └── christofreichardt
+│       │           └── jca
+│       │               └── shamirsdemo
+│       │                   ├── AbstractMenu.java
+│       │                   ├── App.java
+│       │                   ├── AppCallback.java
+│       │                   ├── KeyStoreMenu.java
+│       │                   ├── MainMenu.java
+│       │                   └── Menu.java
+│       └── resources
+│           └── de
+│               └── christofreichardt
+│                   └── jca
+│                       └── trace-config.xml
+├── target
+│   └── shamirs-demo-1.3.1.jar
+├── workspace
+│   └── my-workspace-0
+│       ├── my-keys.p12
+│       ├── test-0.json
+│       ├── test-1.json
+│       ├── test-2.json
+│       ├── test-3.json
+│       ├── test-4.json
+│       ├── test-5.json
+│       ├── test-6.json
+│       └── test.json
+├── LICENCE.txt
+├── NOTICE.txt
+├── run-shamirs-demo.bat
+├── run-shamirs-demo.sh
+└── winpty-shamirs-demo.sh</p>
+      </div>
+      <table style="margin-top: 0rem">
+        <tbody>
+          <tr>
+            <td><img style="width: 2rem; float: left; margin-right: 1em; display: grid" src="./101.png" alt="CAUTION"/></td>
+            <td>
+              <p class="section">
+                Starting with JDK-22, Java uses an internal JLine instance as the default Console implementation to improve the user experience of programs using the Console API, see
+                <a href="https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591">JLine As The Default Console Provider</a>. Indeed, the
+                <a href="https://github.com/rprichard/winpty">winpty</a> wrapper isn't needed anymore to run the demo when using the Git Bash in conjunction with JDK-22. Unfortunately, this change 
+                presently seems to break the bulk read operations when using the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Reader.html">Reader</a> associated with 
+                the Console, see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Console.html#reader()">Console#reader()</a>. You would have to restore the older behaviour
+                by additionally passing <span class="code" style="white-space: nowrap">-Djdk.console=java.base</span> when launching older demo versions (prior to 1.3.1) on JDK-22.
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="section" style="margin-top: -0.5rem">
+        Refer to the table below for the selection of a suitable launch script depending on Operating System and JDK version:
+      </p>
+      <table style="font-family: serif; width: 85%; margin-left: auto; margin-right: auto; margin-top: 1rem; margin-top: 0rem">
+        <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">Launch scripts</caption>
+        <tbody>
+          <tr>
+            <th class="cell"></th>
+            <th class="cell">Git Bash on Windows</th>
+            <th class="cell">Windows Cmd</th>
+            <th class="cell">Linux Bash</th>
+          </tr>
+          <tr style="text-align: center">
+            <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-11 until JDK-21</td>
+            <td class="cell">winpty-shamirs-demo.sh</td>
+            <td class="cell">run-shamirs-demo.bat</td>
+            <td class="cell">run-shamirs-demo.sh</td>
+          </tr>
+          <tr style="text-align: center">
+            <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-22</td>
+            <td class="cell">run-shamirs-demo.sh</td>
+            <td class="cell">run-shamirs-demo.bat</td>
+            <td class="cell">run-shamirs-demo.sh</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="section">
       </p>
       <div class="code">
         <p class="code" style="white-space: pre">$ cd shamirs-demo/
 $ ls
-LICENCE.txt  log/  NOTICE.txt  run-shamirs-demo.sh*  src/  target/  workspace/
-$ ls --recursive target workspace
-target:
-shamirs-demo-1.3.0.jar
-
-workspace:
-my-workspace-0/
-
-workspace/my-workspace-0:
-my-keys.p12  test.json  test-0.json  test-1.json  test-2.json  test-3.json  test-4.json  test-5.json  test-6.json</p>
-      </div>
-      <p class="section">
-        On Linux the demo can be started with <span class="code">./run-shamirs-demo.sh</span>. On Windows and using the Git Bash you will instead need <span class="code">winpty sh -i -c ./run-shamirs-demo.sh</span>
-        or simply <span class="code">winpty java -jar target/shamirs-demo-1.3.0.jar</span>. Without the wrapper <a href="https://github.com/rprichard/winpty">winpty</a> provided by the Git Bash distribution there would be no 
-        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Console.html">Console</a> and 
-        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/System.html#console()">System.console()</a> would return null. Using the command interpreter
-        <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a> of Windows you can simply type 
-        <span class="code">java -jar target/shamirs-demo-1.3.0.jar</span> to invoke the demo.
-      </p>
-      <div class="code">
-        <p class="code" style="white-space: pre">$ java -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-1.3.0.jar
+LICENCE.txt  log/  NOTICE.txt  run-shamirs-demo.bat  run-shamirs-demo.sh*  src/  target/  winpty-shamirs-demo.sh*  workspace/
+$ java -version
+openjdk version "22.0.1" 2024-04-16
+OpenJDK Runtime Environment (build 22.0.1+8-16)
+OpenJDK 64-Bit Server VM (build 22.0.1+8-16, mixed mode, sharing)
+$ ./run-shamirs-demo.sh
 ...
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-02-20T16:39:09.7893644
-   Workspace: 2024-02-20
+Current time: 2024-06-18T15:54:09.3878296
+   Workspace: 2024-06-18
 
-2024-02-20-> Main menu
+2024-06-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-02-20-></p>
+2024-06-18-></p>
       </div>
       <p class="section">
-        On Linux the explicit handover of the system property <span class="code">java.security.egd=file:/dev/urandom</span> is required otherwise the program would stall
-        when generating random passwords. See <a href="https://www.2uo.de/myths-about-urandom/">Myths about /dev/urandom</a> for a discussion about the confusion
-        regarding the special device files which serve as (pseudo) random generators on Linux systems.
-        The string <span class="code">2024-02-20</span> left from the arrow denotes the current workspace. You automatically get a new one on every day you are using
+        The string <span class="code">2024-06-18</span> left from the arrow denotes the current date and workspace. You automatically get a new one on every day you are using
         the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
         a password:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> s
-2024-02-20-> split password
-2024-02-20-> Password ([A-Za-z0-9-]{8,45}) [t76B3TGw1W8CmDEGf0eXQIEPF]:
-2024-02-20-> Number of shares ([0-9]+): 12
-2024-02-20-> Threshold ([0-9]+): 4
-2024-02-20-> Name of partition ([A-Za-z]{1,10}): demo
-2024-02-20-> Number of slices ([0-9]+): 7
-2024-02-20-> Size[i=0, sum=0] ([0-9]+): 4
-2024-02-20-> Size[i=1, sum=4] ([0-9]+): 2
-2024-02-20-> Size[i=2, sum=6] ([0-9]+): 2
-2024-02-20-> Size[i=3, sum=8] ([0-9]+): 1
-2024-02-20-> Size[i=4, sum=9] ([0-9]+): 1
-2024-02-20-> Size[i=5, sum=10] ([0-9]+): 1
-2024-02-20-> Size[i=6, sum=11] ([0-9]+): 1
-2024-02-20-> Certification method (All|Slices|None) [None]: All
+        <p class="code" style="white-space: pre">2024-06-18-> s
+2024-06-18-> split password
+2024-06-18-> Password ([A-Za-z0-9-]{8,45}) [FU97W8aNeirrDFE6NYV3VHByH]:
+2024-06-18-> Number of shares ([0-9]+): 12
+2024-06-18-> Threshold ([0-9]+): 4
+2024-06-18-> Name of partition ([A-Za-z]{1,10}): demo
+2024-06-18-> Number of slices ([0-9]+): 7
+2024-06-18-> Size[i=0, sum=0] ([0-9]+): 4
+2024-06-18-> Size[i=1, sum=4] ([0-9]+): 2
+2024-06-18-> Size[i=2, sum=6] ([0-9]+): 2
+2024-06-18-> Size[i=3, sum=8] ([0-9]+): 1
+2024-06-18-> Size[i=4, sum=9] ([0-9]+): 1
+2024-06-18-> Size[i=5, sum=10] ([0-9]+): 1
+2024-06-18-> Size[i=6, sum=11] ([0-9]+): 1
+2024-06-18-> Certification method (All|Slices|None) [None]: All
 -------------------------------------------------------------
 certificationResult = (298 falsified, 495 verified)</p>
       </div>
@@ -573,7 +655,7 @@ certificationResult = (298 falsified, 495 verified)</p>
         and vice versa all slice combinations with a sharepoint count equal to or above the threshold will be verified. The certification method <span class="code">All</span> means that regardless 
         of the chosen slices all combinations of shares below the threshold will be falsified and all combination of shares that equals the threshold will be verified. These are potentially very 
         expensive operations depending on the number of combinations that have to be considered. You can consult <a href="https://www.wolframalpha.com/">WolframAlpha</a> for the computation of the binomial 
-        coefficients, e.g. <a href="https://www.wolframalpha.com/input?i=12+choose+4">12 choose 4</a> gives 495 as expected. A negative outcome would result in an 
+        coefficients, e.g. <a href="https://www.wolframalpha.com/input?i=12+choose+4">12 choose 4</a> gives 495 as expected. A negative outcome would raise an 
         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/AssertionError.html">AssertionError</a>. 
       </p>
       <p class="section">
@@ -584,7 +666,7 @@ certificationResult = (298 falsified, 495 verified)</p>
           Now, open another console and review the content of the your workspace directory (workspace/yyyy-MM-dd):
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ ls workspace/2024-02-20
+        <p class="code" style="white-space: pre">$ ls workspace/2024-06-18/
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json</p>
       </div>
       <p class="section">
@@ -596,21 +678,21 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         <span class="code">(li)st workspace</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> li
-2024-02-20-> list workspace
-2024-02-20-> Partitions: [demo]
-2024-02-20-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2024-02-20-> Keystores: []</p>
+        <p class="code" style="white-space: pre">2024-06-18-> li
+2024-06-18-> list workspace
+2024-06-18-> Partitions: [demo]
+2024-06-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-06-18-> Keystores: []</p>
       </div>
       <p class="section">
         We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
         <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> m
-2024-02-20-> merge password
-2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
-2024-02-20-> password = t76B3TGw1W8CmDEGf0eXQIEPF</p>
+        <p class="code" style="white-space: pre">2024-06-18-> m
+2024-06-18-> merge password
+2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
+2024-06-18-> password = FU97W8aNeirrDFE6NYV3VHByH</p>
       </div>
       <p class="section">
         As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
@@ -623,30 +705,30 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         Now, let's create a keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> Main menu
+        <p class="code" style="white-space: pre">2024-06-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-02-20-> c
-2024-02-20-> create keystore
-2024-02-20-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
-2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
+2024-06-18-> c
+2024-06-18-> create keystore
+2024-06-18-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
+2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-02-20T17:43:02.8641386
-   Workspace: 2024-02-20
+Current time: 2024-06-18T16:18:42.3677483
+   Workspace: 2024-06-18
 
-2024-02-20-> KeyStore menu [donalds-keys]
+2024-06-18-> KeyStore menu [donalds-keys]
 
          (l)ist entries          (p)rivate key           (s)ecret key
           (c)ertificate            (m)ain menu
 
-2024-02-20-></p>
+2024-06-18-></p>
       </div>
       <p class="section">
         We used four of the slices containing a single share to produce the credentials for the keystore. The demo app switched to a submenu regarding
@@ -659,18 +741,18 @@ Current time: 2024-02-20T17:43:02.8641386
         be the result from a PKCS10 certificate request too.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> p
-2024-02-20-> private key
-2024-02-20-> Keygenerator algorithm (DSA|RSA|EC): EC
-2024-02-20-> Validity ([0-9]+): 100
-2024-02-20-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
-2024-02-20-> Locality ([A-Za-z- ]{5,30}): Entenhausen
-2024-02-20-> State ([A-Za-z- ]{5,30}): Bayern
-2024-02-20-> Country ([A-Za-z- ]{5,30}): Deutschland
-2024-02-20-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
+        <p class="code" style="white-space: pre">2024-06-18-> p
+2024-06-18-> private key
+2024-06-18-> Keygenerator algorithm (DSA|RSA|EC): EC
+2024-06-18-> Validity ([0-9]+): 100
+2024-06-18-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
+2024-06-18-> Locality ([A-Za-z- ]{5,30}): Entenhausen
+2024-06-18-> State ([A-Za-z- ]{5,30}): Bayern
+2024-06-18-> Country ([A-Za-z- ]{5,30}): Deutschland
+2024-06-18-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
       </div>
       <p class="section">
-        We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
+        We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
         algorithm and a validity of 100 days for the accompanying self-signed certificate. The remaining parameter constitute the so called
         <a href="https://datatracker.ietf.org/doc/html/rfc2253">Distinguished Name</a>.
       </p>
@@ -678,50 +760,50 @@ Current time: 2024-02-20T17:43:02.8641386
         Now, list the entries so far:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> l
-2024-02-20-> list entries
-2024-02-20-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:30:38:34:34:37:36:31:30:33:31:32, algorithm=EC, keytype=Private Key</p>
+        <p class="code" style="white-space: pre">2024-06-18-> l
+2024-06-18-> list entries
+2024-06-18-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:31:38:37:32:30:34:37:36:36:39:38, algorithm=EC, keytype=Private Key</p>
       </div>
       <p class="section">
         Go back to main menu:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> m
-2024-02-20-> main menu
+        <p class="code" style="white-space: pre">2024-06-18-> m
+2024-06-18-> main menu
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-02-20T17:55:52.2256648
-   Workspace: 2024-02-20
+Current time: 2024-06-18T16:25:05.3273361
+   Workspace: 2024-06-18
 
-2024-02-20-> Main menu
+2024-06-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-02-20-></p>
+2024-06-18-></p>
       </div>
       <p class="section">
         Now, list the workspace again:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> li
-2024-02-20-> list workspace
-2024-02-20-> Partitions: [demo]
-2024-02-20-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2024-02-20-> Keystores: [donalds-keys]</p>
+        <p class="code" style="white-space: pre">2024-06-18-> li
+2024-06-18-> list workspace
+2024-06-18-> Partitions: [demo]
+2024-06-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-06-18-> Keystores: [donalds-keys]</p>
       </div>
       <p class="section">
         Again, merge some of the slices to recover the password of the keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> m
-2024-02-20-> merge password
-2024-02-20-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
-2024-02-20-> password = t76B3TGw1W8CmDEGf0eXQIEPF</p>
+        <p class="code" style="white-space: pre">2024-06-18-> m
+2024-06-18-> merge password
+2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
+2024-06-18-> password = FU97W8aNeirrDFE6NYV3VHByH</p>
       </div>
       <p class="section">
         Switch to a separate console since we want to investigate the keystore with 
@@ -729,27 +811,27 @@ Current time: 2024-02-20T17:55:52.2256648
         different.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd workspace/2024-02-20  # workspace/yyyy-MM-dd
+        <p class="code" style="white-space: pre">$ cd workspace/2024-06-18  # workspace/yyyy-MM-dd
 $ ls
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  donalds-keys.p12
-$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass t76B3TGw1W8CmDEGf0eXQIEPF -storetype pkcs12 -v
+$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass FU97W8aNeirrDFE6NYV3VHByH -storetype pkcs12 -v
 Keystore type: PKCS12
 Keystore provider: SUN
 
 Your keystore contains 1 entry
 
 Alias name: donalds-private-ec-key
-Creation date: 20 Feb 2024
+Creation date: 18 Jun 2024
 Entry type: PrivateKeyEntry
 Certificate chain length: 1
 Certificate[1]:
 Owner: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
 Issuer: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
-Serial number: 18dc769b231
-Valid from: Tue Feb 20 17:46:49 CET 2024 until: Thu May 30 18:46:49 CEST 2024
+Serial number: 1902bb93557
+Valid from: Tue Jun 18 16:21:16 CEST 2024 until: Thu Sep 26 16:21:16 CEST 2024
 Certificate fingerprints:
-         SHA1: E9:2F:E4:7E:A2:58:BE:BF:7B:95:0C:0A:50:84:1C:8D:FE:48:E9:7E
-         SHA256: AA:C7:5B:3C:50:F2:4A:68:20:1E:26:0C:50:96:98:6F:DD:71:36:72:C7:91:D6:93:3A:DB:0D:5C:EE:07:B7:8B
+         SHA1: AD:CB:EC:03:0A:81:88:6C:10:BA:1F:DF:6A:E9:3F:A7:61:20:35:53
+         SHA256: 86:77:4C:87:A0:BC:9A:CF:EB:EE:7E:14:B9:36:34:0B:57:2F:0B:A5:CA:5F:6E:32:59:4C:CA:91:54:37:36:84
 Signature algorithm name: SHA256withECDSA
 Subject Public Key Algorithm: 521-bit EC (secp521r1) key
 Version: 3
@@ -761,17 +843,17 @@ Version: 3
       <p class="section">
         Note that we used the recovered password in combination with keytool. This will be the end of our little tour. There are other
         options to consider and there are some rough edges as well. For example <a href="https://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha20</a> 
-        secret keys don't work since the underlying keystore implementation of the JDK doesn't regocnize them.
+        secret keys don't work since the underlying keystore implementation of the JDK doesn't recognize them.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-02-20-> Main menu
+        <p class="code" style="white-space: pre">2024-06-18-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-02-20-> e
-2024-02-20-> exit</p>
+2024-06-18-> e
+2024-06-18-> exit</p>
       </div>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -907,7 +989,7 @@ provider[Christofs Crypto Lib] = A pkcs12 KeyStore implementation which supports
                     <td style="white-space: pre; font-family: monospace; font-size: 12px;">ShamirsProtection shamirsProtection = new ShamirsProtection(paths);</td>
                   </tr>
                   <tr>
-                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">File keyStoreFile = dir.resolve("my-keys.p12").toFile();</td>
+                    <td style="white-space: pre; font-family: monospace; font-size: 12px;">File keyStoreFile = dir.resolve("donalds-keys.p12").toFile();</td>
                   </tr>
                 </tbody>
               </table>

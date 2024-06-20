@@ -6,23 +6,28 @@
 JUnit Jupiter, (uniqueId = [engine:junit-jupiter])
 containers = 1, tests = 0, successful = 1, failed = 0, aborted = 0
 -------------------------------------
-ShamirsDemoUnit[container=true, test=false, start=2024-03-12T17:31:41.986903, end=2024-03-12T17:31:45.9532447, duration=PT3.9663417S, status=SUCCESSFUL]
+ShamirsDemoUnit[container=true, test=false, start=2024-06-20T16:31:10.2482945, end=2024-06-20T16:31:14.7948448, duration=PT4.5465503S, status=SUCCESSFUL]
 
 -------------------------------------
 ShamirsDemoUnit, (uniqueId = [engine:junit-jupiter]/[class:de.christofreichardt.jca.shamirsdemo.ShamirsDemoUnit])
-containers = 0, tests = 7, successful = 7, failed = 0, aborted = 0
+containers = 0, tests = 12, successful = 12, failed = 0, aborted = 0
 -------------------------------------
-encoding-1[container=false, test=true, start=2024-03-12T17:31:43.1078893, end=2024-03-12T17:31:44.5285653, duration=PT1.420676S, status=SUCCESSFUL]
-requiredCharacterSets_1[container=false, test=true, start=2024-03-12T17:31:42.0149033, end=2024-03-12T17:31:42.551635, duration=PT0.5367317S, status=SUCCESSFUL]
-requiredCharacterSets_2[container=false, test=true, start=2024-03-12T17:31:42.5536355, end=2024-03-12T17:31:42.5606472, duration=PT0.0070117S, status=SUCCESSFUL]
-passwordStream[container=false, test=true, start=2024-03-12T17:31:42.6106355, end=2024-03-12T17:31:43.1068892, duration=PT0.4962537S, status=SUCCESSFUL]
-encoding-3[container=false, test=true, start=2024-03-12T17:31:45.807212, end=2024-03-12T17:31:45.9502418, duration=PT0.1430298S, status=SUCCESSFUL]
-ec-keypair[container=false, test=true, start=2024-03-12T17:31:42.5616347, end=2024-03-12T17:31:42.6096357, duration=PT0.048001S, status=SUCCESSFUL]
-encoding-2[container=false, test=true, start=2024-03-12T17:31:44.5285653, end=2024-03-12T17:31:45.8062462, duration=PT1.2776809S, status=SUCCESSFUL]
+encoding-1[container=false, test=true, start=2024-06-20T16:31:12.0585609, end=2024-06-20T16:31:13.4140449, duration=PT1.355484S, status=SUCCESSFUL]
+cannotEraseString[container=false, test=true, start=2024-06-20T16:31:14.7898459, end=2024-06-20T16:31:14.7918439, duration=PT0.001998S, status=SUCCESSFUL]
+erasePasswords[container=false, test=true, start=2024-06-20T16:31:11.455556, end=2024-06-20T16:31:11.4991701, duration=PT0.0436141S, status=SUCCESSFUL]
+eraseStringBuilder[container=false, test=true, start=2024-06-20T16:31:11.4475562, end=2024-06-20T16:31:11.4545561, duration=PT0.0069999S, status=SUCCESSFUL]
+requiredCharacterSets_1[container=false, test=true, start=2024-06-20T16:31:10.274294, end=2024-06-20T16:31:11.4405568, duration=PT1.1662628S, status=SUCCESSFUL]
+requiredCharacterSets_2[container=false, test=true, start=2024-06-20T16:31:11.4415561, end=2024-06-20T16:31:11.4465566, duration=PT0.0050005S, status=SUCCESSFUL]
+passwordStream[container=false, test=true, start=2024-06-20T16:31:11.5447099, end=2024-06-20T16:31:12.0575464, duration=PT0.5128365S, status=SUCCESSFUL]
+encoding-3[container=false, test=true, start=2024-06-20T16:31:14.6422434, end=2024-06-20T16:31:14.7838111, duration=PT0.1415677S, status=SUCCESSFUL]
+eraseCharBuffer[container=false, test=true, start=2024-06-20T16:31:14.7848122, end=2024-06-20T16:31:14.7878147, duration=PT0.0030025S, status=SUCCESSFUL]
+eraseStringBuffer[container=false, test=true, start=2024-06-20T16:31:11.5001701, end=2024-06-20T16:31:11.5021706, duration=PT0.0020005S, status=SUCCESSFUL]
+ec-keypair[container=false, test=true, start=2024-06-20T16:31:11.5031699, end=2024-06-20T16:31:11.5437099, duration=PT0.04054S, status=SUCCESSFUL]
+encoding-2[container=false, test=true, start=2024-06-20T16:31:13.4150344, end=2024-06-20T16:31:14.6412452, duration=PT1.2262108S, status=SUCCESSFUL]
 
 
 Tests--------------------------------
-succeeded: 7
+succeeded: 12
    failed: 0
   aborted: 0
 -------------------------------------
