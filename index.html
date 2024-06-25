@@ -134,7 +134,7 @@
         Above command will compile the sources, run the tests and install the provider into the local Maven repo.
       </p>
       <p class="section">
-        Note that the included demo app makes use of the pkix sub-module from the <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a> crypto library for 
+        Note that the included demo app makes use of the pkix sub-module from the <a href="https://www.bouncycastle.org/download/bouncy-castle-java/">Bouncy Castle</a> crypto library for 
         programmatically generating self-signed X.509 certificates which is something that cannot be easily done with the JDK alone. The library itself
         depends on the <a href="https://www.scala-lang.org/">Scala</a>-Library (since the core module containing the actual algorithm is presently written in Scala) and
         on <a href="https://jakarta.ee/specifications/jsonp/">Jakarta JSON Processing</a>. The latter is merely the specification of an API and hence
@@ -413,7 +413,7 @@
       <p class="section">
         Note that the demo app includes binaries from external open source projects, namely the <a href="https://www.scala-lang.org/">Scala</a>-Library, 
         the Jakarta JSON-Processing implementation <a href="https://github.com/eclipse-ee4j/parsson">Eclipse Parsson</a> and
-        the pkix sub-module from <a href="https://www.bouncycastle.org/java.html">Bouncy Castle</a>. Section <a href="#14">7.1 Demo App</a> explains how to use the demo app.
+        the pkix sub-module from <a href="https://www.bouncycastle.org/download/bouncy-castle-java/">Bouncy Castle</a>. Section <a href="#14">7.1 Demo App</a> explains how to use the demo app.
       </p>
       <p id="13" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">6.2 Maven Coordinates</p>
       <p class="section">
@@ -584,13 +584,11 @@
           <tr style="text-align: center">
             <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-11 until JDK-21</td>
             <td class="cell">winpty-shamirs-demo.sh</td>
-            <td class="cell">run-shamirs-demo.bat</td>
-            <td class="cell">run-shamirs-demo.sh</td>
+            <td class="cell" rowspan="2">run-shamirs-demo.bat</td>
+            <td class="cell" rowspan="2">run-shamirs-demo.sh</td>
           </tr>
           <tr style="text-align: center">
             <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-22</td>
-            <td class="cell">run-shamirs-demo.sh</td>
-            <td class="cell">run-shamirs-demo.bat</td>
             <td class="cell">run-shamirs-demo.sh</td>
           </tr>
         </tbody>
