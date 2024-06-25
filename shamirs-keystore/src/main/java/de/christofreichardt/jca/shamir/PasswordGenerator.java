@@ -256,9 +256,17 @@ public class PasswordGenerator implements Traceable {
         }
     }
 
+    /**
+     * Overwrites the provided {@link CharSequence} with the given fillingCharacter if possible.
+     *
+     * @param charSequence the to be erased {@link CharSequence}
+     * @param fillingCharacter the character for overwriting the {@link CharSequence}
+     *
+     * @return true if the sequence of characters have been overwritten
+     */
     static public boolean erase(CharSequence charSequence, char fillingCharacter) {
-        AbstractTracer tracer = TracerFactory.getInstance().getCurrentPoolTracer();
-        tracer.entry("boolean", PasswordGenerator.class, "erase(CharSequence charSequence)");
+        AbstractTracer tracer = TracerFactory.getInstance().getDefaultTracer();
+        tracer.entry("boolean", PasswordGenerator.class, "erase(CharSequence charSequence), char fillingCharacter");
         try {
             boolean erased;
             tracer.out().printfIndentln("charSequence.getClass().getSimpleName() = %s", charSequence.getClass().getName());
