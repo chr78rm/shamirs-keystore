@@ -118,7 +118,6 @@
 							<scalaVersion>${scala.version}</scalaVersion>
 							<args>
 								<arg>-deprecation</arg>
-								<arg>-release:11</arg>
 								<arg>-encoding</arg>
 								<arg>utf-8</arg>
 							</args>
@@ -193,7 +192,6 @@
 									<scalaVersion>${scala.version}</scalaVersion>
 									<args>
 										<arg>-deprecation</arg>
-										<arg>-release:11</arg>
 										<arg>-encoding</arg>
 										<arg>utf-8</arg>
 									</args>
