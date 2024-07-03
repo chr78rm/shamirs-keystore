@@ -24,8 +24,6 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.jca.shamir.ShamirsFacade;
-import de.christofreichardt.scala.shamir.SecretMerging;
-import de.christofreichardt.scala.shamir.SecretSharing;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -39,9 +37,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import org.junit.jupiter.api.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShamirsDemoUnit implements Traceable {
@@ -144,9 +142,9 @@ public class ShamirsDemoUnit implements Traceable {
                     .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
                     .collect(Collectors.toList());
             List<String> recoveredPasswords = passwords.stream()
-                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
-                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
-                    .map(password -> new String(password))
+                    .map(password -> new ShamirsFacade.Splitter(SHARES, THRESHOLD, password))
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> new String(merger.password()))
                     .collect(Collectors.toList());
             assertThat(passwords).isEqualTo(recoveredPasswords);
         } finally {
@@ -179,9 +177,9 @@ public class ShamirsDemoUnit implements Traceable {
                     .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
                     .collect(Collectors.toList());
             List<String> recoveredPasswords = passwords.stream()
-                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
-                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
-                    .map(password -> new String(password))
+                    .map(password -> new ShamirsFacade.Splitter(SHARES, THRESHOLD, password))
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> new String(merger.password()))
                     .collect(Collectors.toList());
             assertThat(passwords).isEqualTo(recoveredPasswords);
         } finally {
@@ -214,9 +212,9 @@ public class ShamirsDemoUnit implements Traceable {
                     .limit(LIMIT)
                     .collect(Collectors.toList());
             List<CharSequence> recoveredPasswords = passwords.stream()
-                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
-                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
-                    .map(password -> new StringBuilder().append(password))
+                    .map(password -> new ShamirsFacade.Splitter(SHARES, THRESHOLD, password))
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> new StringBuilder().append(merger.password()))
                     .peek(password -> tracer.out().printfIndentln("password = %s", password))
                     .collect(Collectors.toList());
             boolean allMatched = true;
@@ -246,7 +244,6 @@ public class ShamirsDemoUnit implements Traceable {
 
             final Set<char[]> requiredCharSets = new HashSet<>();
             requiredCharSets.add(PasswordGenerator.alphanumeric());
-            requiredCharSets.add(PasswordGenerator.umlauts());
             requiredCharSets.add(PasswordGenerator.punctuationAndSymbols());
 
             List<CharSequence> passwords = passwordGenerator.generate(requiredCharSets)
@@ -257,6 +254,10 @@ public class ShamirsDemoUnit implements Traceable {
                     .collect(Collectors.toList());
 
             class RequiredCharsetProver implements Predicate<CharSequence> {
+                final Set<char[]> requiredCharSets = new HashSet<>();
+                RequiredCharsetProver(Set<char[]> requiredCharSets) {
+                    this.requiredCharSets.addAll(requiredCharSets);
+                }
                 @Override
                 public boolean test(CharSequence charSequence) {
                     return requiredCharSets.stream()
@@ -275,13 +276,17 @@ public class ShamirsDemoUnit implements Traceable {
                 }
             }
             assertThat(passwords.stream()
-                    .allMatch(new RequiredCharsetProver())
+                    .allMatch(new RequiredCharsetProver(requiredCharSets))
             ).isTrue();
+            requiredCharSets.add(PasswordGenerator.umlauts());
+            assertThat(passwords.stream()
+                    .allMatch(new RequiredCharsetProver(requiredCharSets))
+            ).isFalse();
 
             List<CharSequence> recoveredPasswords = passwords.stream()
-                    .map(password -> new SecretSharing(SHARES, THRESHOLD, password))
-                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
-                    .map(password -> new StringBuilder().append(password))
+                    .map(password -> new ShamirsFacade.Splitter(SHARES, THRESHOLD, password))
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> new StringBuilder().append(merger.password()))
                     .peek(password -> tracer.out().printfIndentln("password = %s", password))
                     .collect(Collectors.toList());
 
@@ -397,11 +402,12 @@ public class ShamirsDemoUnit implements Traceable {
                     .collect(Collectors.toList());
             List<CharSequence> recoveredPasswords = erasablePasswords.stream()
                     .map(password -> {
-                        SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, password);
-                        PasswordGenerator.erase(password, fillingChar);
-                        return secretSharing;
-                    })
-                    .map(sharing -> new SecretMerging(sharing.sharePoints().take(THRESHOLD).toIndexedSeq(), sharing.prime()).password())
+                                ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, password);
+                                PasswordGenerator.erase(password, fillingChar);
+                                return splitter;
+                            })
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> merger.password())
                     .map(recoveredPassword -> CharBuffer.wrap(recoveredPassword))
                     .collect(Collectors.toList());
             assertThat(copiedPasswords.size()).isEqualTo(recoveredPasswords.size());
