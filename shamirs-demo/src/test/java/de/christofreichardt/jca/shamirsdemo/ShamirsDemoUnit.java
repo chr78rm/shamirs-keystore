@@ -23,6 +23,7 @@ import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
+import de.christofreichardt.jca.shamir.ShamirsFacade;
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
 import java.nio.ByteBuffer;
@@ -476,6 +477,32 @@ public class ShamirsDemoUnit implements Traceable {
             boolean erased = PasswordGenerator.erase(stringBuffer, '*');
             assertThat(erased).isTrue();
             assertThat(CharSequence.compare("***************", stringBuffer)).isEqualTo(0);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("facade")
+    void facade() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "facade()");
+        try {
+            final int LIMIT = 100, LENGTH = 25;
+            final int SHARES = 8;
+            final int THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH, PasswordGenerator.alphanumericWithUmlauts());
+            List<String> passwords = passwordGenerator.generate()
+                    .map(passwordCharSeq -> passwordCharSeq.toString())
+                    .limit(LIMIT)
+                    .peek(password -> tracer.out().printfIndentln("%1$s, UTF-8(%1$s) = %2$s, UTF-16(%1$s) = %3$s", password, formatBytes(password.getBytes(StandardCharsets.UTF_8)), formatBytes(password.getBytes(StandardCharsets.UTF_16))))
+                    .collect(Collectors.toList());
+            List<String> recoveredPasswords = passwords.stream()
+                    .map(password -> new ShamirsFacade.Splitter(SHARES, THRESHOLD, password))
+                    .map(splitter -> new ShamirsFacade.Merger(splitter))
+                    .map(merger -> new String(merger.password()))
+                    .collect(Collectors.toList());
+            assertThat(passwords).isEqualTo(recoveredPasswords);
         } finally {
             tracer.wayout();
         }
