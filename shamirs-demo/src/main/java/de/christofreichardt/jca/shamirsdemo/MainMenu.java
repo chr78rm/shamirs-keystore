@@ -21,11 +21,10 @@ package de.christofreichardt.jca.shamirsdemo;
 
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
+import de.christofreichardt.jca.shamir.ShamirsFacade;
 import de.christofreichardt.jca.shamir.ShamirsLoadParameter;
 import de.christofreichardt.jca.shamir.ShamirsProtection;
 import de.christofreichardt.jca.shamir.ShamirsProvider;
-import de.christofreichardt.scala.shamir.SecretMerging;
-import de.christofreichardt.scala.shamir.SecretSharing;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -38,7 +37,12 @@ import java.security.KeyStore;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -199,25 +203,25 @@ public class MainMenu  extends AbstractMenu {
                 sizes[i] = size;
                 sum += size;
             }
-            SecretSharing secretSharing = new SecretSharing(shares, threshold, passwordSeq);
-            tracer.out().printfIndentln("secretSharing = %s", secretSharing);
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(shares, threshold, passwordSeq);
+            tracer.out().printfIndentln("secretSharing = %s", splitter);
             PasswordGenerator.erase(passwordSeq, '\u0000');
 
             String certificationMethod = this.console.readString("All|Slices|None", "Certification method", "None");
             tracer.out().printfIndentln("certificationMethod = %s", certificationMethod);
             if (Objects.equals("All", certificationMethod)) {
-                SecretSharing.CertificationResult certificationResult = secretSharing.certified();
+                ShamirsFacade.CertificationResult certificationResult = splitter.certified();
                 tracer.out().printfIndentln("certificationResult = %s", certificationResult);
-                secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+                splitter.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
                 System.console().printf("-------------------------------------------------------------\n");
                 System.console().printf("certificationResult = %s\n", certificationResult);
             } else if (Objects.equals("Slices", certificationMethod)) {
-                SecretSharing.CertificationResult certificationResult = secretSharing.saveCertifiedPartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+                ShamirsFacade.CertificationResult certificationResult = splitter.saveCertifiedPartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
                 tracer.out().printfIndentln("certificationResult = %s", certificationResult);
                 System.console().printf("-------------------------------------------------------------\n");
                 System.console().printf("certificationResult = %s\n", certificationResult);
             } else {
-                secretSharing.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
+                splitter.savePartition(sizes, this.app.getCurrentWorkspace().resolve(partition));
             }
         } finally {
             tracer.wayout();
@@ -238,7 +242,9 @@ public class MainMenu  extends AbstractMenu {
                 tracer.out().printfIndentln("path = %s", path);
                 paths[i++] = path;
             }
-            String password = new String(SecretMerging.apply(paths).password());
+            ShamirsFacade shamirsFacade = new ShamirsFacade();
+            char[] chars = shamirsFacade.mergeSlices(paths);
+            String password = new String(chars);
 
             System.console().printf("%s-> password = %s\n", this.app.getCurrentWorkspace().getFileName(), password);
         } finally {

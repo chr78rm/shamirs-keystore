@@ -13,11 +13,33 @@ public class ShamirsFacade {
         return SecretMerging.apply(paths).password();
     }
 
+    static public record CertificationResult(int falsified, int verified) {
+    }
+
     static public class Splitter {
         final SecretSharing secretSharing;
 
         public Splitter(int shares, int threshold, CharSequence password) {
             this.secretSharing = new SecretSharing(shares, threshold, password);
+        }
+
+        public CertificationResult certified() {
+            SecretSharing.CertificationResult certificationResult = this.secretSharing.certified();
+            return new CertificationResult(certificationResult.falsified(), certificationResult.verified());
+        }
+
+        public CertificationResult saveCertifiedPartition(int[] sizes, Path path) {
+            SecretSharing.CertificationResult certificationResult = this.secretSharing.saveCertifiedPartition(sizes, path);
+            return new CertificationResult(certificationResult.falsified(), certificationResult.verified());
+        }
+
+        public void savePartition(int[] sizes, Path path) {
+            this.secretSharing.savePartition(sizes, path);
+        }
+
+        @Override
+        public String toString() {
+            return this.secretSharing.toString();
         }
     }
 
