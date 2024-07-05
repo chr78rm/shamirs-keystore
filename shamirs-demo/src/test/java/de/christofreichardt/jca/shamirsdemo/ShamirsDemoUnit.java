@@ -24,20 +24,41 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.jca.shamir.ShamirsFacade;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Provider;
+import java.security.Security;
 import java.security.spec.ECGenParameterSpec;
-import java.util.*;
-import java.util.function.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
@@ -509,6 +530,101 @@ public class ShamirsDemoUnit implements Traceable {
                     .map(merger -> new String(merger.password()))
                     .collect(Collectors.toList());
             assertThat(passwords).isEqualTo(recoveredPasswords);
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("certifyAllAndSave")
+    void certifyAllAndSave() throws GeneralSecurityException, IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "certifyAllAndSave()");
+        try {
+            final int LENGTH = 25;
+            final int SHARES = 12, THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
+            CharSequence passwordSeq = passwordGenerator.generate().findFirst().orElseThrow();
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, passwordSeq);
+            tracer.out().printfIndentln("secretSharing = %s", splitter);
+            boolean erased = PasswordGenerator.erase(passwordSeq, '\u0000');
+            tracer.out().printfIndentln("erased = %b", erased);
+            ShamirsFacade.CertificationResult certificationResult = splitter.certified();
+            tracer.out().printfIndentln("certificationResult = %s", certificationResult);
+            assertThat(certificationResult.falsified()).isEqualTo(298); // '12 choose 1' + '12 choose 2' + '12 choose 3' = 12 + 66 + 220 = 298
+            assertThat(certificationResult.verified()).isEqualTo(495); //'12 choose 4' = 495
+            try (Stream<Path> paths = Files.list(Path.of(".", "json"))) {
+                paths.filter(path -> path.getFileName().toString().endsWith(".json"))
+                        .forEach(path -> {
+                            boolean deleted = false;
+                            try {
+                                deleted = Files.deleteIfExists(path);
+                            } catch (IOException ex) {
+                                throw new UncheckedIOException(ex);
+                            }
+                            tracer.out().printfIndentln("path = %s, deleted = %b", path, deleted);
+                        });
+            }
+            try (Stream<Path> paths = Files.list(Path.of(".", "json"))) {
+                long counted = paths.count();
+                tracer.out().printfIndentln("counted = %d", counted);
+                assertThat(counted).isEqualTo(1); // dummy.txt
+            }
+            int[] sizes = {4, 2, 2, 1, 1, 1, 1};
+            splitter.savePartition(sizes, Path.of("json", "foo"));
+            String[] fileNames = {"foo.json", "foo-0.json", "foo-1.json", "foo-2.json", "foo-3.json", "foo-4.json", "foo-5.json", "foo-6.json"};
+            assertThat(
+                    Stream.of(fileNames)
+                            .map(fileName -> Path.of(".", "json").resolve(fileName))
+                            .peek(path -> tracer.out().printfIndentln("fileName = %s, exists = %b", path, Files.exists(path)))
+                            .allMatch(path -> Files.exists(path))
+            ).isTrue();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    @Test
+    @DisplayName("certifySlicesAndSave")
+    void certifySlicesAndSave() throws GeneralSecurityException, IOException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "certifySlicesAndSave()");
+        try {
+            final int LENGTH = 25;
+            final int SHARES = 12, THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
+            CharSequence passwordSeq = passwordGenerator.generate().findFirst().orElseThrow();
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, passwordSeq);
+            tracer.out().printfIndentln("secretSharing = %s", splitter);
+            boolean erased = PasswordGenerator.erase(passwordSeq, '\u0000');
+            tracer.out().printfIndentln("erased = %b", erased);
+            try (Stream<Path> paths = Files.list(Path.of(".", "json"))) {
+                paths.filter(path -> path.getFileName().toString().endsWith(".json"))
+                        .forEach(path -> {
+                            boolean deleted = false;
+                            try {
+                                deleted = Files.deleteIfExists(path);
+                            } catch (IOException ex) {
+                                throw new UncheckedIOException(ex);
+                            }
+                            tracer.out().printfIndentln("path = %s, deleted = %b", path, deleted);
+                        });
+            }
+            try (Stream<Path> paths = Files.list(Path.of(".", "json"))) {
+                long counted = paths.count();
+                tracer.out().printfIndentln("counted = %d", counted);
+                assertThat(counted).isEqualTo(1); // dummy.txt
+            }
+            int[] sizes = {4, 2, 2, 1, 1, 1, 1};
+            ShamirsFacade.CertificationResult certificationResult = splitter.saveCertifiedPartition(sizes, Path.of("json", "bar"));
+            assertThat(certificationResult.verified() + certificationResult.falsified()).isEqualTo(127); // '7 choose 1' + '7 choose 2' + '7 choose 3' + '7 choose 4' + '7 choose 5' + '7 choose 6' + '7 choose 7' == 7 + 21 + 35 +35 + 21 + 7 + 1 == 127
+            String[] fileNames = {"bar.json", "bar-0.json", "bar-1.json", "bar-2.json", "bar-3.json", "bar-4.json", "bar-5.json", "bar-6.json"};
+            assertThat(
+                    Stream.of(fileNames)
+                            .map(fileName -> Path.of(".", "json").resolve(fileName))
+                            .peek(path -> tracer.out().printfIndentln("fileName = %s, exists = %b", path, Files.exists(path)))
+                            .allMatch(path -> Files.exists(path))
+            ).isTrue();
         } finally {
             tracer.wayout();
         }
