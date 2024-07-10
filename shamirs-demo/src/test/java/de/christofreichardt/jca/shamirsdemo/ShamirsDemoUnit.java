@@ -24,7 +24,18 @@ import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
 import de.christofreichardt.jca.shamir.PasswordGenerator;
 import de.christofreichardt.jca.shamir.ShamirsFacade;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonWriter;
+import jakarta.json.JsonWriterFactory;
+import jakarta.json.stream.JsonGenerator;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -40,6 +51,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,16 +66,15 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ShamirsDemoUnit implements Traceable {
+public class ShamirsDemoUnit implements Traceable, WithAssertions {
 
     @BeforeAll
     void systemProperties() {
@@ -625,6 +636,106 @@ public class ShamirsDemoUnit implements Traceable {
                             .peek(path -> tracer.out().printfIndentln("fileName = %s, exists = %b", path, Files.exists(path)))
                             .allMatch(path -> Files.exists(path))
             ).isTrue();
+        } finally {
+            tracer.wayout();
+        }
+    }
+
+    class JsonTracer implements Traceable {
+
+        private final JsonWriterFactory jsonWriterFactory;
+
+        public JsonTracer() {
+            Map<String, Object> writerProps = new HashMap<>();
+            writerProps.put(JsonGenerator.PRETTY_PRINTING, Boolean.TRUE);
+            this.jsonWriterFactory = Json.createWriterFactory(writerProps);
+        }
+
+        public void trace(JsonStructure jsonStructure) {
+            AbstractTracer tracer = getCurrentTracer();
+            tracer.entry("void", this, "trace(JsonStructure jsonStructure)");
+
+            try {
+                try {
+                    byte[] bytes;
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    try (JsonWriter jsonWriter = this.jsonWriterFactory.createWriter(byteArrayOutputStream, StandardCharsets.UTF_8);) {
+                        jsonWriter.write(jsonStructure);
+                    }
+                    tracer.out().println();
+                    bytes = byteArrayOutputStream.toByteArray();
+                    try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+                         InputStreamReader inputStreamReader = new InputStreamReader(byteArrayInputStream, StandardCharsets.UTF_8);
+                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                        bufferedReader.lines().forEach(line -> tracer.out().printfIndentln(line));
+                    }
+                    tracer.out().println();
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
+            } finally {
+                tracer.wayout();
+            }
+        }
+
+        @Override
+        public AbstractTracer getCurrentTracer() {
+            return ShamirsDemoUnit.this.getCurrentTracer();
+        }
+    }
+
+    @Test
+    @DisplayName("partitionAsJson")
+    void partitionAsJson() throws GeneralSecurityException {
+        AbstractTracer tracer = getCurrentTracer();
+        tracer.entry("void", this, "partitionAsJson()");
+        try {
+            final int LENGTH = 25;
+            final int SHARES = 12, THRESHOLD = 4;
+            PasswordGenerator passwordGenerator = new PasswordGenerator(LENGTH);
+            CharSequence passwordSeq = passwordGenerator.generate().findFirst().orElseThrow();
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, passwordSeq);
+            tracer.out().printfIndentln("secretSharing = %s", splitter);
+            int[] sizes = {4, 2, 2, 1, 1, 1, 1};
+            int[] reversed = new int[sizes.length];
+            for (int i=sizes.length - 1, j=0; i>=0; i--, j++) {
+                reversed[j] = sizes[i];
+            }
+            tracer.out().printfIndentln("reversed = %s", Arrays.toString(reversed));
+            JsonArray partition = splitter.partitionAsJson(reversed);
+            JsonTracer jsonTracer = new JsonTracer();
+            jsonTracer.trace(partition);
+            ShamirsFacade shamirsFacade = new ShamirsFacade();
+            JsonArray fourPoints = Json.createArrayBuilder()
+                    .add(partition.get(0))
+                    .build();
+            int compared = CharSequence.compare(passwordSeq, CharBuffer.wrap(shamirsFacade.mergeSlicesToChars(fourPoints)));
+            assertThat(compared).isEqualTo(0);
+            JsonArray twoTimesTwoPoints = Json.createArrayBuilder()
+                    .add(partition.get(1))
+                    .add(partition.get(2))
+                    .build();
+            compared = CharSequence.compare(passwordSeq, CharBuffer.wrap(shamirsFacade.mergeSlicesToChars(twoTimesTwoPoints)));
+            assertThat(compared).isEqualTo(0);
+            JsonArray fourTimesOnePoints = Json.createArrayBuilder()
+                    .add(partition.get(3))
+                    .add(partition.get(4))
+                    .add(partition.get(5))
+                    .add(partition.get(6))
+                    .build();
+            compared = CharSequence.compare(passwordSeq, CharBuffer.wrap(shamirsFacade.mergeSlicesToChars(fourTimesOnePoints)));
+            assertThat(compared).isEqualTo(0);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> {
+                        JsonArray tooFewPoints = Json.createArrayBuilder()
+                                .add(partition.get(3))
+                                .add(partition.get(4))
+                                .add(partition.get(5))
+                                .build();
+                        char[] chars = shamirsFacade.mergeSlicesToChars(tooFewPoints);
+                        tracer.out().printfIndentln("chars = %s", new String(chars));
+                    })
+                    .withMessageEndingWith("Too few sharepoints.");
         } finally {
             tracer.wayout();
         }

@@ -46,6 +46,10 @@ public class ShamirsFacade {
             this.secretSharing.savePartition(sizes, path);
         }
 
+        public JsonArray partitionAsJson(int[] sizes) {
+            return this.secretSharing.partitionAsJson(sizes);
+        }
+
         @Override
         public String toString() {
             return this.secretSharing.toString();
