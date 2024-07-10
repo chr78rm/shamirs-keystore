@@ -22,18 +22,39 @@ package de.christofreichardt.jca.shamir;
 import de.christofreichardt.diagnosis.AbstractTracer;
 import de.christofreichardt.diagnosis.Traceable;
 import de.christofreichardt.diagnosis.TracerFactory;
-import de.christofreichardt.scala.shamir.SecretMerging;
-import de.christofreichardt.scala.shamir.SecretSharing;
-import java.io.*;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonValue;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -43,10 +64,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import jakarta.json.*;
 import javax.security.auth.DestroyFailedException;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -55,8 +73,16 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.*;
-import scala.jdk.CollectionConverters;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShamirsKeystoreUnit implements Traceable {
@@ -100,9 +126,12 @@ public class ShamirsKeystoreUnit implements Traceable {
             List<Path> paths = new ArrayList<>();
             paths.add(Path.of("..", "shamirs-secret-sharing", "json", "partition-3-1.json"));
             paths.add(Path.of("..", "shamirs-secret-sharing", "json", "partition-3-2.json"));
-            SecretMerging secretMerging = SecretMerging.apply(CollectionConverters.ListHasAsScala(paths).asScala());
-
-            tracer.out().printfIndentln("secretMerging.secretBytes() = (%s)", secretMerging.secretBytes().mkString(","));
+            ShamirsFacade shamirsFacade = new ShamirsFacade();
+            byte[] secretBytes = shamirsFacade.mergeSlicesToBytes(paths.toArray(new Path[0]));
+            HexFormat hexFormat = HexFormat.ofDelimiter(",")
+                    .withUpperCase()
+                    .withPrefix("0x");
+            tracer.out().printfIndentln("secretMerging.secretBytes() = (%s)", hexFormat.formatHex(secretBytes));
         } finally {
             tracer.wayout();
         }
@@ -118,9 +147,9 @@ public class ShamirsKeystoreUnit implements Traceable {
             String myPassword = "Dies-ist-streng-geheim";
             final int SHARES = 8;
             final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
-            SecretMerging secretMerging = new SecretMerging(secretSharing.sharePoints(), secretSharing.prime());
-            assertThat(secretMerging.password()).isEqualTo(myPassword.toCharArray());
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, myPassword);
+            ShamirsFacade.Merger merger = new ShamirsFacade.Merger(splitter);
+            assertThat(merger.password()).isEqualTo(myPassword.toCharArray());
         } finally {
             tracer.wayout();
         }
@@ -136,9 +165,9 @@ public class ShamirsKeystoreUnit implements Traceable {
             String myPassword = "Dies-ist-streng-geheim";
             final int SHARES = 8;
             final int THRESHOLD = 4;
-            SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, myPassword);
+            ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, myPassword);
             final int[] SIZES = {4, 2, 2};
-            secretSharing.savePartition(SIZES, Path.of("json", "roundtrip-2", "partition"));
+            splitter.savePartition(SIZES, Path.of("json", "roundtrip-2", "partition"));
             Path[] paths_1 = {Path.of("json", "roundtrip-2", "partition-0.json")};
             assertThat(new ShamirsProtection(paths_1).getPassword()).isEqualTo(myPassword.toCharArray());
             Path[] paths_2 = {Path.of("json", "roundtrip-2", "partition-1.json"), Path.of("json", "roundtrip-2", "partition-2.json")};
@@ -195,9 +224,9 @@ public class ShamirsKeystoreUnit implements Traceable {
                 final String MY_PASSWORD = "Super-sicheres-Passwort";
                 final int SHARES = 8;
                 final int THRESHOLD = 4;
-                SecretSharing secretSharing = new SecretSharing(SHARES, THRESHOLD, MY_PASSWORD);
+                ShamirsFacade.Splitter splitter = new ShamirsFacade.Splitter(SHARES, THRESHOLD, MY_PASSWORD);
                 final int[] SIZES = {4, 2, 2};
-                secretSharing.savePartition(SIZES, Path.of("json", "keystore-1", "partition"));
+                splitter.savePartition(SIZES, Path.of("json", "keystore-1", "partition"));
                 Path[] paths = {Path.of("json", "keystore-1", "partition-0.json")};
                 File keyStoreFile = Path.of("pkcs12", "my-keystore-1.p12").toFile();
                 this.shamirsProtection = new ShamirsProtection(paths);

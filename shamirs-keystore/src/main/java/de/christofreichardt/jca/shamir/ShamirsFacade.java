@@ -9,8 +9,12 @@ import scala.math.BigInt;
 
 public class ShamirsFacade {
 
-    public char[] mergeSlices(Path[] paths) {
+    public char[] mergeSlicesToChars(Path[] paths) {
         return SecretMerging.apply(paths).password();
+    }
+
+    public byte[] mergeSlicesToBytes(Path[] paths) {
+        return SecretMerging.apply(paths).secretBytesAsArray();
     }
 
     static public record CertificationResult(int falsified, int verified) {

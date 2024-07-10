@@ -45,6 +45,8 @@ class SecretMerging(
   val s: BigInt = interpolation.newtonPolynomial.evaluateAt(BigInt(0))
   /** the actual (recovered) secret bytes */
   val secretBytes: IndexedSeq[Byte] = bigIntToBytes(s)
+  /** converts the recovered bytes into a Java array */
+  lazy val secretBytesAsArray: Array[Byte] = this.secretBytes.toArray
 
   /**
    * Computes a character sequence from the recovered secret bytes by applying UTF-8 encoding.

@@ -243,7 +243,7 @@ public class MainMenu  extends AbstractMenu {
                 paths[i++] = path;
             }
             ShamirsFacade shamirsFacade = new ShamirsFacade();
-            char[] chars = shamirsFacade.mergeSlices(paths);
+            char[] chars = shamirsFacade.mergeSlicesToChars(paths);
             String password = new String(chars);
 
             System.console().printf("%s-> password = %s\n", this.app.getCurrentWorkspace().getFileName(), password);
