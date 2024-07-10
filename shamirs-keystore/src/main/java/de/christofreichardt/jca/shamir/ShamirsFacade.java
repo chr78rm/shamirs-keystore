@@ -2,6 +2,7 @@ package de.christofreichardt.jca.shamir;
 
 import de.christofreichardt.scala.shamir.SecretMerging;
 import de.christofreichardt.scala.shamir.SecretSharing;
+import jakarta.json.JsonArray;
 import java.nio.file.Path;
 import scala.Tuple2;
 import scala.collection.immutable.IndexedSeq;
@@ -15,6 +16,10 @@ public class ShamirsFacade {
 
     public byte[] mergeSlicesToBytes(Path[] paths) {
         return SecretMerging.apply(paths).secretBytesAsArray();
+    }
+
+    public char[] mergeSlicesToChars(JsonArray slices) {
+        return SecretMerging.apply(slices).password();
     }
 
     static public record CertificationResult(int falsified, int verified) {

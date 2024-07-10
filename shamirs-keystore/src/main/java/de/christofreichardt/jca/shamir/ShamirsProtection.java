@@ -19,12 +19,11 @@
 
 package de.christofreichardt.jca.shamir;
 
-import de.christofreichardt.scala.shamir.SecretMerging;
+import jakarta.json.JsonArray;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
-import jakarta.json.JsonArray;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
 
@@ -68,11 +67,13 @@ public class ShamirsProtection implements KeyStore.ProtectionParameter, Destroya
     }
 
     private char[] mergePassword(Path[] paths) {
-        return SecretMerging.apply(paths).password();
+        ShamirsFacade shamirsFacade = new ShamirsFacade();
+        return shamirsFacade.mergeSlicesToChars(paths);
     }
 
     private char[] mergePassword(JsonArray slices) {
-        return SecretMerging.apply(slices).password();
+        ShamirsFacade shamirsFacade = new ShamirsFacade();
+        return shamirsFacade.mergeSlicesToChars(slices);
     }
 
     /**
