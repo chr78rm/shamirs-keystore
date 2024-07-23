@@ -97,10 +97,21 @@
 						</goals>
 						<configuration>
 							<args>
+								<arg>-nobootcp</arg>
 								<arg>-no-link-warnings</arg>
 								<arg>-doc-footer</arg>
 								<arg>Copyright &#x00A9; 2017, 2024, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</arg>
 							</args>
+							<scaladocClassName>dotty.tools.scaladoc.Main</scaladocClassName>
+							<sourceDir>${project.build.outputDirectory}</sourceDir>
+							<includes>**/*.tasty</includes>
+							<dependencies>
+								<dependency>
+									<groupId>org.scala-lang</groupId>
+									<artifactId>scaladoc_3</artifactId>
+									<version>${scala.version}</version>
+								</dependency>
+							</dependencies>
 							<!--
 							<outputDirectory>apidocs</outputDirectory>
 							<reportOutputDirectory>target</reportOutputDirectory>
