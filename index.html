@@ -71,7 +71,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2024-06-25</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2024-07-02</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -123,7 +123,7 @@
         </p>
       </div>
       <p class="section">
-        <a href="https://maven.apache.org/">Maven</a> and a JDK11+ is required for the build of the multi-module project:
+        <a href="https://maven.apache.org/">Maven</a> and a JDK 11+ is required for the build of the multi-module project:
       </p>
       <div class="code">
         <p class="code">
@@ -408,6 +408,16 @@
               <a href="shamirs-demo-1.3.1.zip.sha512.txt">shamirs-demo-1.3.1.zip.sha512</a>
             </td>
           </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">shamirs-demo-1.3.2</td>
+            <td class="cell">
+              <a href="https://www.dropbox.com/scl/fi/2k3vr5v38oelqqkkc08mi/shamirs-demo-1.3.2.zip?rlkey=my9m14rsgr6kyza5qviw75mrk&dl=1">shamirs-demo-1.3.2.zip</a>
+            </td>
+            <td class="cell">2024-07-31 15:02:49.280 +0200</td>
+            <td class="cell">
+              <a href="shamirs-demo-1.3.2.zip.sha512.txt">shamirs-demo-1.3.2.zip.sha512</a>
+            </td>
+          </tr>
         </tbody>
       </table>
       <p class="section">
@@ -525,11 +535,12 @@
       <p id="9" class="headline-1">7. User Manual</p>
       <p id="14" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
       <p class="section">
-        <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK11+ is needed for the execution of the app. I am using the 
+        <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK 11+ is needed for the execution of the app. I am using the
         <a href="https://git-scm.com/download/win">Git Bash</a> for this manual but the default command line interpreter of Windows 
         (<a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a>) works as well. Of course you can use the 
-        <a href="https://www.gnu.org/software/bash/">GNU Bash</a> on Linux systems too. I have tested the distribution with the Git Bash on Windows 10, with Windows Cmd on Windows 10 and with
-        the GNU Bash on Ubuntu 20.04.6 LTS (Focal Fossa) by randomly using a JDK-11, JDK-17, JDK-21 or JDK-22. 
+        <a href="https://www.gnu.org/software/bash/">GNU Bash</a> on Linux systems too. I have tested the distribution with the Git Bash (2.45.2) on Windows 11, with Windows Cmd on Windows 11 and with
+        the GNU Bash on Ubuntu 24.04.6 LTS (Noble Numbat) by randomly using a JDK 11, JDK 17, JDK 21 or JDK 22. I'm using the latest
+        <a href="https://www.azul.com/downloads/?package=jdk#download-openjdk">Azul Zulu Builds of OpenJDK</a> for the LTS releases.
       </p>
       <p class="section">
         After unzipping the distribution exhibits the following structure:
@@ -556,10 +567,10 @@
 │                   └── jca
 │                       └── trace-config.xml
 ├── target
-│   └── shamirs-demo-1.3.1.jar
+│   └── shamirs-demo-1.3.2.jar
 ├── workspace
 │   └── my-workspace-0
-│       ├── my-keys.p12
+│       ├── donalds-keys.p12
 │       ├── test-0.json
 │       ├── test-1.json
 │       ├── test-2.json
@@ -580,41 +591,47 @@
             <td><img style="width: 2rem; float: left; margin-right: 1em; display: grid" src="./101.png" alt="CAUTION"/></td>
             <td>
               <p class="section">
-                Starting with JDK-22, Java uses an internal JLine instance as the default Console implementation to improve the user experience of programs using the Console API, see
-                <a href="https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591">JLine As The Default Console Provider</a>. Indeed, the
-                <a href="https://github.com/rprichard/winpty">winpty</a> wrapper isn't needed anymore to run the demo when using the Git Bash in conjunction with JDK-22. Unfortunately, this change 
-                presently seems to break the bulk read operations when using the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Reader.html">Reader</a> associated with 
-                the Console, see <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Console.html#reader()">Console#reader()</a>. You would have to restore the older behaviour
-                by additionally passing <span class="code" style="white-space: nowrap">-Djdk.console=java.base</span> when launching older demo versions (prior to 1.3.1) on JDK-22.
+                Starting with JDK 22, Java uses an internal JLine instance as the default Console implementation to improve the user experience of programs using the Console API, see
+                <a href="https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591">JLine As The Default Console Provider</a>. Unfortunately, this change 
+                presently seems to break the bulk read operations when using the <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Reader.html">Reader</a> associated with
+                the Console, see <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Console.html#reader()">Console#reader()</a> and
+                <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Reader.html#read(java.nio.CharBuffer)">Reader#read(java.nio.CharBuffer)</a>.
+                Furthermore, I have observed a variety of slightly disparate (mis)behaviors across different platforms and JDK versions when using the internal JLine instance in conjunction with 
+                the single character operation <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Reader.html#read()">Reader#read()</a>.
+                Therefore the included launch scripts (see table below) restore the older behavior by default. When using a JDK 22+, you can experiment with the internal JLine instance by
+                passing the argument <span style="font-style: italic">--jline</span> to the launch scripts. Then you would additionally need <span style="font-style: italic">--no-bulk</span> and perhaps
+                <span style="font-style: italic">--echo</span>.
               </p>
             </td>
           </tr>
         </tbody>
       </table>
       <p class="section" style="margin-top: -0.5rem">
-        Refer to the table below for the selection of a suitable launch script depending on Operating System and JDK version:
+        Refer to the table below for the selection of a suitable launch script depending on the environment:
       </p>
       <table style="font-family: serif; width: 85%; margin-left: auto; margin-right: auto; margin-top: 1rem; margin-top: 0rem">
         <caption style="background-color: rgb(33,102,172); color: rgb(253,219,199); font-weight: bold">Launch scripts</caption>
         <tbody>
           <tr>
-            <th class="cell"></th>
             <th class="cell">Git Bash on Windows</th>
             <th class="cell">Windows Cmd</th>
             <th class="cell">Linux Bash</th>
           </tr>
           <tr style="text-align: center">
-            <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-11 until JDK-21</td>
-            <td class="cell">winpty-shamirs-demo.sh</td>
-            <td class="cell" rowspan="2">run-shamirs-demo.bat</td>
-            <td class="cell" rowspan="2">run-shamirs-demo.sh</td>
+            <td class="cell">run-shamirs-demo.sh <span style="font-style: italic">[option]...</span></td>
+            <td class="cell" rowspan="2">run-shamirs-demo.bat <span style="font-style: italic">[option]...</span></td>
+            <td class="cell" rowspan="2">run-shamirs-demo.sh <span style="font-style: italic">[option]...</span></td>
           </tr>
           <tr style="text-align: center">
-            <td style="background-color: rgb(244,165,130); font-weight: bold">JDK-22</td>
-            <td class="cell">run-shamirs-demo.sh</td>
+            <td class="cell">winpty-shamirs-demo.sh <span style="font-style: italic">[option]...</span></td>
           </tr>
         </tbody>
       </table>
+      <p class="section" style="">
+        whereby <span style="font-style: italic">option</span> is one of <span style="font-style: italic">--jline</span>, <span style="font-style: italic">--echo</span> or
+        <span style="font-style: italic">--no-bulk</span>. Older versions of the Git Bash might require <span class="code">winpty-shamirs-demo.sh</span> otherwise there would be
+        no console without using the internal JLine instance.
+      </p>
       <p class="section">
       </p>
       <div class="code">
@@ -622,47 +639,47 @@
 $ ls
 LICENCE.txt  log/  NOTICE.txt  run-shamirs-demo.bat  run-shamirs-demo.sh*  src/  target/  winpty-shamirs-demo.sh*  workspace/
 $ java -version
-openjdk version "22.0.1" 2024-04-16
-OpenJDK Runtime Environment (build 22.0.1+8-16)
-OpenJDK 64-Bit Server VM (build 22.0.1+8-16, mixed mode, sharing)
+openjdk version "22.0.2" 2024-07-16
+OpenJDK Runtime Environment (build 22.0.2+9-70)
+OpenJDK 64-Bit Server VM (build 22.0.2+9-70, mixed mode, sharing)
 $ ./run-shamirs-demo.sh
 ...
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-06-18T15:54:09.3878296
-   Workspace: 2024-06-18
+Current time: 2024-07-31T15:51:27.1203688
+   Workspace: 2024-07-31
 
-2024-06-18-> Main menu
+2024-07-31-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-06-18-></p>
+2024-07-31-></p>
       </div>
       <p class="section">
-        The string <span class="code">2024-06-18</span> left from the arrow denotes the current date and workspace. You automatically get a new one on every day you are using
+        The string <span class="code">2024-07-31</span> left from the arrow denotes the current date and workspace. You automatically get a new one on every day you are using
         the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
         a password:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> s
-2024-06-18-> split password
-2024-06-18-> Password ([A-Za-z0-9-]{8,45}) [FU97W8aNeirrDFE6NYV3VHByH]:
-2024-06-18-> Number of shares ([0-9]+): 12
-2024-06-18-> Threshold ([0-9]+): 4
-2024-06-18-> Name of partition ([A-Za-z]{1,10}): demo
-2024-06-18-> Number of slices ([0-9]+): 7
-2024-06-18-> Size[i=0, sum=0] ([0-9]+): 4
-2024-06-18-> Size[i=1, sum=4] ([0-9]+): 2
-2024-06-18-> Size[i=2, sum=6] ([0-9]+): 2
-2024-06-18-> Size[i=3, sum=8] ([0-9]+): 1
-2024-06-18-> Size[i=4, sum=9] ([0-9]+): 1
-2024-06-18-> Size[i=5, sum=10] ([0-9]+): 1
-2024-06-18-> Size[i=6, sum=11] ([0-9]+): 1
-2024-06-18-> Certification method (All|Slices|None) [None]: All
+        <p class="code" style="white-space: pre">2024-07-31-> s
+2024-07-31-> split password
+2024-07-31-> Password ([A-Za-z0-9-]{8,45}) [8onrsDfXTz79hyev6GwjCiszE]:
+2024-07-31-> Number of shares ([0-9]+): 12
+2024-07-31-> Threshold ([0-9]+): 4
+2024-07-31-> Name of partition ([A-Za-z]{1,10}): demo
+2024-07-31-> Number of slices ([0-9]+): 7
+2024-07-31-> Size[i=0, sum=0] ([0-9]+): 4
+2024-07-31-> Size[i=1, sum=4] ([0-9]+): 2
+2024-07-31-> Size[i=2, sum=6] ([0-9]+): 2
+2024-07-31-> Size[i=3, sum=8] ([0-9]+): 1
+2024-07-31-> Size[i=4, sum=9] ([0-9]+): 1
+2024-07-31-> Size[i=5, sum=10] ([0-9]+): 1
+2024-07-31-> Size[i=6, sum=11] ([0-9]+): 1
+2024-07-31-> Certification method (All|Slices|None) [None]: All
 -------------------------------------------------------------
 certificationResult = (298 falsified, 495 verified)</p>
       </div>
@@ -686,7 +703,7 @@ certificationResult = (298 falsified, 495 verified)</p>
           Now, open another console and review the content of the your workspace directory (workspace/yyyy-MM-dd):
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ ls workspace/2024-06-18/
+        <p class="code" style="white-space: pre">$ ls workspace/2024-07-31/
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json</p>
       </div>
       <p class="section">
@@ -698,21 +715,21 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         <span class="code">(li)st workspace</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> li
-2024-06-18-> list workspace
-2024-06-18-> Partitions: [demo]
-2024-06-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2024-06-18-> Keystores: []</p>
+        <p class="code" style="white-space: pre">2024-07-31-> li
+2024-07-31-> list workspace
+2024-07-31-> Partitions: [demo]
+2024-07-31-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-07-31-> Keystores: []</p>
       </div>
       <p class="section">
         We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
         <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> m
-2024-06-18-> merge password
-2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
-2024-06-18-> password = FU97W8aNeirrDFE6NYV3VHByH</p>
+        <p class="code" style="white-space: pre">2024-07-31-> m
+2024-07-31-> merge password
+2024-07-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
+2024-07-31-> password = 8onrsDfXTz79hyev6GwjCiszE</p>
       </div>
       <p class="section">
         As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
@@ -725,30 +742,30 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         Now, let's create a keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> Main menu
+        <p class="code" style="white-space: pre">2024-07-31-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-06-18-> c
-2024-06-18-> create keystore
-2024-06-18-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
-2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
+2024-07-31-> c
+2024-07-31-> create keystore
+2024-07-31-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
+2024-07-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-06-18T16:18:42.3677483
-   Workspace: 2024-06-18
+Current time: 2024-07-31T16:05:50.9864034
+   Workspace: 2024-07-31
 
-2024-06-18-> KeyStore menu [donalds-keys]
+2024-07-31-> KeyStore menu [donalds-keys]
 
          (l)ist entries          (p)rivate key           (s)ecret key
           (c)ertificate            (m)ain menu
 
-2024-06-18-></p>
+2024-07-31-></p>
       </div>
       <p class="section">
         We used four of the slices containing a single share to produce the credentials for the keystore. The demo app switched to a submenu regarding
@@ -757,19 +774,19 @@ Current time: 2024-06-18T16:18:42.3677483
         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.SecretKeyEntry.html">Secret Key</a> and 
         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.TrustedCertificateEntry.html">Certificate</a> entries.
         Private and Secret Keys need protection whereas certificates need not since latter are public. Hence we will create a Private Key. A Private Key
-        is always accompanied with a certifcate that attests the associated Public Key. From the start these certificates are self-signed but could
+        is always accompanied with a certificate that attests the associated Public Key. From the start these certificates are self-signed but could
         be the result from a PKCS10 certificate request too.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> p
-2024-06-18-> private key
-2024-06-18-> Keygenerator algorithm (DSA|RSA|EC): EC
-2024-06-18-> Validity ([0-9]+): 100
-2024-06-18-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
-2024-06-18-> Locality ([A-Za-z- ]{5,30}): Entenhausen
-2024-06-18-> State ([A-Za-z- ]{5,30}): Bayern
-2024-06-18-> Country ([A-Za-z- ]{5,30}): Deutschland
-2024-06-18-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
+        <p class="code" style="white-space: pre">2024-07-31-> p
+2024-07-31-> private key
+2024-07-31-> Keygenerator algorithm (DSA|RSA|EC): EC
+2024-07-31-> Validity ([0-9]+): 100
+2024-07-31-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
+2024-07-31-> Locality ([A-Za-z- ]{5,30}): Entenhausen
+2024-07-31-> State ([A-Za-z- ]{5,30}): Bayern
+2024-07-31-> Country ([A-Za-z- ]{5,30}): Deutschland
+2024-07-31-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
       </div>
       <p class="section">
         We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
@@ -780,50 +797,50 @@ Current time: 2024-06-18T16:18:42.3677483
         Now, list the entries so far:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> l
-2024-06-18-> list entries
-2024-06-18-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:31:38:37:32:30:34:37:36:36:39:38, algorithm=EC, keytype=Private Key</p>
+        <p class="code" style="white-space: pre">2024-07-31-> l
+2024-07-31-> list entries
+2024-07-31-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:32:32:34:33:34:38:39:30:36:33:37, algorithm=EC, keytype=Private Key</p>
       </div>
       <p class="section">
         Go back to main menu:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> m
-2024-06-18-> main menu
+        <p class="code" style="white-space: pre">2024-07-31-> m
+2024-07-31-> main menu
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2024-06-18T16:25:05.3273361
-   Workspace: 2024-06-18
+Current time: 2024-07-31T16:09:33.7122039
+   Workspace: 2024-07-31
 
-2024-06-18-> Main menu
+2024-07-31-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-06-18-></p>
+2024-07-31-></p>
       </div>
       <p class="section">
         Now, list the workspace again:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> li
-2024-06-18-> list workspace
-2024-06-18-> Partitions: [demo]
-2024-06-18-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2024-06-18-> Keystores: [donalds-keys]</p>
+        <p class="code" style="white-space: pre">2024-07-31-> li
+2024-07-31-> list workspace
+2024-07-31-> Partitions: [demo]
+2024-07-31-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2024-07-31-> Keystores: [donalds-keys]</p>
       </div>
       <p class="section">
         Again, merge some of the slices to recover the password of the keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> m
-2024-06-18-> merge password
-2024-06-18-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
-2024-06-18-> password = FU97W8aNeirrDFE6NYV3VHByH</p>
+        <p class="code" style="white-space: pre">2024-07-31-> m
+2024-07-31-> merge password
+2024-07-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
+2024-07-31-> password = 8onrsDfXTz79hyev6GwjCiszE</p>
       </div>
       <p class="section">
         Switch to a separate console since we want to investigate the keystore with 
@@ -831,27 +848,27 @@ Current time: 2024-06-18T16:25:05.3273361
         different.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd workspace/2024-06-18  # workspace/yyyy-MM-dd
+        <p class="code" style="white-space: pre">$ cd workspace/2024-07-31  # workspace/yyyy-MM-dd
 $ ls
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  donalds-keys.p12
-$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass FU97W8aNeirrDFE6NYV3VHByH -storetype pkcs12 -v
+$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass 8onrsDfXTz79hyev6GwjCiszE -storetype pkcs12 -v
 Keystore type: PKCS12
 Keystore provider: SUN
 
 Your keystore contains 1 entry
 
 Alias name: donalds-private-ec-key
-Creation date: 18 Jun 2024
+Creation date: 31 Jul 2024
 Entry type: PrivateKeyEntry
 Certificate chain length: 1
 Certificate[1]:
 Owner: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
 Issuer: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
-Serial number: 1902bb93557
-Valid from: Tue Jun 18 16:21:16 CEST 2024 until: Thu Sep 26 16:21:16 CEST 2024
+Serial number: 191091eaa8e
+Valid from: Wed Jul 31 16:08:10 CEST 2024 until: Fri Nov 08 15:08:10 CET 2024
 Certificate fingerprints:
-         SHA1: AD:CB:EC:03:0A:81:88:6C:10:BA:1F:DF:6A:E9:3F:A7:61:20:35:53
-         SHA256: 86:77:4C:87:A0:BC:9A:CF:EB:EE:7E:14:B9:36:34:0B:57:2F:0B:A5:CA:5F:6E:32:59:4C:CA:91:54:37:36:84
+         SHA1: E8:5E:3D:0A:62:F2:48:3E:D1:F0:4B:76:31:0A:78:79:EC:F8:76:ED
+         SHA256: 0A:E8:AC:1C:1B:95:C5:34:D4:5A:EC:CB:E5:A7:E7:85:4D:BD:AA:E4:F9:40:CE:B9:48:59:4F:BF:A8:1B:56:11
 Signature algorithm name: SHA256withECDSA
 Subject Public Key Algorithm: 521-bit EC (secp521r1) key
 Version: 3
@@ -866,14 +883,14 @@ Version: 3
         secret keys don't work since the underlying keystore implementation of the JDK doesn't recognize them.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2024-06-18-> Main menu
+        <p class="code" style="white-space: pre">2024-07-31-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2024-06-18-> e
-2024-06-18-> exit</p>
+2024-07-31-> e
+2024-07-31-> exit</p>
       </div>
       <p class="section">
         <a href="#1">[ToC]</a>
