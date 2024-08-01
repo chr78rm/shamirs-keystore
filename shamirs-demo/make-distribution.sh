@@ -19,26 +19,13 @@ cp --recursive src/main ${DIST}/shamirs-demo/src
 echo "Copying binary ..."
 cp ./target/${NAME}-${VERSION}.jar ${DIST}/shamirs-demo/target
 
-echo "Making launch scripts ..."
-# bash launch script
-echo '#!/bin/bash' > ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo 'if [ "x${JAVA_HOME}" == "x" ]' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '  then' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '    BIN_JAVA=$(which java)' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '  else' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '    BIN_JAVA=${JAVA_HOME}/bin/java' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo 'fi' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '${BIN_JAVA} -version' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo 'SHAMIRS_VERSION='${VERSION} >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
-echo '${BIN_JAVA} -Djava.security.egd=file:/dev/urandom -jar target/shamirs-demo-${SHAMIRS_VERSION}.jar' >> ${DIST}/shamirs-demo/run-shamirs-demo.sh
+echo "Creating launch scripts ..."
+cp ./run-uber-demo.sh ${DIST}/shamirs-demo/run-shamirs-demo.sh
+cp ./run-uber-demo.bat ${DIST}/shamirs-demo/run-shamirs-demo.bat
 # winpty wrapper
 echo '#!/bin/bash' > ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
 echo '' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
-echo 'winpty sh -i -c ./run-shamirs-demo.sh' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
-# cmd launch script
-echo '@echo off' > ${DIST}/shamirs-demo/run-shamirs-demo.bat
-echo 'java -version' >> ${DIST}/shamirs-demo/run-shamirs-demo.bat
-echo 'set SHAMIRS_VERSION='${VERSION} >> ${DIST}/shamirs-demo/run-shamirs-demo.bat
-echo 'java -Dde.christofreichardt.jca.shamirsdemo.console.echo=ON -jar target/shamirs-demo-%SHAMIRS_VERSION%.jar' >> ${DIST}/shamirs-demo/run-shamirs-demo.bat
+echo '# you must quote the arguments which are passed through, like:' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
+echo '# ./winpty-shamirs-demo.sh "--no-bulk --jline --echo"' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
+echo '' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
+echo 'winpty sh -i -c "./run-shamirs-demo.sh $@"' >> ${DIST}/shamirs-demo/winpty-shamirs-demo.sh
