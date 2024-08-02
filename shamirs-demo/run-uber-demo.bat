@@ -6,7 +6,7 @@ set ECHO_SWITCH=OFF
 set JLINE_SWITCH=OFF
 
 rem current version
-set SHAMIRS_VERSION=1.3.2
+set SHAMIRS_VERSION=1.3.3
 
 rem evaluate arguments
 set ARGS=%*

@@ -41,7 +41,7 @@ if [ "x${JAVA_HOME}" == "x" ]
 fi
 ${BIN_JAVA} -version
 
-SHAMIRS_VERSION=1.3.2
+SHAMIRS_VERSION=1.3.3
 ${BIN_JAVA} -Djava.security.egd=file:/dev/urandom \
   -Dde.christofreichardt.jca.shamirsdemo.console.echo=${ECHO_SWITCH} \
   ${CONSOLE_PROPERTY} \
