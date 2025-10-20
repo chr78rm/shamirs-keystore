@@ -28,7 +28,7 @@ import java.time.{Duration, Instant, LocalDateTime, ZoneId}
 import org.scalatest.*
 import org.scalatest.events.*
 
-class MySuites(suites: Suite*) extends Suites(suites: _*) with Tracing with BeforeAndAfterAll with SequentialNestedSuiteExecution {
+class MySuites(suites: Suite*) extends Suites(suites*) with Tracing with BeforeAndAfterAll with SequentialNestedSuiteExecution {
 
   override def run(testName: Option[String], args: Args): Status = {
     printf("%s.run%n", this.getClass.getSimpleName)
