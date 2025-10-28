@@ -6,7 +6,7 @@ ARGS=$* # all parameter
 # defaults
 ECHO_SWITCH=OFF
 BULK_SWITCH=ON
-CONSOLE_SWITCH=base
+CONSOLE_SWITCH=jline
 
 # evaluate parameter
 for ARG in ${ARGS}
@@ -22,6 +22,10 @@ do
   if [[ "${ARG}" == "--jline" ]]
   then
     CONSOLE_SWITCH=jline
+  fi
+  if [[ "${ARG}" == "--base" ]]
+  then
+    CONSOLE_SWITCH=base
   fi
 done
 echo -e "\necho = ${ECHO_SWITCH}"
