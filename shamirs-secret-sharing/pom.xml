@@ -45,10 +45,10 @@
 		<maven.compiler.release>11</maven.compiler.release>
 		-->
 		<encoding>UTF-8</encoding>
-		<scala.version>3.8.1</scala.version>
-		<scalatest.version>3.2.19</scalatest.version>
-		<scala-maven-plugin.version>4.9.9</scala-maven-plugin.version>
-		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+		<scala.version>3.8.3</scala.version>
+		<scalatest.version>3.2.20</scalatest.version>
+		<scala-maven-plugin.version>4.9.10</scala-maven-plugin.version>
+		<maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
 		<scalatest-maven-plugin.version>2.2.0</scalatest-maven-plugin.version>
 	</properties>
 
@@ -99,11 +99,12 @@
 							<goal>doc</goal>
 						</goals>
 						<configuration>
+							<displayCmd>false</displayCmd>
 							<args>
 								<arg>-nobootcp</arg>
 								<arg>-no-link-warnings</arg>
 								<arg>-doc-footer</arg>
-								<arg>Copyright &#x00A9; 2017, 2025, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</arg>
+								<arg>Copyright &#x00A9; 2017, 2026, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</arg>
 							</args>
 							<scaladocClassName>dotty.tools.scaladoc.Main</scaladocClassName>
 							<sourceDir>${project.build.outputDirectory}</sourceDir>
@@ -181,7 +182,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.3.1</version>
+						<version>3.4.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>

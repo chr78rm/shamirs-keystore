@@ -25,7 +25,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.14.1</version>
+				<version>3.15.0</version>
 				<configuration>
 					<release>17</release>
 					<compilerArgument>-Xlint:all</compilerArgument>
@@ -83,17 +83,17 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>6.0.1</version>
+			<version>6.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>6.0.1</version>
+			<version>6.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
-			<version>6.0.1</version>
+			<version>6.0.3</version>
 		</dependency>
 	</dependencies>
 </project>

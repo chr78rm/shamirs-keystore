@@ -60,7 +60,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.5</version>
                 <configuration>
                     <includes>
                         <include>de/christofreichardt/jca/shamir/ShamirsKeystoreUnit.java</include>
@@ -91,7 +91,7 @@
                         <configuration>
                             <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                             <header>shamirs-keystore ${project.version} API</header>
-                            <bottom>Copyright &#x00A9; 2017, 2024, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</bottom>
+                            <bottom>Copyright &#x00A9; 2017, 2026, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</bottom>
                             <additionalJOptions>
                                 <additionalJOption>-J-Duser.language=en</additionalJOption>
                             </additionalJOptions>
@@ -124,7 +124,7 @@
                         <configuration>
                             <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                             <header>shamirs-keystore ${project.version} API</header>
-                            <bottom>Copyright &#x00A9; 2017, 2024, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</bottom>
+                            <bottom>Copyright &#x00A9; 2017, 2026, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau</bottom>
                             <additionalJOptions>
                                 <additionalJOption>-J-Duser.language=en</additionalJOption>
                             </additionalJOptions>
@@ -158,19 +158,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>6.0.1</version>
+            <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>6.0.1</version>
+            <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>6.0.1</version>
+            <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -188,7 +188,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.82</version>
+            <version>1.84</version>
             <scope>test</scope>
         </dependency>
         <dependency>
