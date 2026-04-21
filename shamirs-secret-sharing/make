@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#
+# Terminate on error
+#
+set -o errexit
+
+#
+# Check location
+#
+if [[ ! -f "../shamirs-secret-sharing/alt-build/download-compiler-deps.sh" ]]
+then
+  echo "ERROR -> 'make' must be called from the (sub-)project directory."
+  exit
+fi
+
+#
+# evaluate parameter
+#
+ARGS=$*
+for ARG in ${ARGS}
+do
+  if [[ "${ARG}" == "all" ]]
+  then
+    readonly MAKE_ALL=ON
+  fi
+  if [[ "${ARG}" == "clean" ]]
+  then
+    readonly CLEAN_UP=ON
+  fi
+done
+echo MAKE_ALL=${MAKE_ALL}
+echo CLEAN_UP=${CLEAN_UP}
+echo
+
+#
+# Clean up
+#
+if [[ "${CLEAN_UP}" == "ON" ]]
+then
+  ./alt-build/cleanup.sh
+fi
+
+#
+# Download the Scala 3 compiler dependencies (if required), compile the main sources and build a jar-archive. Thereupon compile the test sources
+# and run the tests. Finally, download the Scaladoc 3 dependencies (if required), generate the scaladocs and build a jar-archive accordingly.
+#
+if [[ ${MAKE_ALL} == "ON" ]]
+then
+  ./alt-build/download-compiler-deps.sh
+  ./alt-build/compile.sh
+  ./alt-build/test-compile.sh
+  ./alt-build/run-tests.sh
+  ./alt-build/download-scaladoc-deps.sh
+  ./alt-build/generate-scaladoc.sh
+fi
+
