@@ -18,6 +18,7 @@ echo PROJECT_LIBS_DIR=${PROJECT_LIBS_DIR}
 echo CLASSPATH_SEPARATOR=${CLASSPATH_SEPARATOR}
 echo JAVA_OUTPUT_VERSION=${JAVA_OUTPUT_VERSION}
 echo SHAMIR_VERSION=${SHAMIR_VERSION}
+echo SUN_MISC_UNSAFE_OPT=${SUN_MISC_UNSAFE_OPT}
 echo
 
 #
@@ -58,7 +59,7 @@ echo Compiling main classes ...
 
 mkdir --parents --verbose ./target/classes
 
-${JAVA} -Dpath.separator=${CLASSPATH_SEPARATOR} --class-path ${COMPILER_CLASSPATH} -Dscala.expandjavacp=true -Dscala.usejavacp=true \
+${JAVA} ${SUN_MISC_UNSAFE_OPT} -Dpath.separator=${CLASSPATH_SEPARATOR} --class-path ${COMPILER_CLASSPATH} -Dscala.expandjavacp=true -Dscala.usejavacp=true \
 dotty.tools.MainGenericCompiler -d ./target/classes \
 -classpath \
 ${PROJECT_CLASSPATH} \
