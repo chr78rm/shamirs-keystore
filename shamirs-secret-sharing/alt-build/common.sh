@@ -12,9 +12,6 @@ readonly PROJECT_DIR=$(dirname ${SCRIPT_DIR})
 #
 # Constants
 #
-readonly SCALA_VERSION=3.8.3
-readonly SHAMIR_VERSION=1.4.0
-
 readonly SCALA_MAVEN_REPO=https://repo1.maven.org/maven2/org/scala-lang
 
 readonly SCALA3_COMPILER_JAR=${SCALA_MAVEN_REPO}/scala3-compiler_3/${SCALA_VERSION}/scala3-compiler_3-${SCALA_VERSION}.jar

@@ -9,6 +9,7 @@ set -o errexit
 # Constants
 #
 source ./alt-build/common.sh
+echo SCALA_VERSION=${SCALA_VERSION}
 echo SCALADOC_3_JAR=${SCALADOC_3_JAR}
 echo SCALADOC_3_POM=${SCALADOC_3_POM}
 echo SCALADOC_LIBS_DIR=${SCALADOC_LIBS_DIR}

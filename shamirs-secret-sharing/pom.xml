@@ -93,11 +93,7 @@
 				<version>${scala-maven-plugin.version}</version>
 				<executions>
 					<execution>
-						<!-- use mvn scala:doc@Scaladoc to generate the documentation -->
 						<id>Scaladoc</id>
-						<goals>
-							<goal>doc</goal>
-						</goals>
 						<configuration>
 							<displayCmd>false</displayCmd>
 							<args>
@@ -117,18 +113,13 @@
 								</dependency>
 							</dependencies>
 							<!--
-							<outputDirectory>apidocs</outputDirectory>
-							<reportOutputDirectory>target</reportOutputDirectory>
-							-->
+                            <outputDirectory>apidocs</outputDirectory>
+                            <reportOutputDirectory>target</reportOutputDirectory>
+                            -->
 						</configuration>
 					</execution>
 					<execution>
 						<id>Scalac</id>
-						<goals>
-							<goal>compile</goal>
-							<goal>testCompile</goal>
-							<goal>add-source</goal>
-						</goals>
 						<configuration>
 							<scalaVersion>${scala.version}</scalaVersion>
 							<args>
@@ -149,32 +140,67 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.scalatest</groupId>
-				<artifactId>scalatest-maven-plugin</artifactId>
-				<version>${scalatest-maven-plugin.version}</version>
-				<configuration>
-					<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-					<junitxml>.</junitxml>
-					<filereports>WDF TestSuite.txt</filereports>
-					<suites>de.christofreichardt.scala.shamir.ShamirSuites</suites>
-					<systemProperties>
-						<de.christofreichardt.scala.scalatest.summary>../reports/shamirs-secret-sharing-summary.txt</de.christofreichardt.scala.scalatest.summary>
-					</systemProperties>
-				</configuration>
-				<executions>
-					<execution>
-						<id>test</id>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- see http://davidb.github.com/scala-maven-plugin -->
+						<groupId>net.alchim31.maven</groupId>
+						<artifactId>scala-maven-plugin</artifactId>
+						<version>${scala-maven-plugin.version}</version>
+						<executions>
+							<execution>
+								<!-- use mvn scala:doc@Scaladoc to generate the documentation -->
+								<id>Scaladoc</id>
+								<!--
+                                <goals>
+                                    <goal>doc</goal>
+                                </goals>
+                                -->
+							</execution>
+							<execution>
+								<id>Scalac</id>
+								<goals>
+									<goal>compile</goal>
+									<goal>testCompile</goal>
+									<goal>add-source</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.scalatest</groupId>
+						<artifactId>scalatest-maven-plugin</artifactId>
+						<version>${scalatest-maven-plugin.version}</version>
+						<configuration>
+							<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+							<junitxml>.</junitxml>
+							<filereports>WDF TestSuite.txt</filereports>
+							<suites>de.christofreichardt.scala.shamir.ShamirSuites</suites>
+							<systemProperties>
+								<de.christofreichardt.scala.scalatest.summary>../reports/shamirs-secret-sharing-summary.txt</de.christofreichardt.scala.scalatest.summary>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>test</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>release</id>
 			<build>
@@ -199,19 +225,12 @@
 						<version>${scala-maven-plugin.version}</version>
 						<executions>
 							<execution>
+								<id>Scalac</id>
 								<goals>
 									<goal>compile</goal>
 									<goal>testCompile</goal>
 									<goal>add-source</goal>
 								</goals>
-								<configuration>
-									<scalaVersion>${scala.version}</scalaVersion>
-									<args>
-										<arg>-deprecation</arg>
-										<arg>-encoding</arg>
-										<arg>utf-8</arg>
-									</args>
-								</configuration>
 							</execution>
 							<execution>
 								<id>Scaladoc</id>
@@ -225,6 +244,48 @@
 										<jvmArg>-Xmx1024m</jvmArg>
 									</jvmArgs>
 								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>alt-build</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.6.3</version>
+						<executions>
+							<execution>
+								<!-- mvn -P dist exec:exec@dist -->
+								<id>make</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<executable>sh</executable>
+							<arguments>
+								<argument>-c</argument>
+								<argument>./make all --scala-version=${scala.version} --shamir-version=${project.version}</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.4.0</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
 							</execution>
 						</executions>
 					</plugin>

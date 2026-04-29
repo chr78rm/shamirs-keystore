@@ -17,9 +17,12 @@ fi
 #
 # evaluate parameter
 #
+readonly SCALA_VERSION_REGEX="^--scala-version=[0-9]{1,2}\\.[0-9]{1,2}\\.[0-9]{1,2}$"
+readonly SHAMIR_VERSION_REGEX="^--shamir-version=[0-9]{1,2}\\.[0-9]{1,2}\\.[0-9]{1,2}$"
 ARGS=$*
 for ARG in ${ARGS}
 do
+  echo ARG=${ARG}
   if [[ "${ARG}" == "all" ]]
   then
     readonly MAKE_ALL=ON
@@ -28,9 +31,29 @@ do
   then
     readonly CLEAN_UP=ON
   fi
+  if [[ "${ARG}" =~ ${SCALA_VERSION_REGEX} ]]
+  then
+    readonly SCALA_VERSION=${ARG:16}
+    export SCALA_VERSION
+  fi
+  if [[ "${ARG}" =~ ${SHAMIR_VERSION_REGEX} ]]
+  then
+    readonly SHAMIR_VERSION=${ARG:17}
+    export SHAMIR_VERSION
+  fi
 done
 echo MAKE_ALL=${MAKE_ALL}
 echo CLEAN_UP=${CLEAN_UP}
+if [[ -z "${SCALA_VERSION}" ]]
+then
+  SCALA_VERSION=3.8.3
+fi
+echo SCALA_VERSION=${SCALA_VERSION}
+if [[ -z "${SHAMIR_VERSION}" ]]
+then
+  SHAMIR_VERSION=1.4.0
+fi
+echo SHAMIR_VERSION=${SHAMIR_VERSION}
 echo
 
 #
