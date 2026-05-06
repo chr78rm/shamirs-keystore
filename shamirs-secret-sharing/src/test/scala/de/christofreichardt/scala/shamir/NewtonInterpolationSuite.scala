@@ -184,4 +184,35 @@ class NewtonInterpolationSuite extends MyFunSuite {
     assert(ps.forall(p => coDomain.contains(p)))
     assert(coDomain.forall(p => p._2 == polynomial.evaluateAt(p._1)))
   }
+
+  /*
+   * Next, we define a certain secret sharing scheme given SHARES, THRESHOLD and SECRET. We use the minimal required number of shares to compute
+   * the corresponding Newton polynomial and assert that the given SECRET has been recovered. Additionally we select a sample of random x values
+   * to compute the corresponding points by using both the canonical and the Newton polynomials. Finally we assert that those point sequences are equal.
+   */
+  testWithTracing(this, "Interpolation-3") {
+    val tracer = getCurrentTracer()
+    val SHARES = 12
+    val THRESHOLD = 4
+    val SECRET = "g8IGleOjiSpBx8TYpMo71GB0c"
+    val secretSharing = SecretSharing(SHARES, THRESHOLD, SECRET)
+    tracer.out().printfIndentln("secretSharing = %s", secretSharing)
+    val minimumSharePoints = secretSharing.sharePoints.take(THRESHOLD)
+    val secretMerging = SecretMerging(minimumSharePoints, secretSharing.prime)
+    tracer.out().printfIndentln("secretMerging.password = %s", new String(secretMerging.password))
+    assert(SECRET == new String(secretMerging.password))
+    val SAMPLES = 5000
+    val randomGenerator = RandomGenerator()
+    val randomXs = randomGenerator.bigIntStream(secretSharing.s.bitLength * 2, secretSharing.prime)
+      .take(SAMPLES)
+      .toIndexedSeq
+//    tracer.out().printfIndentln("randomXs = %s", randomXs.mkString("(", ",", ")"))
+    val pointsFromCanonical = randomXs
+      .map(x => (x, secretSharing.polynomial.evaluateAt(x)))
+//    tracer.out().printfIndentln("pointsFromCanonical = %s", pointsFromCanonical.mkString("(", ",", ")"))
+    val pointsFromNewton = randomXs
+      .map(x => (x, secretMerging.interpolation.newtonPolynomial.evaluateAt(x)))
+//    tracer.out().printfIndentln("   pointsFromNewton = %s", pointsFromNewton.mkString("(", ",", ")"))
+    assert(pointsFromCanonical == pointsFromNewton)
+  }
 }
