@@ -71,7 +71,7 @@
   <body style="background-color: rgb(255,255,255)">
     <div class="main">
       <p style="color: rgb(26,26,26); font-family: serif; font-style: italic; text-align: right; border-bottom-style: solid; border-bottom-width: 1px; 
-         border-bottom-color: rgb(26,26,26)">Last updated: 2025-November-05</p>
+         border-bottom-color: rgb(26,26,26)">Last updated: 2026-June-09</p>
       <div class="drop-down-button">
         <img class="menu" src="menu-widget.png" alt="menu"/>
         <div class="drop-down-content">
@@ -100,10 +100,10 @@
       <p id="1" class="headline-0">Shamir's Keystore</p>
       <p id="2" class="headline-1">Abstract</p>
       <p class="section">
-        This <a href="https://docs.oracle.com/en/java/javase/21/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190">JCA provider</a> presently implements
+        This <a href="https://docs.oracle.com/en/java/javase/25/security/java-cryptography-architecture-jca-reference-guide.html">JCA provider</a> presently implements
         <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a> using
-        Newton Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
-        as defined by the <a href="https://docs.oracle.com/en/java/javase/21/security/howtoimplaprovider.html#GUID-C485394F-08C9-4D35-A245-1B82CDDBC031">Java Cryptographic Architecture</a> is provided. Such a keystore instance might
+        Newton Polynomials. Building on this, a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/security/KeyStore.html">KeyStore</a> Engine
+        as defined by the <a href="https://docs.oracle.com/en/java/javase/25/security/howtoimplaprovider.html">Java Cryptographic Architecture</a> is provided. Such a keystore instance might
         be unlocked - apart from the master password - by certain subsets of previously computed secret shares. In order to be able to reconstruct the master password a specific number of secret shares 
         equal to (or above) a given threshold must be combined. Shamirs scheme is information-theoretically secure. This means that an attacker does not get any additional information about the original master 
         password with fewer shares as defined by the given threshold. In this way, it is possible to enforce e.g. the four-eye-principle. The provided keystore implementation
@@ -123,7 +123,7 @@
         </p>
       </div>
       <p class="section">
-        <a href="https://maven.apache.org/">Maven</a> and a JDK 11+ are required for the build of the multi-module project:
+        <a href="https://maven.apache.org/">Maven</a> and a JDK 17+ are required for the build of the multi-module project:
       </p>
       <div class="code">
         <p class="code">
@@ -144,6 +144,29 @@
       <p class="section">
           The project uses <a href="https://junit.org/junit5/">JUnit 5</a> together with <a href="https://assertj.github.io/doc/">AssertJ</a> or rather 
           <a href="https://www.scalatest.org/">ScalaTest</a> for unit testing.
+      </p>
+      <table style="margin-top: 0rem">
+        <tbody>
+          <tr>
+            <td><img style="width: 2rem; float: left; margin-right: 1em; display: grid" src="./101.png" alt="CAUTION"/></td>
+            <td>
+              <p class="section">
+                When using a JDK24+ for the build you will get some warnings regarding calls of terminally deprecated methods in <span class="code">sun.misc.Unsafe</span> by the libraries
+                zero-allocation-hashing-0.16 and scala-library-3.8.3. The latter one is somewhat confusing since it was supposed to be fixed since Scala 3.8.0. This is probably due to tooling(s)
+                compiled against "unsafe" Versions of Scala 3. Scala 3 guarantees backwards compatibility across minor releases, that is libraries compiled against e.g. version 3.3.7 can be used in
+                projects compiled against Scala 3.8.3. (A similar cross compilation and linking between minor versions wasn't possible in Scala 2.) For additional background information, see e.g. 
+                <a href="https://github.com/scala/scala3/issues/25508">REPL still prints LazyVal warnings</a> regarding a similar issue within the Scala command-line interpreter. According to my current 
+                understanding, the offending tools are <a href="https://github.com/sbt/zinc">zinc</a> leveraged by the <a href="https://github.com/davidB/scala-maven-plugin">scala-maven-plugin</a> 
+                and <a href="https://github.com/scalatest/scalatest">scalatest</a> or rather the <a href="https://github.com/scalatest/scalatest-maven-plugin">scalatest-maven-plugin</a>.
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="section">
+        I have added an alternative and minimal build tool based on bash scripts and the maven dependency plugin to minimize the exposure against these tools and thus mitigate the risk. 
+        The alternative build tool is leveraged by a corresponding maven build profile. This eliminates the warnings due to zinc. The warnings due to scalatest remain. 
+        Interestingly some of those warnings show up during the compilation(!) of the test sources, possibly because of the compile time evaluation of some scalatest code.
       </p>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -428,6 +451,16 @@
               <a href="shamirs-demo-1.3.3.zip.sha512.txt">shamirs-demo-1.3.3.zip.sha512</a>
             </td>
           </tr>
+          <tr style="">
+            <td class="cell" style="width: 15%">shamirs-demo-1.4.0</td>
+            <td class="cell">
+              <a href="https://www.dropbox.com/scl/fi/53t8bcfe1rpgkmyxmsdtx/shamirs-demo-1.4.0.zip?rlkey=hniy00elq3gay2myejuyijpch&st=0ecbohp8&dl=1">shamirs-demo-1.4.0.zip</a>
+            </td>
+            <td class="cell">2026-05-21 16:31:27.188 +0200</td>
+            <td class="cell">
+              <a href="shamirs-demo-1.4.0.zip.sha512.txt">shamirs-demo-1.4.0.zip.sha512</a>
+            </td>
+          </tr>
         </tbody>
       </table>
       <p class="section">
@@ -443,7 +476,7 @@
         <p class="code" style="white-space: pre">&lt;dependency&gt;
     &lt;groupId&gt;de.christofreichardt&lt;/groupId&gt;
     &lt;artifactId&gt;shamirs-keystore&lt;/artifactId&gt;
-    &lt;version&gt;1.3.1&lt;/version&gt;
+    &lt;version&gt;1.4.0&lt;/version&gt;
 &lt;/dependency&gt;</p>
       </div>
       <p class="section">
@@ -453,7 +486,7 @@
         <p class="code" style="white-space: pre">&lt;dependency&gt;
     &lt;groupId&gt;org.eclipse.parsson&lt;/groupId&gt;
     &lt;artifactId&gt;jakarta.json&lt;/artifactId&gt;
-    &lt;version&gt;1.1.5&lt;/version&gt;
+    &lt;version&gt;1.1.7&lt;/version&gt;
     &lt;scope&gt;runtime&lt;/scope&gt;
 &lt;/dependency&gt;</p>
       </div>
@@ -489,15 +522,8 @@
           </tr>
           <tr style="">
             <td class="cell" style="width: 15%">org.scala-lang</td>
-            <td class="cell" style="width: 15%">scala3-library_3</td>
-            <td class="cell" style="width: 15%">3.3.3</td>
-            <td class="cell" style="width: 15%">compile</td>
-            <td class="cell" style="width: 40%">Apache License, Version 2.0</td>
-          </tr>
-          <tr style="">
-            <td class="cell" style="width: 15%">org.scala-lang</td>
             <td class="cell" style="width: 15%">scala-library</td>
-            <td class="cell" style="width: 15%">2.13.12</td>
+            <td class="cell" style="width: 15%">3.8.3</td>
             <td class="cell" style="width: 15%">compile</td>
             <td class="cell" style="width: 40%">Apache License, Version 2.0</td>
           </tr>
@@ -511,7 +537,7 @@
           <tr style="">
             <td class="cell" style="width: 15%">org.eclipse.parsson</td>
             <td class="cell" style="width: 15%">jakarta.json</td>
-            <td class="cell" style="width: 15%">1.1.5</td>
+            <td class="cell" style="width: 15%">1.1.7</td>
             <td class="cell" style="width: 15%">provided</td>
             <td class="cell" style="width: 40%">GNU General Public License Version 2 with Classpath Exception,<br/>Eclipse Public License 2.0</td>
           </tr>
@@ -533,7 +559,7 @@
           <tr style="">
             <td class="cell" style="width: 15%">org.bouncycastle</td>
             <td class="cell" style="width: 15%">bcpkix-jdk18on</td>
-            <td class="cell" style="width: 15%">1.82</td>
+            <td class="cell" style="width: 15%">1.84</td>
             <td class="cell" style="width: 15%">compile</td>
             <td class="cell" style="width: 40%">MIT License</td>
           </tr>
@@ -545,15 +571,17 @@
       <p id="9" class="headline-1">7. User Manual</p>
       <p id="14" class="section" style="font-family: sans-serif; padding-left: 2rem; font-weight: bold">7.1 Demo App</p>
       <p class="section">
-        <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. A JDK 11+ is needed for the execution of the app. I am using the
+        <a href="#8">Download</a> the demo app and unzip the archive into a directory of your choice. Starting with Version 1.4.0 you will need a JDK 17+ for the execution of the app. 
+        I am using the
         <a href="https://git-scm.com/download/win">Git Bash</a> for this manual but the default command line interpreter of Windows 
         (<a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd">cmd</a>) works as well. Of course you can use the 
-        <a href="https://www.gnu.org/software/bash/">GNU Bash</a> on Linux systems too. I have tested the distribution with the Git Bash (2.51.2) on Windows 11, with Windows Cmd on Windows 11 and with
-        the GNU Bash on Ubuntu 24.04.3 LTS (Noble Numbat) by randomly using a JDK 11, JDK 17, JDK 21 or JDK 25. I'm using the latest
+        <a href="https://www.gnu.org/software/bash/">GNU Bash</a> on Linux systems too. I have tested the distribution with the Git Bash (2.54.0) on Windows 11, with Windows Cmd on Windows 11 and with
+        the GNU Bash on Ubuntu 24.04.4 LTS (Noble Numbat) by randomly using a JDK 17, JDK 21 or JDK 25. I'm using the latest
         <a href="https://www.azul.com/downloads/?package=jdk#download-openjdk">Azul Zulu Builds of OpenJDK</a> for the LTS releases.
       </p>
       <p class="section">
-        After unzipping the distribution exhibits the following structure:
+          I have moved away from creating an uber-jar by shading. Instead the required (third-party) libraries are now separately packaged. Therefore, after unzipping the distribution exhibits the 
+          following structure:
       </p>
       <div class="code">
         <p class="code" style="white-space: pre">shamirs-demo/
@@ -577,7 +605,18 @@
 │                   └── jca
 │                       └── trace-config.xml
 ├── target
-│   └── shamirs-demo-1.3.3.jar
+│   ├── lib
+│   │   ├── bcpkix-jdk18on-1.84.jar
+│   │   ├── bcprov-jdk18on-1.84.jar
+│   │   ├── bcutil-jdk18on-1.84.jar
+│   │   ├── jakarta.json-1.1.7.jar
+│   │   ├── jakarta.json-api-2.1.3.jar
+│   │   ├── scala-library-3.8.3.jar
+│   │   ├── scala3-library_3-3.8.3.jar
+│   │   ├── shamirs-keystore-1.4.0.jar
+│   │   ├── shamirs-secret-sharing-1.4.0.jar
+│   │   └── tracelogger-1.10.0.jar
+│   └── shamirs-demo-1.4.0.jar
 ├── workspace
 │   └── my-workspace-0
 │       ├── donalds-keys.p12
@@ -605,15 +644,15 @@
                 Console API, see <a href="https://www.oracle.com/java/technologies/javase/22-relnote-issues.html#JDK-8308591">JLine As The Default Console Provider</a>. Initially, this change caused 
                 some problems especially with the bulk read operations when using the associated <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Reader.html">Reader</a> of
                 the Console, see <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Console.html#reader()">Console#reader()</a>. As of JDK 25 those operations seem to
-                work properly again - I haven't checked JDK 24, though. Therefore the included launch scripts of version 1.3.3 (see table below) are now setting up JLine as Console provider,
-                contrary to the previous version 1.3.2. If needed, the older behaviour can be restored by passing the argument <span style="font-style: italic">--base</span> to the launch scripts.
+                work properly again - I haven't checked JDK 24, though. Therefore the included launch scripts starting with version 1.3.3 (see table below) are now setting up JLine as Console provider. 
+                If needed, the older behaviour can be restored by passing the argument <span style="font-style: italic">--base</span> to the launch scripts.
               </p>
               <p class="section">
-                  However, when using JDK 24+ you will get a warning that a terminally deprecated method in <span class="code">sun.misc.Unsafe</span> has been called by the Scala runtime.
-                  Similar warnings are currently being raised when using the latest Maven 3.9.11 (and a bunch of other libraries) in conjunction with JDK 24+, see e.g. 
-                  <a href="https://github.com/apache/maven/issues/10174">[MNG-8455] WARNING deprecated method in sun.misc.Unsafe has been called</a>. A fix has been announced for Scala 3.8.0, see
-                  <a href="https://github.com/scala/scala3/issues/9013">Runtime code implementing lazy val should not use sun.misc.Unsafe on Java 9+</a>. 
-                  Not sure about the Scala 3.3.x LTS releases which have been used by the 1.3.x series of this Demo App.
+                  I am no longer seeing the now infamous <a href="https://github.com/scala/scala3/issues/9013">warnings</a> about calling terminally deprecated methods in 
+                  <span class="code">sun.misc.Unsafe</span> when executing the demo by using a JDK 24+. This had previously been an issue with the <span class="code">lazy val</span> definitions 
+                  employed by the library. Therefore you don't need disabling the warning by applying the <span style="font-style: italic">--sun-misc-unsafe</span> option, see below, and the 1.4.0 
+                  version of the library is probably safe to use even when the plug is finally pulled by the OpenJDK team sometime in the future. But unfortunately the issue hasn't been completely 
+                  solved, see my remarks concerning the <a href="#3">build</a>.
               </p>
             </td>
           </tr>
@@ -651,53 +690,53 @@
       <p class="section">
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd shamirs-demo/
+        <p class="code" style="white-space: pre">$ cd shamirs-demo
 $ ls
 LICENCE.txt  log/  NOTICE.txt  run-shamirs-demo.bat  run-shamirs-demo.sh*  src/  target/  winpty-shamirs-demo.sh*  workspace/
-$ $ java -version
-openjdk version "25.0.1" 2025-10-21
-OpenJDK Runtime Environment (build 25.0.1+8-27)
-OpenJDK 64-Bit Server VM (build 25.0.1+8-27, mixed mode, sharing)
-$ ./run-shamirs-demo.sh --sun-misc-unsafe
+$ java -version
+openjdk version "26.0.1" 2026-04-21
+OpenJDK Runtime Environment (build 26.0.1+8-34)
+OpenJDK 64-Bit Server VM (build 26.0.1+8-34, mixed mode, sharing)
+$ ./run-shamirs-demo.sh
 ...
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2025-10-31T17:51:40.7221291
-   Workspace: 2025-10-31
+Current time: 2026-05-28T17:07:26.0359069
+   Workspace: 2026-05-28
 
-2025-10-31-> Main menu
+2026-05-28-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2025-10-31-></p>
+2026-05-28-></p>
       </div>
       <p class="section">
-        The string <span class="code">2025-10-31</span> left from the arrow denotes the current date and workspace. You automatically get a new one on every day you are using
+        The string <span class="code">2026-05-28</span> left from the arrow denotes the current date and workspace. You automatically get a new one on every day you are using
         the app. The provided commands are invoked by their given shortcuts. Since this newly created workspace is empty we begin with splitting
         a password:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> s
-2025-10-31-> split password
-2025-10-31-> Password ([A-Za-z0-9-]{8,45}) [GvE6XYOqWkYrCfNsEjstxkZr3]:
-2025-10-31-> Number of shares ([0-9]+): 12
-2025-10-31-> Threshold ([0-9]+): 4
-2025-10-31-> Name of partition ([A-Za-z]{1,10}): demo
-2025-10-31-> Number of slices ([0-9]+): 7
-2025-10-31-> Size[i=0, sum=0] ([0-9]+): 4
-2025-10-31-> Size[i=1, sum=4] ([0-9]+): 2
-2025-10-31-> Size[i=2, sum=6] ([0-9]+): 2
-2025-10-31-> Size[i=3, sum=8] ([0-9]+): 1
-2025-10-31-> Size[i=4, sum=9] ([0-9]+): 1
-2025-10-31-> Size[i=5, sum=10] ([0-9]+): 1
-2025-10-31-> Size[i=6, sum=11] ([0-9]+): 1
-2025-10-31-> Certification method (All|Slices|None) [None]: All
+        <p class="code" style="white-space: pre">2026-05-28-> s
+2026-05-28-> split password
+2026-05-28-> Password ([A-Za-z0-9-]{8,45}) [4Mzy4EIqijzUTZyg1z2P7SmyH]:
+2026-05-28-> Number of shares ([0-9]+): 12
+2026-05-28-> Threshold ([0-9]+): 4
+2026-05-28-> Name of partition ([A-Za-z]{1,10}): demo
+2026-05-28-> Number of slices ([0-9]+): 7
+2026-05-28-> Size[i=0, sum=0] ([0-9]+): 4
+2026-05-28-> Size[i=1, sum=4] ([0-9]+): 2
+2026-05-28-> Size[i=2, sum=6] ([0-9]+): 2
+2026-05-28-> Size[i=3, sum=8] ([0-9]+): 1
+2026-05-28-> Size[i=4, sum=9] ([0-9]+): 1
+2026-05-28-> Size[i=5, sum=10] ([0-9]+): 1
+2026-05-28-> Size[i=6, sum=11] ([0-9]+): 1
+2026-05-28-> Certification method (All|Slices|None) [None]: All
 -------------------------------------------------------------
-certificationResult = (298 falsified, 495 verified)</p>
+certificationResult = CertificationResult[falsified=298, verified=495]</p>
       </div>
       <p class="section">
         The app will make a password proposal (seen within the square brackets). Every user provided input will be matched against the regular expressions 
@@ -719,7 +758,7 @@ certificationResult = (298 falsified, 495 verified)</p>
           Now, open another console and review the content of the your workspace directory (workspace/yyyy-MM-dd):
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ ls workspace/2025-10-31/
+        <p class="code" style="white-space: pre">$ ls workspace/2026-05-28/
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json</p>
       </div>
       <p class="section">
@@ -731,21 +770,21 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         <span class="code">(li)st workspace</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> li
-2025-10-31-> list workspace
-2025-10-31-> Partitions: [demo]
-2025-10-31-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2025-10-31-> Keystores: []</p>
+        <p class="code" style="white-space: pre">2026-05-28-> li
+2026-05-28-> list workspace
+2026-05-28-> Partitions: [demo]
+2026-05-28-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2026-05-28-> Keystores: []</p>
       </div>
       <p class="section">
         We have already seen that. Now lets recover the original password by combining the slices <span class="code">demo-1.json</span>,
         <span class="code">demo-3.json</span> and <span class="code">demo-6.json</span>:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> m
-2025-10-31-> merge password
-2025-10-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
-2025-10-31-> password = GvE6XYOqWkYrCfNsEjstxkZr3</p>
+        <p class="code" style="white-space: pre">2026-05-28-> m
+2026-05-28-> merge password
+2026-05-28-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-3.json, demo-6.json
+2026-05-28-> password = 4Mzy4EIqijzUTZyg1z2P7SmyH</p>
       </div>
       <p class="section">
         As expected. Merging works, inter alia, by providing a list of <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Path.html">Path</a>s 
@@ -758,30 +797,30 @@ demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo
         Now, let's create a keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> Main menu
+        <p class="code" style="white-space: pre">2026-05-28-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2025-10-31-> c
-2025-10-31-> create keystore
-2025-10-31-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
-2025-10-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
+2026-05-28-> c
+2026-05-28-> create keystore
+2026-05-28-> Keystore name ([A-Za-z-]{1,20}): donalds-keys
+2026-05-28-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-3.json, demo-4.json, demo-5.json, demo-6.json
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2025-10-31T18:06:45.9779115
-   Workspace: 2025-10-31
+Current time: 2026-05-28T17:23:08.5051034
+   Workspace: 2026-05-28
 
-2025-10-31-> KeyStore menu [donalds-keys]
+2026-05-28-> KeyStore menu [donalds-keys]
 
          (l)ist entries          (p)rivate key           (s)ecret key
           (c)ertificate            (m)ain menu
 
-2025-10-31-></p>
+2026-05-28-></p>
       </div>
       <p class="section">
         We used four of the slices containing a single share to produce the credentials for the keystore. The demo app switched to a submenu regarding
@@ -794,15 +833,15 @@ Current time: 2025-10-31T18:06:45.9779115
         be the result from a PKCS10 certificate request too.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> p
-2025-10-31-> private key
-2025-10-31-> Keygenerator algorithm (DSA|RSA|EC): EC
-2025-10-31-> Validity ([0-9]+): 100
-2025-10-31-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
-2025-10-31-> Locality ([A-Za-z- ]{5,30}): Entenhausen
-2025-10-31-> State ([A-Za-z- ]{5,30}): Bayern
-2025-10-31-> Country ([A-Za-z- ]{5,30}): Deutschland
-2025-10-31-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
+        <p class="code" style="white-space: pre">2026-05-28-> p
+2026-05-28-> private key
+2026-05-28-> Keygenerator algorithm (DSA|RSA|EC): EC
+2026-05-28-> Validity ([0-9]+): 100
+2026-05-28-> Common Name ([A-Za-z- ]{5,30}): Donald Duck
+2026-05-28-> Locality ([A-Za-z- ]{5,30}): Entenhausen
+2026-05-28-> State ([A-Za-z- ]{5,30}): Bayern
+2026-05-28-> Country ([A-Za-z- ]{5,30}): Deutschland
+2026-05-28-> Alias ([a-z0-9-]{5,25}): donalds-private-ec-key</p>
       </div>
       <p class="section">
         We specified Elliptic Curve (EC) as <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/security/KeyPairGenerator.html">KeyPairGenerator</a> 
@@ -813,50 +852,50 @@ Current time: 2025-10-31T18:06:45.9779115
         Now, list the entries so far:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> l
-2025-10-31-> list entries
-2025-10-31-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:36:31:39:33:30:36:37:35:36:33:39, algorithm=EC, keytype=Private Ke</p>
+        <p class="code" style="white-space: pre">2026-05-28-> l
+2026-05-28-> list entries
+2026-05-28-> donalds-private-ec-key: friendlyName=donalds-private-ec-key, localId=54:69:6d:65:20:31:37:37:39:39:38:32:30:30:37:31:33:38, algorithm=EC, keytype=Private Key</p>
       </div>
       <p class="section">
         Go back to main menu:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> m
-2025-10-31-> main menu
+        <p class="code" style="white-space: pre">2026-05-28-> m
+2026-05-28-> main menu
 
 +---------------+
 | Shamir's Demo |
 +---------------+
 
-Current time: 2025-10-31T18:13:28.9189151
-   Workspace: 2025-10-31
+Current time: 2026-05-28T17:28:44.0114178
+   Workspace: 2026-05-28
 
-2025-10-31-> Main menu
+2026-05-28-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2025-10-31-></p>
+2026-05-28-></p>
       </div>
       <p class="section">
         Now, list the workspace again:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> li
-2025-10-31-> list workspace
-2025-10-31-> Partitions: [demo]
-2025-10-31-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
-2025-10-31-> Keystores: [donalds-keys]</p>
+        <p class="code" style="white-space: pre">2026-05-28-> li
+2026-05-28-> list workspace
+2026-05-28-> Partitions: [demo]
+2026-05-28-> Slices(demo): [demo-0.json, demo-1.json, demo-2.json, demo-3.json, demo-4.json, demo-5.json, demo-6.json]
+2026-05-28-> Keystores: [donalds-keys]</p>
       </div>
       <p class="section">
         Again, merge some of the slices to recover the password of the keystore:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> m
-2025-10-31-> merge password
-2025-10-31-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
-2025-10-31-> password = GvE6XYOqWkYrCfNsEjstxkZr3</p>
+        <p class="code" style="white-space: pre">2026-05-28-> m
+2026-05-28-> merge password
+2026-05-28-> Slices (([A-Za-z]{1,10}-[0-9]+\.json(,( )*)?)+([A-Za-z]{1,10}-[0-9]+\.json)?): demo-1.json, demo-2.json
+2026-05-28-> password = 4Mzy4EIqijzUTZyg1z2P7SmyH</p>
       </div>
       <p class="section">
         Switch to a separate console since we want to investigate the keystore with 
@@ -864,34 +903,34 @@ Current time: 2025-10-31T18:13:28.9189151
         different.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">$ cd workspace/2025-10-31  # workspace/yyyy-MM-dd
+        <p class="code" style="white-space: pre">$ cd workspace/2026-05-28  # workspace/yyyy-MM-dd
 $ ls
 demo.json  demo-0.json  demo-1.json  demo-2.json  demo-3.json  demo-4.json  demo-5.json  demo-6.json  donalds-keys.p12
-$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass GvE6XYOqWkYrCfNsEjstxkZr3 -storetype pkcs12 -v
+$ keytool -J-Duser.language=en -list -keystore donalds-keys.p12 -storepass 4Mzy4EIqijzUTZyg1z2P7SmyH -storetype pkcs12 -v
 Keystore type: PKCS12
 Keystore provider: SUN
 
 Your keystore contains 1 entry
 
 Alias name: donalds-private-ec-key
-Creation date: 31 Oct 2025
+Creation date: 28 May 2026
 Entry type: PrivateKeyEntry
 Certificate chain length: 1
 Certificate[1]:
 Owner: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
 Issuer: C=Deutschland, ST=Bayern, L=Entenhausen, CN=Donald Duck
-Serial number: 19a3b408500
-Valid from: Fri Oct 31 18:11:15 CET 2025 until: Sun Feb 08 18:11:15 CET 2026
+Serial number: 19e6f31fa28
+Valid from: Thu May 28 17:26:46 CEST 2026 until: Sat Sep 05 17:26:46 CEST 2026
 Certificate fingerprints:
-         SHA1: 51:B6:06:34:79:2D:26:95:AF:A7:ED:13:B5:63:3A:C0:26:00:85:96
-         SHA256: 12:7D:47:21:3F:79:11:0E:DD:11:BC:83:04:6D:52:F9:FF:D7:98:06:4F:B1:94:7D:FC:C7:EA:64:50:98:A4:E8
+         SHA1: 1D:AF:4F:AA:98:0D:94:0D:E1:B8:F6:7D:1A:D5:E5:DF:86:FE:7F:4D
+         SHA256: AA:7F:C4:F0:96:47:4D:64:77:82:41:D4:63:77:C5:13:E9:EB:10:46:57:48:E8:C0:61:18:51:D1:77:C3:58:DC
 Signature algorithm name: SHA256withECDSA
 Subject Public Key Algorithm: 521-bit EC (secp521r1) key
 Version: 3
 
 
 *******************************************
-*******************************************</p>
+********************************************</p>
       </div>
       <p class="section">
         Note that we used the recovered password in combination with keytool. This will be the end of our little tour. There are other
@@ -899,14 +938,14 @@ Version: 3
         secret keys don't work since the underlying keystore implementation of the JDK doesn't recognize them.
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">2025-10-31-> Main menu
+        <p class="code" style="white-space: pre">2026-05-28-> Main menu
 
        (s)plit password       (m)erge password       (o)pen workspace
       (c)reate keystore        (lo)ad keystore       (li)st workspace
                  (e)xit
 
-2025-10-31-> e
-2025-10-31-> exit</p>
+2026-05-28-> e
+2026-05-28-> exit</p>
       </div>
       <p class="section">
         <a href="#1">[ToC]</a>
@@ -956,11 +995,11 @@ Version: 3
         On my system I'm getting the following output:
       </p>
       <div class="code">
-        <p class="code" style="white-space: pre">provider[SUN] = SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; PKCS12, JKS &amp; DKS keystores; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
+        <p class="code" style="white-space: pre">provider[SUN] = SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; PKCS12, JKS & DKS keystores; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
 provider[SunRsaSign] = Sun RSA signature provider
-provider[SunEC] = Sun Elliptic Curve provider (EC, ECDSA, ECDH)
+provider[SunEC] = Sun Elliptic Curve provider
 provider[SunJSSE] = Sun JSSE provider(PKCS12, SunX509/PKIX key/trust factories, SSLv3/TLSv1/TLSv1.1/TLSv1.2/TLSv1.3/DTLSv1.0/DTLSv1.2)
-provider[SunJCE] = SunJCE Provider (implements RSA, DES, Triple DES, AES, Blowfish, ARCFOUR, RC2, PBE, Diffie-Hellman, HMAC, ChaCha20)
+provider[SunJCE] = SunJCE Provider (implements RSA, DES, Triple DES, AES, Blowfish, ARCFOUR, RC2, PBE, Diffie-Hellman, HMAC, ChaCha20, DHKEM, ML-KEM, and HKDF)
 provider[SunJGSS] = Sun (Kerberos v5, SPNEGO)
 provider[SunSASL] = Sun SASL provider(implements client mechanisms for: DIGEST-MD5, EXTERNAL, PLAIN, CRAM-MD5, NTLM; server mechanisms for: DIGEST-MD5, CRAM-MD5, NTLM)
 provider[XMLDSig] = XMLDSig (DOM XMLSignatureFactory; DOM KeyInfoFactory; C14N 1.0, C14N 1.1, Exclusive C14N, Base64, Enveloped, XPath, XPath2, XSLT TransformServices)
