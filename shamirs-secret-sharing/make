@@ -44,16 +44,6 @@ do
 done
 echo MAKE_ALL=${MAKE_ALL}
 echo CLEAN_UP=${CLEAN_UP}
-if [[ -z "${SCALA_VERSION}" ]]
-then
-  SCALA_VERSION=3.8.3
-fi
-echo SCALA_VERSION=${SCALA_VERSION}
-if [[ -z "${SHAMIR_VERSION}" ]]
-then
-  SHAMIR_VERSION=1.4.0
-fi
-echo SHAMIR_VERSION=${SHAMIR_VERSION}
 echo
 
 #

@@ -10,6 +10,19 @@ readonly SCRIPT_DIR=$(dirname $(realpath $0))
 readonly PROJECT_DIR=$(dirname ${SCRIPT_DIR})
 
 #
+# Defaults
+#
+if [[ -z "${SCALA_VERSION}" ]]
+then
+  readonly SCALA_VERSION=3.8.3
+fi
+if [[ -z "${SHAMIR_VERSION}" ]]
+then
+  readonly SHAMIR_VERSION=1.4.0
+fi
+
+
+#
 # Constants
 #
 readonly SCALA_MAVEN_REPO=https://repo1.maven.org/maven2/org/scala-lang
