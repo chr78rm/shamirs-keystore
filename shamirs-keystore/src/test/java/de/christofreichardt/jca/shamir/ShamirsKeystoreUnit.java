@@ -583,7 +583,7 @@ public class ShamirsKeystoreUnit implements Traceable {
                         keyPair.getPrivate().getAlgorithm(), keyPair.getPrivate().getEncoded().length);
 
                 final int DAYS = 365;
-                final String COMMON_NAME = "CN=Christof Reichardt", LOCALITY = "L=Rodgau", STATE = "ST=Hessen", COUNTRY = "C=Deutschland";
+                final String COMMON_NAME = "CN=Christof Reichardt", LOCALITY = "L=Rodgau", STATE = "ST=Hessen", COUNTRY = "C=DE";
                 final String SIGNATURE_ALGO = "SHA256withRSA", DISTINGUISHED_NAME = COMMON_NAME + ", " + LOCALITY + ", " + STATE + ", " + COUNTRY;
                 Instant now = Instant.now();
                 Date notBefore = Date.from(now);
