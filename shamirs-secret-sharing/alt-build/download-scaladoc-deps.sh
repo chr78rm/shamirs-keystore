@@ -35,6 +35,7 @@ if [[ ! -f "${SCALADOC_LIBS_DIR}/scaladoc_3-${SCALA_VERSION}.pom" ]]
 then
   echo scaladoc_3-${SCALA_VERSION}.pom is missing, downloading it ...
   curl --remote-name --output-dir ${SCALADOC_LIBS_DIR} ${SCALADOC_3_POM} && sha1sum ${SCALADOC_LIBS_DIR}/scaladoc_3-${SCALA_VERSION}.pom | grep ${SCALADOC_3_POM_CHECKSUM}
+  ./alt-build/override-scaladoc-deps.sh
 else
   echo scaladoc_3-${SCALA_VERSION}.pom already exists in destination.
 fi

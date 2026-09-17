@@ -111,6 +111,26 @@
 									<artifactId>scaladoc_3</artifactId>
 									<version>${scala.version}</version>
 								</dependency>
+								<dependency>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-annotations</artifactId>
+									<version>2.22</version>
+								</dependency>
+								<dependency>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-core</artifactId>
+									<version>2.22.2</version>
+								</dependency>
+								<dependency>
+									<groupId>com.fasterxml.jackson.core</groupId>
+									<artifactId>jackson-databind</artifactId>
+									<version>2.22.2</version>
+								</dependency>
+								<dependency>
+									<groupId>com.fasterxml.jackson.datatype</groupId>
+									<artifactId>jackson-datatype-jsr310</artifactId>
+									<version>2.22.2</version>
+								</dependency>
 							</dependencies>
 							<!--
                             <outputDirectory>apidocs</outputDirectory>
@@ -260,7 +280,7 @@
 						<version>3.6.3</version>
 						<executions>
 							<execution>
-								<!-- mvn -P dist exec:exec@dist -->
+								<!-- mvn -P alt-build exec:exec@make -->
 								<id>make</id>
 								<phase>package</phase>
 								<goals>

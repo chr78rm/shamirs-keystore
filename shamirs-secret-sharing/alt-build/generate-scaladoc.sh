@@ -55,7 +55,7 @@ dotty.tools.scaladoc.Main -d ./target/site/scaladocs \
 -doc-footer \
 "Copyright © 2017, 2026, Christof Reichardt - Paul-Ehrlich-Weg 1 - D-63110 Rodgau" \
 -doc-title \
-"shamirs-secret-sharing 1.4.0 API" \
+"shamirs-secret-sharing ${SHAMIR_VERSION} API" \
 ${SOURCES}
 
 ${JAR} --create --file=target/shamirs-secret-sharing-${SHAMIR_VERSION}-javadoc.jar -C ./target/site/scaladocs .

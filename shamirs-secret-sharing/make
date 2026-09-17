@@ -23,27 +23,68 @@ ARGS=$*
 for ARG in ${ARGS}
 do
   echo ARG=${ARG}
+
   if [[ "${ARG}" == "all" ]]
   then
     readonly MAKE_ALL=ON
   fi
+
   if [[ "${ARG}" == "clean" ]]
   then
     readonly CLEAN_UP=ON
   fi
+
+  if [[ "${ARG}" == "compile" ]]
+  then
+    if [[ -z "${MAKE_ALL}" ]]
+    then
+      readonly COMPILE=ON
+    fi
+  fi
+
+  if [[ "${ARG}" == "test-compile" ]]
+  then
+    if [[ -z "${MAKE_ALL}" ]]
+    then
+      readonly TEST_COMPILE=ON
+    fi
+  fi
+
+  if [[ "${ARG}" == "test" ]]
+  then
+    if [[ -z "${MAKE_ALL}" ]]
+    then
+      readonly TEST=ON
+    fi
+  fi
+
+  if [[ "${ARG}" == "scaladoc" ]]
+  then
+    if [[ -z "${MAKE_ALL}" ]]
+    then
+      readonly SCALADOC=ON
+    fi
+  fi
+
   if [[ "${ARG}" =~ ${SCALA_VERSION_REGEX} ]]
   then
     readonly SCALA_VERSION=${ARG:16}
     export SCALA_VERSION
   fi
+
   if [[ "${ARG}" =~ ${SHAMIR_VERSION_REGEX} ]]
   then
     readonly SHAMIR_VERSION=${ARG:17}
     export SHAMIR_VERSION
   fi
 done
+
 echo MAKE_ALL=${MAKE_ALL}
 echo CLEAN_UP=${CLEAN_UP}
+echo COMPILE=${COMPILE}
+echo TEST_COMPILE=${TEST_COMPILE}
+echo TEST=${TEST}
+echo SCALADOC=${SCALADOC}
 echo
 
 #
@@ -52,6 +93,40 @@ echo
 if [[ "${CLEAN_UP}" == "ON" ]]
 then
   ./alt-build/cleanup.sh
+fi
+
+#
+# Compiling
+#
+if [[ "${COMPILE}" == "ON" ]]
+then
+  ./alt-build/download-compiler-deps.sh
+  ./alt-build/compile.sh
+fi
+
+#
+# Test compiling
+#
+if [[ "${TEST_COMPILE}" == "ON" ]]
+then
+  ./alt-build/test-compile.sh
+fi
+
+#
+# Running tests
+#
+if [[ "${TEST}" == "ON" ]]
+then
+  ./alt-build/run-tests.sh
+fi
+
+#
+# Running tests
+#
+if [[ "${SCALADOC}" == "ON" ]]
+then
+  ./alt-build/download-scaladoc-deps.sh
+  ./alt-build/generate-scaladoc.sh
 fi
 
 #
